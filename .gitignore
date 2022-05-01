@@ -5,6 +5,8 @@
 
 BCT/*
 matrices data/*
+*.txt
+
 # User-specific files
 *.rsuser
 *.suo
