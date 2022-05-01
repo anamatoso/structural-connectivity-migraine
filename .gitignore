@@ -353,3 +353,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 fdt_network_matrix
+.DS_Store
