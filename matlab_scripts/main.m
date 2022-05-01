@@ -1,12 +1,8 @@
-%% Template Import data
-% connectome5k=importdata("connmatrix5000.csv");
-% figure()
-% imagesc(connectome5k)
-% title("MRTrix 5k deterministic")
-% colormap jet
-% colorbar
-% max(max(connectome5k))
+%% Load data
+connectomes=load_data('/Users/ana/Documents/Ana/universidade/Tese/Code/matrices data','*.csv'); 
+% size= 116 x 116 x n_people
 
+%% Import data
 connectome1k=importdata("__connmatrix1000.csv");
 connectome5k=importdata("__connmatrix5000.csv");
 connectome10k=importdata("__connmatrix10000.csv");
@@ -17,7 +13,7 @@ connectome1M=importdata("__connmatrix1000000.csv");
 connectome5M=importdata("__connmatrix5000000.csv");
 connectome10M=importdata("__connmatrix10000000.csv");
 %% Comparison of connectivity matrices mrtrix probablistic
-f=figure()
+f=figure();
 subplot(2,3,1)
 plotconmat("connmatrix5k.csv",5000,"5k probablistic")
 
@@ -41,7 +37,7 @@ sgtitle ("Comparison of matrices of mrtrix probablistic",'interpreter',...
 f.WindowState = 'maximized';
 
 %% Comparison of connectivity matrices mrtrix deterministic
-f=figure()
+f=figure();
 
 subplot(2,4,1)
 plotconmat("__connmatrix5000.csv",5000,"5k")
@@ -71,6 +67,7 @@ sgtitle ("Comparison of matrices of mrtrix deterministic",'interpreter',...
     'latex','FontUnits','points','FontWeight','demi','FontSize',18,'FontName','Times')
 
 f.WindowState = 'maximized';
+
 %% Evolution of certain ROIxROI connectivity
 f=figure();
 for j=1:10
@@ -100,6 +97,7 @@ end
 sgtitle('Connectivity Convergence','interpreter','latex','FontUnits','points',...
     'FontWeight','demi','FontSize',18,'FontName','Times')
 f.WindowState = 'maximized';
+
 %% FSL vs MRTrix (det) 5k
 
 connectomeFSL=normalize_roisize("fdt_network_matrix","roi_size.txt");
