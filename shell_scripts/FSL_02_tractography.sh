@@ -44,4 +44,9 @@ probtrackx2 --network -x $ROIS -l --onewaycondition --omatrix1 -c 0.2 -S $fiber_
  #probtrackx -s "basename" -m bet_mask -x gm_boundary --omatrix3 connmatrix --target3 mask_roi
  # probtrackx2 -x /home/amatoso/tese/data/sub-control019_ses-midcycle_altered/mrtrix_outputs_og/gmwmSeed_coreg_bin.nii.gz -l --onewaycondition --network --omatrix1 --omatrix3 --target3 /home/amatoso/tese/data/sub-control019_ses-midcycle/mrtrix_outputs/atlas.nii.gz -c 0.2 -S 250 --steplength=1 -P 5000 --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 --forcedir --opd -s /home/amatoso/tese/data/sub-control019_ses-midcycle_altered/bedpostdata.bedpostX/merged -m /home/amatoso/tese/data/sub-control019_ses-midcycle_altered/bedpostdata.bedpostX/nodif_brain_mask --dir=/home/amatoso/tese/data/sub-control019_ses-midcycle_altered/probtrackX_outputs5000 
 
+# change name of connectivity matrix
+cd $output_dir
+mv "${DIR}_fsl_matrix"
+
+# go back to data directory
 cd $MAINDIR
