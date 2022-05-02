@@ -16,7 +16,7 @@ display_usage() {
 	fi
 
 DIR=$1 #example name: sub-control019_ses-midcycle
-SUB=${place:0:14} # example name: sub-control019
+SUB=${DIR:0:14} # example name: sub-control019
 
 ########################### STEP 1 ###################################
 #             		  Prepare data and directories					 #
