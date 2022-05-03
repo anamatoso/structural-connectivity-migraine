@@ -1,6 +1,6 @@
 function [] = plotconmat(filename,nstreamlines,t)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% This function plots the connectivity matrix by firstly normalizing it
+% by the number of streamlines.
 
 if isfile("matrices data/"+filename)
     connectome=importdata(filename)./nstreamlines;

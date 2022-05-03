@@ -1,4 +1,7 @@
 function [connectomes] = load_data(folder,pattern)
+% This function load the data from a given folder which have a given
+% pattern
+
 F = folder;
 filePattern = fullfile(F, pattern); % Change to whatever pattern you need.
 theFiles = dir(filePattern);
