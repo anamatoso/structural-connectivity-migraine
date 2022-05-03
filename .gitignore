@@ -354,3 +354,4 @@ MigrationBackup/
 .ionide/
 fdt_network_matrix
 .DS_Store
+*.csv
