@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 # Have to be in data directory
 MAINDIR=$(pwd)
 display_usage() {
@@ -125,6 +125,6 @@ tcksift2 -act 5tt_coreg.mif -out_mu sift_mu.txt -out_coeffs sift_coeffs.txt trac
 ######################################################################
 
 #Creating the connectome 
-tck2connectome -symmetric -zero_diagonal -scale_invnodevol -tck_weights_in sift.txt tracks.tck atlas.mif "${DIR}_mrtrix_matrix.csv" -force
+tck2connectome -symmetric -zero_diagonal -scale_invnodevol -tck_weights_in sift.txt tracks.tck atlas.mif "${MAINDIR}/matrix_data/${DIR}_mrtrix_matrix.csv" -force
 
 cd $MAINDIR

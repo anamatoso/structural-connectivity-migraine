@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 # Have to be in data directory
 MAINDIR=$(pwd) #data
 display_usage() {

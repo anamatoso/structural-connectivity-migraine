@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 # Have to be in data directory
 MAINDIR=$(pwd)
 display_usage() {
@@ -38,15 +38,13 @@ fiber_len=250 		# length of fiber in mm
 step=1 				# step of each guess
 mask="${MAINDIR}/${SUBDIR}/bedpostdata.bedpostX/nodif_brain_mask"
 seed="${MAINDIR}/${SUBDIR}/bedpostdata.bedpostX/merged"
-output_dir="${MAINDIR}/${SUBDIR}/probtrackX_outputs"
+output_dir="${MAINDIR}/${SUBDIR}/probtrackX_outputs_gpu"
 
-probtrackx2 --network -x $ROIS -l --onewaycondition --omatrix1 -c 0.2 -S $fiber_len --steplength=$step -P $n_fibers --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 --forcedir --opd -s $seed -m $mask --dir=$output_dir
- #probtrackx -s "basename" -m bet_mask -x gm_boundary --omatrix3 connmatrix --target3 mask_roi
- # probtrackx2 -x /home/amatoso/tese/data/sub-control019_ses-midcycle_altered/mrtrix_outputs_og/gmwmSeed_coreg_bin.nii.gz -l --onewaycondition --network --omatrix1 --omatrix3 --target3 /home/amatoso/tese/data/sub-control019_ses-midcycle/mrtrix_outputs/atlas.nii.gz -c 0.2 -S 250 --steplength=1 -P 5000 --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 --forcedir --opd -s /home/amatoso/tese/data/sub-control019_ses-midcycle_altered/bedpostdata.bedpostX/merged -m /home/amatoso/tese/data/sub-control019_ses-midcycle_altered/bedpostdata.bedpostX/nodif_brain_mask --dir=/home/amatoso/tese/data/sub-control019_ses-midcycle_altered/probtrackX_outputs5000 
+probtrackx2_gpu --network -x $ROIS -l --onewaycondition --omatrix1 -c 0.2 -S $fiber_len --steplength=$step -P $n_fibers --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 --forcedir --opd -s $seed -m $mask --dir=$output_dir
 
 # change name of connectivity matrix
 cd $output_dir
-mv "${DIR}_fsl_matrix"
+mv fdt_network_matrix "${MAINDIR}/matrix_data/${DIR}_fsl_matrix"
 
 # go back to data directory
 cd $MAINDIR
