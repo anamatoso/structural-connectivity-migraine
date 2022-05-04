@@ -15,9 +15,10 @@ connectome1M=importdata("__connmatrix1000000.csv");
 connectome5M=importdata("__connmatrix5000000.csv");
 connectome10M=importdata("__connmatrix10000000.csv");
 
-%connectomecontrol20=importdata("sub-control020_ses-midcycle_mrtrix_matrix.csv");
-%plotconmat(connectomecontrol20,1e7,"title")
-
+connectomecontrol20=importdata("sub-control020_ses-midcycle_mrtrix_matrix.csv");
+plotconmat(connectomecontrol20,1e7,"title")
+%%
+g=randmio_und(connectome10M,200);
 
 %% Comparison of connectivity matrices mrtrix probablistic
 f=figure();
