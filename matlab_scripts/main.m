@@ -61,8 +61,3 @@ for i=1:length(metrics2analyse)
 %     end
     hold off
 end
-
-
-
-
-%%
