@@ -6,7 +6,7 @@ significance_mask=zeros(116,116);
 for i=1:116
    for j=1:116
       data=squeeze(a(i,j,:));
-      [~,h,~] = signtest(data,0);
+      [p,h,stats] = signtest(data,0);
       significance_mask(i,j)=h;
    end
 end
