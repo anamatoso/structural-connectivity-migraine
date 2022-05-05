@@ -32,32 +32,45 @@ for i=1:n_conditions
         connectomes{i}(:,:,p)=connectomes{i}(:,:,p).*significance_mask(:,:,i);
     end
 end
-% imagesc(significance_mask(i)); colormap jet
+% imagesc(significance_mask(:,:,i)); colormap jet
 clear i p
+%% Calculate metrics- load result of script below
+load("metrics.mat")
 %% Calculate metrics
 % 24s per person
 for i=1:n_conditions
     conmats=connectomes{i};
     for p=1:n_people(i)
         mat=conmats(:,:,p);                 % connectivity matrix
-        m(:,p)=calculate_metrics(mat);     
+        %m(:,p)=calculate_metrics(mat);
+        m2(:,p)=calculate_metrics_v2(mat);
     end
-    metrics{i}=m;
+    %metrics{i}=m;
+    metrics2{i}=m2;
 end
-clear i p mat conmats
+clear i p mat conmats m m2
 %% Analysis of results
-n_metrics=length(metrics{1});
-metrics2analyse=[117 118 119 583 584 585];
-for i=1:length(metrics2analyse)
-    m=metrics2analyse(i); %index of metric
-    figure
-    x = [metrics{1}(m,:) metrics{2}(m,:)];
+[n_metrics,~]=size(metrics2{1});
+metrics_labels=get_label_metrics();
+
+metrics_sign=[];
+for m=1:n_metrics
+    hc=metrics2{1}(m,:);hc=hc(~isnan(hc));
+    mig=metrics2{2}(m,:);mig=mig(~isnan(mig));
+    if (isequal(hc,zeros(1,length(hc))) && isequal(mig,zeros(1,length(mig)))) || isempty(hc) || isempty(mig)
+        continue
+    end
+    x = [hc mig];
     g = [zeros(1,n_people(1)),ones(1,n_people(2))];
-    boxplot(x,g,'Labels',{'HC','M'})
-     hold on
     
-%     if % difference is significative
-%         text(2.1,1.01*quantile(metrics{2}(m,:),0.75), '*','FontSize',14,'Color','red');
-%     end
-    hold off
+     if ttest2(hc,mig, 'Alpha', 0.05/4) || ttest2(hc,mig, 'Alpha', 0.05/4,'Tail','right') || ttest2(hc,mig, 'Alpha', 0.05/4,'Tail','left')
+%         figure
+%         boxplot(x,g,'Labels',{'HC','M'})
+%         hold on
+%         text(2.1,1.01*quantile(mig,0.75), '*','FontSize',14,'Color','red');
+%         hold off
+        metrics_sign=[metrics_sign m];
+    end
+    
 end
+disp(metrics_labels(metrics_sign))

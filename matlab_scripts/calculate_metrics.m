@@ -12,11 +12,11 @@ C=mean(Ci);                                                     % global cluster
 EC=eigenvector_centrality_und(mat)';                            % eigenvector centrality
 [Qi, Q] = modularity_und(mat);Qi=Qi';                           % modularity
 RC=rich_club_wu(mat);                                           % rich club coefficient
-%degree=strengths_und(mat);                                     % node strength
+degree=strengths_und(mat);                                     % node strength
 T=transitivity_wu(mat);                                         % transitivity
 S=smallworldness(mat);                                          %smallworldness
 
 % insert metrics in matrix
-metrics=[BC L GE C Ci EC Q Qi RC T S]';
+metrics=[BC L GE C Ci EC Q Qi degree RC T S]';
 end
 
