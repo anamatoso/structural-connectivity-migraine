@@ -359,3 +359,6 @@ fdt_network_matrix
 *.csv
 matlab_scripts/allpeople.mat
 *.nii
+BrainNetViewer/*
+*.eps
+matlab_scripts/matrix.edge
