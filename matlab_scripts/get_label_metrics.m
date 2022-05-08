@@ -24,6 +24,6 @@ for i=1:116
     end
 end
 
-metrics_labels=[BC "L" "GE" "C" Ci EC "Q" Qi D RC "T" "S"];
+metrics_labels=[BC "L" "GE" "C" Ci EC Qi "Q" RC D "T" "S"];
 end
 
