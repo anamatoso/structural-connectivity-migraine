@@ -36,7 +36,7 @@ end
 % imagesc(significance_mask(:,:,i)); colormap jet
 clear i p
 %% Calculate metrics- load result of script below
-load("metrics.mat")
+%load("metrics.mat")
 %% Calculate metrics
 % 24s per person
 for i=1:n_conditions
@@ -57,8 +57,8 @@ metrics_labels=get_label_metrics();
 metrics_sign=[];
 
 for m=1:n_metrics
-    hc=metrics{1}(m,:);hc=hc(~isnan(hc));
-    mig=metrics{2}(m,:);mig=mig(~isnan(mig));
+    hc=metrics{1}(m,:);
+    mig=metrics{2}(m,:);
     
     if (isequal(hc,zeros(1,length(hc))) && isequal(mig,zeros(1,length(mig)))) || isempty(hc) || isempty(mig)
         continue
@@ -66,7 +66,7 @@ for m=1:n_metrics
     x = [hc mig];
     g = [zeros(1,length(hc)),ones(1,length(mig))];
     
-    if ttest2(hc,mig)
+    if ttest2(hc,mig)==1
         metrics_sign=[metrics_sign m];
         
         %figure
@@ -78,8 +78,11 @@ for m=1:n_metrics
     
     
 end
-disp(metrics_labels(metrics_sign))
-%% Visualization of results
+node_labels = get_label_nodes("AAL116_labels.txt");
+label_metrics_sign=metrics_labels(metrics_sign);
+clear hc mig x g
+
+%% Visualization of results - Rich club
 
 metrics_mean=mean_met(metrics);
 
@@ -93,23 +96,44 @@ for i=1:n_conditions
         case 2
             color='r';
     end
-    for p=1:n_people(i)
-        plot(linspace(1,115,115),met(469:583,p),color)
-        title("Rich club coefficient curve")
-        xlabel("Degree")
-        ylabel("Rich club coefficient")
+    
+ 
+    %for p=1:n_people(i)
+    %   plot(linspace(1,115,115),met(469:583,p),color)
+    
+    % plot means
+    plot(linspace(1,115,115),mean(met(469:583,:),2),color)
+    title("Rich club coefficient curve")
+    xlabel("Degree")
+    ylabel("Rich club coefficient")
+    hold on
+    %end
+end
+% plot significance
+for m=469:583
+    hc=metrics{1}(m,:);
+    mig=metrics{2}(m,:);
+    
+    if (isequal(hc,zeros(1,length(hc))) && isequal(mig,zeros(1,length(mig)))) || isempty(hc) || isempty(mig)
+        continue
+    end
+    
+    if ttest2(hc,mig)==1
+        plot(m-468,1,"+k")
         hold on
     end
 end
+hold off
 
-% L, GE, C, Q , T, S
-idx=[117 118 119 468 700 701];
+
+%% Visualization of results - Plot General metrics L, GE, C, Q , T, S,A
+idx=[117 118 119 468 700 701 702];
 for i=1:length(idx)
     index=idx(i);
     figure;
     
-    hc=metrics{1}(index,:);hc=hc(~isnan(hc));
-    mig=metrics{2}(index,:);mig=mig(~isnan(mig));
+    hc=metrics{1}(index,:);
+    mig=metrics{2}(index,:);
     
     x = [hc mig];
     g = [zeros(1,length(hc)),ones(1,length(mig))];
@@ -117,10 +141,10 @@ for i=1:length(idx)
     boxplot(x,g,'Labels',{'HC','M'})
     title(metrics_labels(index))
     ylabel(metrics_labels(index))
-   
+    
     if ttest2(hc,mig)
         hold on
-        text(2.1,1.01*quantile(mig,0.75), '*','FontSize',25);
+        
         hold off
     end
 end
@@ -128,6 +152,30 @@ end
 
 
 
+clear i met p idx hc mig x g color
 
+%% Visualization of results - Degree
+figure;
+x=["HC M"];
+bar(metrics_mean(584:699,:)); hold on
+title("Node Strength")
+xlabel("Condition")
+ylabel("Strength")
 
+%plot significance
+for m=584:699
+    hc=metrics{1}(m,:);
+    mig=metrics{2}(m,:);
+    
+    if (isequal(hc,zeros(1,length(hc))) && isequal(mig,zeros(1,length(mig)))) || isempty(hc) || isempty(mig)
+        continue
+    end
+    
+    if ttest2(hc,mig)==1
+        text(m-583,max(mean(hc),mean(mig))+0.1, '*','FontSize',15);
+        
+        hold on
+    end
+end
+hold off
 
