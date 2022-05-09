@@ -15,8 +15,8 @@ RC=rich_club_wu_norm(mat,115);                                  % rich club coef
 degree=strengths_und(mat);                                      % node strength 584-699
 T=transitivity_wu(mat);                                         % transitivity 700
 S=smallworldness(mat);                                          % smallworldness 701
-
+A=assortativity_wei(mat,0);
 % insert metrics in matrix
-metrics=[BC L GE C Ci EC Qi Q RC degree T S]';
+metrics=[BC L GE C Ci EC Qi Q RC degree T S A]';
 end
 
