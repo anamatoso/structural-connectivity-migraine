@@ -3,11 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-BCT/*
+matlab_scripts/BCT/*
 matrices data/*
 *.txt
 *.mat
-NBS/*
+matlab_scripts/NBS/*
 
 # User-specific files
 *.rsuser
@@ -359,6 +359,6 @@ fdt_network_matrix
 *.csv
 matlab_scripts/allpeople.mat
 *.nii
-BrainNetViewer/*
+matlab_scripts/BrainNetViewer/*
 *.eps
 matlab_scripts/matrix.edge
