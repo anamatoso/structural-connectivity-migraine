@@ -61,32 +61,38 @@ clear i p mat conmats m m2
 [n_metrics,~]=size(metrics{1});
 metrics_labels=get_label_metrics();
 
-metrics_sign=[];
+metrics_intervsmid=[];
+metrics_icvspre=[];
 
 for m=1:n_metrics
-    hc=metrics{1}(m,:);
-    mig=metrics{2}(m,:);
-    
-    if (isequal(hc,zeros(1,length(hc))) && isequal(mig,zeros(1,length(mig)))) || isempty(hc) || isempty(mig)
+    hc_mid=metrics{1}(m,:);
+    mig_inter=metrics{2}(m,:);
+    hc_pre=metrics{3}(m,:);
+    mig_ic=metrics{4}(m,:);
+    if (isequal(hc_mid,zeros(1,length(hc_mid))) && isequal(mig_inter,zeros(1,length(mig_inter)))) || isempty(hc_mid) || isempty(mig_inter)
         continue
     end
-    x = [hc mig];
-    g = [zeros(1,length(hc)),ones(1,length(mig))];
+    x = [hc_mid mig_inter];
+    g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter))];
     
-    if ttest2(hc,mig)==1
-        metrics_sign=[metrics_sign m];
-        
-        %figure
-        %boxplot(x,g,'Labels',{'HC','M'})
-        %hold on
-        %text(2.1,1.01*quantile(mig,0.75), '*','FontSize',14,'Color','red');
-        %hold off
+    if ttest2(hc_mid,mig_inter)==1
+        metrics_intervsmid=[metrics_intervsmid m];
+    end   
+    
+    if (isequal(hc_pre,zeros(1,length(hc_pre))) && isequal(mig_ic,zeros(1,length(mig_ic)))) || isempty(hc_pre) || isempty(mig_ic)
+        continue
     end
+    x = [hc_pre mig_ic];
+    g = [zeros(1,length(hc_pre)),ones(1,length(mig_ic))];
+    if ttest2(hc_pre,mig_ic)==1
+        metrics_intervsmid=[metrics_intervsmid m];
+    end   
+    
     
     
 end
 node_labels = get_label_nodes("AAL116_labels.txt");
-label_metrics_sign=metrics_labels(metrics_sign);
+label_metrics_sign=metrics_labels(metrics_intervsmid);
 clear hc mig x g
 
 %% Visualization of results - Rich club
@@ -117,14 +123,14 @@ end
 
 % plot significance
 for m=469:583
-    hc=metrics{1}(m,:);
-    mig=metrics{2}(m,:);
+    hc_mid=metrics{1}(m,:);
+    mig_inter=metrics{2}(m,:);
     
 %     if (isequal(hc,zeros(1,length(hc))) && isequal(mig,zeros(1,length(mig)))) || isempty(hc) || isempty(mig)
 %         continue
 %     end
     
-    if ttest2(hc,mig)==1
+    if ttest2(hc_mid,mig_inter)==1
         plot(m-468,1,"+k")
         hold on
     end
@@ -138,19 +144,19 @@ for i=1:length(idx)
     index=idx(i);
     figure;
     
-    hc=metrics{1}(index,:);
-    mig=metrics{2}(index,:);
+    hc_mid=metrics{1}(index,:);
+    mig_inter=metrics{2}(index,:);
     
-    x = [hc mig];
-    g = [zeros(1,length(hc)),ones(1,length(mig))];
+    x = [hc_mid mig_inter];
+    g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter))];
     
     boxplot(x,g,'Labels',{'HC','M'})
     title(metrics_labels(index))
     ylabel(metrics_labels(index))
     
-    if ttest2(hc,mig)==1
+    if ttest2(hc_mid,mig_inter)==1
         hold on
-        text(2.1,1.01*quantile(mig,0.75), '*','FontSize',15,'Color','black');
+        text(2.1,1.01*quantile(mig_inter,0.75), '*','FontSize',15,'Color','black');
     end
     hold off
 end
@@ -169,15 +175,15 @@ node=[];
 bar(metrics_mean(642:688,:)); hold on
 %plot significance
 for m=584:699
-    hc=metrics{1}(m,:);
-    mig=metrics{2}(m,:);
+    hc_mid=metrics{1}(m,:);
+    mig_inter=metrics{2}(m,:);
     
-    if (isequal(hc,zeros(1,length(hc))) && isequal(mig,zeros(1,length(mig)))) || isempty(hc) || isempty(mig)
+    if (isequal(hc_mid,zeros(1,length(hc_mid))) && isequal(mig_inter,zeros(1,length(mig_inter)))) || isempty(hc_mid) || isempty(mig_inter)
         continue
     end
     
-    if ttest2(hc,mig)==1
-        text(m-583,max(mean(hc),mean(mig))+0.1, '*','FontSize',15); hold on
+    if ttest2(hc_mid,mig_inter)==1
+        text(m-583,max(mean(hc_mid),mean(mig_inter))+0.1, '*','FontSize',15); hold on
         n_index=[n_index m];
         node=[node m-583];
     end
@@ -201,7 +207,8 @@ for i=1:length(idx)
     x = [hc_mid mig_inter hc_pre mig_ict];
     g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter)),2*ones(1,length(hc_pre)),3*ones(1,length(mig_ict))];
     
-    [p, tbl, stats] = anova1(x,g);
+    [p, tbl, stats] = anova1(x,g,'off');
+    figure;multcompare(stats)
     if p<0.05
         ms=[ms m];
     end
