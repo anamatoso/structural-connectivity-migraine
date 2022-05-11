@@ -2,22 +2,24 @@
 format long
 % directory where connectivity matrices are
 dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data';
+dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
+% FALTA NORMALIZAR PELO TAMANHO DOS ROIS NO FSL
 
 % Controls midcyle
-HC_midcycle_mrtrix=load_data(dir,'*midcycle*mrtrix*bval2.csv'); %116 x 116 x n_people
-%HC_midcycle_fsl=load_data(dir,'*midcycle*fsl*');
+HC_midcycle_mrtrix=load_data_mrtrix(dir,'*midcycle*mrtrix*bval2.csv'); %116 x 116 x n_people
+%HC_midcycle_fsl=load_data_fsl(dir,'*midcycle*fsl*',dir_roi);
 
 % Controls premenstrual
-HC_premenstrual_mrtrix=load_data(dir,'*premenstrual*mrtrix*bval2.csv'); %116 x 116 x n_people
-%HC_midcycle_fsl=load_data(dir,'*premenstrual*fsl*');
+HC_premenstrual_mrtrix=load_data_mrtrix(dir,'*premenstrual*mrtrix*bval2.csv'); %116 x 116 x n_people
+%HC_midcycle_fsl=load_data_fsl(dir,'*premenstrual*fsl*',dir_roi);
 
 % Patients interictal
-M_interictal_mrtrix=load_data(dir,'*interictal*mrtrix*bval2.csv');
-%M_interictal_fsl=load_data(dir,'*interictal*fsl*');
+M_interictal_mrtrix=load_data_mrtrix(dir,'*interictal*mrtrix*bval2.csv');
+%M_interictal_fsl=load_data_fsl(dir,'*interictal*fsl*',dir_roi);
 
 % Patients ictal
-M_ictal_mrtrix=load_data(dir,'*-ictal*mrtrix*bval2.csv');
-%M_ictal_fsl=load_data(dir,'*ictal*fsl*');
+M_ictal_mrtrix=load_data_mrtrix(dir,'*-ictal*mrtrix*bval2.csv');
+%M_ictal_fsl=load_data_fsl(dir,'*ictal*fsl*',dir_roi);
 
 % Note: they are not normalized by number of streamlines
 connectomes={HC_midcycle_mrtrix M_interictal_mrtrix HC_premenstrual_mrtrix M_ictal_mrtrix};
