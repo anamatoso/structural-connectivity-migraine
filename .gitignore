@@ -362,3 +362,4 @@ matlab_scripts/allpeople.mat
 matlab_scripts/BrainNetViewer/*
 *.eps
 matlab_scripts/matrix.edge
+matlab_scripts/matrix_data/*
