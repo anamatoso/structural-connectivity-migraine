@@ -3,7 +3,6 @@ format long
 % directory where connectivity matrices are
 dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data';
 dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
-% FALTA NORMALIZAR PELO TAMANHO DOS ROIS NO FSL
 
 % Controls midcyle
 HC_midcycle_mrtrix=load_data_mrtrix(dir,'*midcycle*mrtrix*bval2.csv'); %116 x 116 x n_people
@@ -33,7 +32,7 @@ for i=1:n_conditions
     n_people(i)=s(end);
 end
 
-clear dir s conmat i
+clear dir s conmat i dir_roi
 %% Test for spurious connections
 
 significance_mask=zeros(116,116,n_conditions);
@@ -76,10 +75,11 @@ for m=1:n_metrics
     end
     x = [hc_mid mig_inter];
     g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter))];
+   
     
     if ttest2(hc_mid,mig_inter)==1
         metrics_intervsmid=[metrics_intervsmid m];
-    end   
+    end
     
     if (isequal(hc_pre,zeros(1,length(hc_pre))) && isequal(mig_ic,zeros(1,length(mig_ic)))) || isempty(hc_pre) || isempty(mig_ic)
         continue
@@ -87,8 +87,8 @@ for m=1:n_metrics
     x = [hc_pre mig_ic];
     g = [zeros(1,length(hc_pre)),ones(1,length(mig_ic))];
     if ttest2(hc_pre,mig_ic)==1
-        metrics_intervsmid=[metrics_intervsmid m];
-    end   
+        metrics_icvspre=[metrics_icvspre m];
+    end
     
     
     
@@ -128,9 +128,9 @@ for m=469:583
     hc_mid=metrics{1}(m,:);
     mig_inter=metrics{2}(m,:);
     
-%     if (isequal(hc,zeros(1,length(hc))) && isequal(mig,zeros(1,length(mig)))) || isempty(hc) || isempty(mig)
-%         continue
-%     end
+    %     if (isequal(hc,zeros(1,length(hc))) && isequal(mig,zeros(1,length(mig)))) || isempty(hc) || isempty(mig)
+    %         continue
+    %     end
     
     if ttest2(hc_mid,mig_inter)==1
         plot(m-468,1,"+k")
@@ -197,24 +197,34 @@ hold off
 % legend('Location','best')
 
 %% Analysis of results - ANOVA - General metrics L, GE, C, Q, T, S,A
-ms=[];
-idx=[117 118 119 468 700 701 702];
-for i=1:length(idx)
-    m=idx(i);
+compare_anova=zeros(1,4);
+
+for m=1:n_metrics
     hc_mid=metrics{1}(m,:);
     mig_inter=metrics{2}(m,:);
     hc_pre=metrics{3}(m,:);
     mig_ict=metrics{4}(m,:);
-
-    x = [hc_mid mig_inter hc_pre mig_ict];
-    g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter)),2*ones(1,length(hc_pre)),3*ones(1,length(mig_ict))];
     
-    [p, tbl, stats] = anova1(x,g,'off');
-    figure;multcompare(stats)
-    if p<0.05
-        ms=[ms m];
+    x = [hc_mid mig_inter hc_pre mig_ict];
+    g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter)),2.*ones(1,length(hc_pre)),3.*ones(1,length(mig_ict))];
+    
+    if any(isnan(x))
+        continue
     end
     
+    [~, ~, stats] = anova1(x,g,'off');
+    c=multcompare(stats,'ctype','bonferroni','display','off');
+    
+    for idx_p=1:length(c(:,end))
+        if c(idx_p,end)<0.05
+            compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end)];
+        end
+    end
 end
-disp(metrics_labels(ms))
-clear i idx m hc_mid mig_inter hc_pre mig_ict x g p
+compare_anova=compare_anova(2:end,:);
+table=array2table(compare_anova, "VariableNames", ["Metric index","Group 1", "Group 2", "P-value"]);
+metrics_names=metrics_labels(compare_anova(:,1))';
+t_names=array2table(metrics_names, "VariableNames", ["Metric Name"]);
+ANOVA_results = [t_names table];
+clear m hc_mid mig_inter hc_pre mig_ict x g c idx_p compare_anova table metrics_names t_names stats
+
