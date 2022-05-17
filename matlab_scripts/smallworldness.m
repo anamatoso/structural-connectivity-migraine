@@ -1,7 +1,7 @@
 function [S] = smallworldness(mat)
 % This function calculates the small worldness of a given connectivity
-% matrix. Since the clustering coefficient and the characteristic path
-% length are already calculated, they are put as input as well.
+% matrix.
+
 mat=round(mat.*1e30);
 
 
