@@ -1,8 +1,11 @@
 %% Load data from matrices
+clear all
 format long
 % directory where connectivity matrices are
 dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data';
 dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
+
+% NORMALIZAR MATRIZES PARA CARCULAR METRICAS
 
 % Controls midcyle
 HC_midcycle_mrtrix=load_data_mrtrix(dir,'*midcycle*mrtrix*bval2.csv'); %116 x 116 x n_people
@@ -37,17 +40,16 @@ clear dir s conmat i dir_roi
 
 significance_mask=zeros(116,116,n_conditions);
 for i=1:n_conditions
-    significance_mask(:,:,i) = signtest_mask(connectomes{i});
+    [significance_mask(:,:,i)] = signtest_mask(connectomes{i});
     for p=1:n_people(i)
         connectomes{i}(:,:,p)=connectomes{i}(:,:,p).*significance_mask(:,:,i);
     end
 end
 % imagesc(significance_mask(:,:,i)); colormap jet
 clear i p
-%% Calculate metrics- load result of script below
-%load("metrics.mat")
+
 %% Calculate metrics
-% 24s per person
+%          connectomes=rescale_connectomes(connectomes,n_people);
 clear metrics
 for i=1:n_conditions
     conmats=connectomes{i};
@@ -57,10 +59,12 @@ for i=1:n_conditions
     end
     metrics{i}=m;
 end
-clear i p mat conmats m m2
-%% Analysis of results
+
 [n_metrics,~]=size(metrics{1});
 metrics_labels=get_label_metrics();
+
+clear i p mat conmats m m2
+%% Analysis of results
 
 metrics_intervsmid=[];
 metrics_icvspre=[];
@@ -196,8 +200,8 @@ hold off
 % legend({'HC', 'M'})
 % legend('Location','best')
 
-%% Analysis of results - ANOVA - General metrics L, GE, C, Q, T, S,A
-compare_anova=zeros(1,4);
+%% Analysis of results - ANOVA
+compare_anova=zeros(1,5);
 
 for m=1:n_metrics
     hc_mid=metrics{1}(m,:);
@@ -213,18 +217,73 @@ for m=1:n_metrics
     end
     
     [~, ~, stats] = anova1(x,g,'off');
-    c=multcompare(stats,'ctype','bonferroni','display','off');
+    c=multcompare(stats,'display','off');
     
     for idx_p=1:length(c(:,end))
         if c(idx_p,end)<0.05
-            compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end)];
+            switch c(idx_p,4)>0 % difference is positive?
+                case 1
+                    compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end) 1];
+                case 0
+                    compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end) -1];
+            end
         end
     end
 end
 compare_anova=compare_anova(2:end,:);
-table=array2table(compare_anova, "VariableNames", ["Metric index","Group 1", "Group 2", "P-value"]);
+table=array2table(compare_anova, "VariableNames", ["Metric index","Group 1", "Group 2", "P-value", "Difference"]);
 metrics_names=metrics_labels(compare_anova(:,1))';
 t_names=array2table(metrics_names, "VariableNames", ["Metric Name"]);
 ANOVA_results = [t_names table];
-clear m hc_mid mig_inter hc_pre mig_ict x g c idx_p compare_anova table metrics_names t_names stats
+clear m hc_mid mig_inter hc_pre mig_ict x g c idx_p compare_anova table metrics_names t_names stats compare_anova table metrics_names t_names
+
+%% Analysis of connectivity between nodes- ANOVA
+compare_anova=zeros(1,6);
+node_labels = get_label_nodes("AAL116_labels.txt");
+for m=1:115
+    for n=m+1:116
+        hc_mid=squeeze(connectomes{1}(m,n,:))';
+        mig_inter=squeeze(connectomes{2}(m,n,:))';
+        hc_pre=squeeze(connectomes{3}(m,n,:))';
+        mig_ict=squeeze(connectomes{4}(m,n,:))';
+        
+        x = [hc_mid mig_inter hc_pre mig_ict];
+        g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter)),2.*ones(1,length(hc_pre)),3.*ones(1,length(mig_ict))];
+        
+        if any(isnan(x)) || all(x==0)
+            continue
+        end
+        
+        [~, ~, stats] = anova1(x,g,'off');
+        c=multcompare(stats,'display','off');
+        
+        for idx_p=1:length(c(:,end))
+            if c(idx_p,end)<0.05
+                switch c(idx_p,4)>0
+                    case 1
+                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) c(idx_p,end) 1];
+                    case 0
+                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) c(idx_p,end) -1];
+                end
+            end
+        end
+    end
+end
+compare_anova=compare_anova(2:end,:);
+table=array2table(compare_anova, "VariableNames", ["Node 1","Node 2","Group 1", "Group 2", "P-value","Difference"]);
+node_names=[node_labels(compare_anova(:,1));node_labels(compare_anova(:,2))]';
+t_names=array2table(node_names, "VariableNames", ["Node 1 Name","Node 2 Name"]);
+ANOVA_results_conn = [t_names table];
+clear m hc_mid mig_inter hc_pre mig_ict x g c idx_p compare_anova table metrics_names t_names stats compare_anova table node_names t_names
+
+
+
+
+
+
+
+
+
+
+
 
