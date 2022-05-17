@@ -14,7 +14,7 @@ for i=1:116
         EC(i)="EC_"+node_labels(i);
         Qi(i)="Qi_"+node_labels(i);
         D(i)="D_"+node_labels(i);
-        RC(i)="RC_"+node_labels(i);
+        RC(i)="RC_"+num2str(i);
         
     else
         BC(i)="BC_"+node_labels(i);
@@ -25,6 +25,6 @@ for i=1:116
     end
 end
 
-metrics_labels=[BC "L" "GE" "C" Ci EC Qi "Q" RC D "T" "S" "A"];
+metrics_labels=[BC "L" "GE" "C" Ci EC Qi "Q" RC D "mean_D" "T" "S" "A"];
 end
 
