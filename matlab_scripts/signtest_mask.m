@@ -4,11 +4,21 @@ function [significance_mask] = signtest_mask(a)
 
 significance_mask=zeros(116,116);
 for i=1:116
-   for j=1:116
-      data=squeeze(a(i,j,:));
-      [p,h,stats] = signtest(data,0);
-      significance_mask(i,j)=h;
-   end
+    for j=1:116
+        data=squeeze(a(i,j,:));
+        k=kstest(data);
+        if k==1
+            [~,h] = signtest(data,0,'Tail','right');
+            
+        else
+            [h,~] = ttest2(data,0,'Tail','right');
+        end
+        if isnan(h)
+            h=1;
+        end
+        significance_mask(i,j)=h;
+    end
 end
 end
+
 
