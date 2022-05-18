@@ -8,13 +8,13 @@ for i=1:116
         data=squeeze(a(i,j,:));
         k=kstest(data);
         if k==1
-            [~,h] = signtest(data,0,'Tail','right');
+            [p,h] = signtest(data,0,'Tail','right');
             
         else
-            [h,~] = ttest2(data,0,'Tail','right');
+            [h,p] = ttest2(data,0,'Tail','right');
         end
         if isnan(h)
-            h=1;
+            h=0;
         end
         significance_mask(i,j)=h;
     end
