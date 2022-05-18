@@ -40,7 +40,7 @@ clear dir s conmat i dir_roi
 
 significance_mask=zeros(116,116,n_conditions);
 for i=1:n_conditions
-    [significance_mask(:,:,i)] = signtest_mask(connectomes{i});
+    significance_mask(:,:,i) = signtest_mask(connectomes{i});
     for p=1:n_people(i)
         connectomes{i}(:,:,p)=connectomes{i}(:,:,p).*significance_mask(:,:,i);
     end
@@ -276,12 +276,18 @@ t_names=array2table(node_names, "VariableNames", ["Node 1 Name","Node 2 Name"]);
 ANOVA_results_conn = [t_names table];
 clear m hc_mid mig_inter hc_pre mig_ict x g c idx_p compare_anova table metrics_names t_names stats compare_anova table node_names t_names
 
+%% Determine hub nodes
+mean_matrices=calculate_mean_matrix(connectomes);
+node_labels = get_label_nodes("AAL116_labels.txt");
+hubnodes=strings(23,n_conditions);
+for i=1:n_conditions
+    idx=hub_nodes(mean_matrices(:,:,i)); %indices of nodes
+    labels=node_labels(idx); %names of nodes
+    hubnodes(:,i)=labels';
+end
+hubnodestable=array2table(hubnodes,'VariableNames',{'HC_midcycle','M_interictal','HC_premenstrual','M_ictal'});
 
-
-
-
-
-
+clear i idx labels
 
 
 
