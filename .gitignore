@@ -364,3 +364,5 @@ matlab_scripts/BrainNetViewer/*
 matlab_scripts/matrix.edge
 matlab_scripts/matrix_data/*
 *.xlsx
+*.node
+*.edge
