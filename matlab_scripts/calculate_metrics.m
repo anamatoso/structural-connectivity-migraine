@@ -52,11 +52,11 @@ elseif version==3
     Ci=clustering_coef_wu(weight_conversion(mat, 'normalize'));    % local clustering coefficient 
     C=mean(Ci);                                                     % global clustering coefficient 3    
     [~, Q]=modularity_und(mat);                                          % modularity 4
-    strength=strengths_und(mat);                                    % node strength 5-120
-    mean_strength=mean(strength);                                   % mean strength 121
-    T=transitivity_wu(mat);                                         % transitivity 122
-    S=smallworldness(mat);                                          % smallworldness 123
-    A=assortativity_wei(mat,0);                                     % assortivity 124
+    strength=strengths_und(mat);                                    % node strength 
+    mean_strength=mean(strength);                                   % mean strength 5
+    T=transitivity_wu(mat);                                         % transitivity 6
+    S=smallworldness(mat);                                          % smallworldness 7
+    A=assortativity_wei(mat,0);                                     % assortivity 8
     
     % insert metrics in matrix
     metrics=[L GE C Q mean_strength T S A]';
