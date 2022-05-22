@@ -9,7 +9,5 @@ for i=1:length(connectomes)
    c{i}=newmat;
 end
 
-
-
 end
 
