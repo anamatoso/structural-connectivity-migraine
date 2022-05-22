@@ -5,11 +5,9 @@ format long
 dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data';
 dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
 
-% NORMALIZAR MATRIZES PARA CARCULAR METRICAS
-
 % Controls midcyle
 HC_midcycle_mrtrix=load_data_mrtrix(dir,'*midcycle*mrtrix*bval2.csv'); %116 x 116 x n_people
-%HC_midcycle_fsl=load_data_fsl(dir,'*midcycle*fsl*',dir_roi);
+HC_midcycle_fsl=load_data_fsl(dir,'*midcycle*fsl*',dir_roi);
 
 % Controls premenstrual
 HC_premenstrual_mrtrix=load_data_mrtrix(dir,'*premenstrual*mrtrix*bval2.csv'); %116 x 116 x n_people
@@ -34,76 +32,52 @@ for i=1:n_conditions
     s=size(conmat);
     n_people(i)=s(end);
 end
-
+[n_nodes,~,~]=size(connectomes{1});
 clear dir s conmat i dir_roi
-%% Test for spurious connections
-
-significance_mask=zeros(116,116,n_conditions);
+%% Analyse only a subnetwork of the connectome (Optional)
+subnetwork=[1 2 3 4 9 10 29 30 31 32 57 58 59 60 69 70 71 72 73 74 77 78 89 90];
+subnetwork=[1:90];
+for i=1:n_conditions
+    connectomes{i}=connectomes{i}(subnetwork,subnetwork,:);
+end
+[n_nodes,~,~]=size(connectomes{1});
+clear i
+%% Remove spurious connections
+%connectomes=rescale_connectomes(connectomes,n_people);
+[n_nodes,~,~]=size(connectomes{1});
+significance_mask=zeros(n_nodes,n_nodes,n_conditions);
 for i=1:n_conditions
     significance_mask(:,:,i) = signtest_mask(connectomes{i});
     for p=1:n_people(i)
         connectomes{i}(:,:,p)=connectomes{i}(:,:,p).*significance_mask(:,:,i);
     end
 end
-% imagesc(significance_mask(:,:,i)); colormap jet
+% imagesc(significance_mask(:,:,i)); colormap jet;colorbar
 clear i p
 
 %% Calculate metrics
-%          connectomes=rescale_connectomes(connectomes,n_people);
+% connectomes=rescale_connectomes(connectomes,n_people);
+% connectomes=connectome2aal90(connectomes);
+
+version_metrics=2;%  1=703 metrics, 2=124 metrics, 3=8 metrics
 clear metrics
 for i=1:n_conditions
     conmats=connectomes{i};
     for p=1:n_people(i)
         mat=conmats(:,:,p); % connectivity matrix
-        m(:,p)=calculate_metrics(mat);
+        m(:,p)=calculate_metrics(mat,version_metrics);
     end
     metrics{i}=m;
 end
 
 [n_metrics,~]=size(metrics{1});
-metrics_labels=get_label_metrics();
+metrics_labels=get_label_metrics(version_metrics);
 
-clear i p mat conmats m m2
-%% Analysis of results
-
-metrics_intervsmid=[];
-metrics_icvspre=[];
-
-for m=1:n_metrics
-    hc_mid=metrics{1}(m,:);
-    mig_inter=metrics{2}(m,:);
-    hc_pre=metrics{3}(m,:);
-    mig_ic=metrics{4}(m,:);
-    if (isequal(hc_mid,zeros(1,length(hc_mid))) && isequal(mig_inter,zeros(1,length(mig_inter)))) || isempty(hc_mid) || isempty(mig_inter)
-        continue
-    end
-    x = [hc_mid mig_inter];
-    g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter))];
-   
-    
-    if ttest2(hc_mid,mig_inter)==1
-        metrics_intervsmid=[metrics_intervsmid m];
-    end
-    
-    if (isequal(hc_pre,zeros(1,length(hc_pre))) && isequal(mig_ic,zeros(1,length(mig_ic)))) || isempty(hc_pre) || isempty(mig_ic)
-        continue
-    end
-    x = [hc_pre mig_ic];
-    g = [zeros(1,length(hc_pre)),ones(1,length(mig_ic))];
-    if ttest2(hc_pre,mig_ic)==1
-        metrics_icvspre=[metrics_icvspre m];
-    end
-    
-    
-    
-end
-node_labels = get_label_nodes("AAL116_labels.txt");
-label_metrics_sign=metrics_labels(metrics_intervsmid);
-clear hc mig x g
+clear i p mat conmats m m2 version_metrics
 
 %% Visualization of results - Rich club
 
-metrics_mean=mean_met(metrics);
+%metrics_mean=mean_met(metrics);
 
 % Rich club coefficient
 figure;
@@ -117,10 +91,10 @@ for i=1:n_conditions
         case 3
             color='c';
         case 4
-            color='y';
+            color='g';
     end
     
-    plot(linspace(1,115,115),mean(met(469:583,:),2),color)
+    plot(linspace(1,115,115),nanmean(met(469:583,:),2),color)
     title("Rich club coefficient curve")
     xlabel("Degree")
     ylabel("Rich club coefficient")
@@ -142,7 +116,7 @@ for m=469:583
     end
 end
 hold off
-
+legend(["HC midcycle", "M interictal", "HC premenstrual", "M ictal"])
 clear m hc mig i met color
 %% Visualization of results - Plot General metrics L, GE, C, Q, T, S,A
 idx=[117 118 119 468 700 701 702];
@@ -209,8 +183,8 @@ for m=1:n_metrics
     hc_pre=metrics{3}(m,:);
     mig_ict=metrics{4}(m,:);
     
-    x = [hc_mid mig_inter hc_pre mig_ict];
-    g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter)),2.*ones(1,length(hc_pre)),3.*ones(1,length(mig_ict))];
+    x = [hc_mid mig_inter];% hc_pre mig_ict];
+    g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter))];%,2.*ones(1,length(hc_pre)),3.*ones(1,length(mig_ict))];
     
     if any(isnan(x))
         continue
@@ -220,18 +194,18 @@ for m=1:n_metrics
     c=multcompare(stats,'display','off');
     
     for idx_p=1:length(c(:,end))
-        if c(idx_p,end)<0.05
+        if c(idx_p,end)<0.05/n_metrics
             switch c(idx_p,4)>0 % difference is positive?
                 case 1
-                    compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end) 1];
+                    compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end)*n_metrics 1];
                 case 0
-                    compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end) -1];
+                    compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end)*n_metrics -1];
             end
         end
     end
 end
 compare_anova=compare_anova(2:end,:);
-table=array2table(compare_anova, "VariableNames", ["Metric index","Group 1", "Group 2", "P-value", "Difference"]);
+table=array2table(compare_anova, "VariableNames", ["Metric index","Group 1", "Group 2", "P-value (corrected)", "Difference"]);
 metrics_names=metrics_labels(compare_anova(:,1))';
 t_names=array2table(metrics_names, "VariableNames", ["Metric Name"]);
 ANOVA_results = [t_names table];
@@ -240,15 +214,15 @@ clear m hc_mid mig_inter hc_pre mig_ict x g c idx_p compare_anova table metrics_
 %% Analysis of connectivity between nodes- ANOVA
 compare_anova=zeros(1,6);
 node_labels = get_label_nodes("AAL116_labels.txt");
-for m=1:115
-    for n=m+1:116
+for m=1:n_nodes-1
+    for n=m+1:n_nodes
         hc_mid=squeeze(connectomes{1}(m,n,:))';
         mig_inter=squeeze(connectomes{2}(m,n,:))';
         hc_pre=squeeze(connectomes{3}(m,n,:))';
         mig_ict=squeeze(connectomes{4}(m,n,:))';
         
-        x = [hc_mid mig_inter hc_pre mig_ict];
-        g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter)),2.*ones(1,length(hc_pre)),3.*ones(1,length(mig_ict))];
+        x = [hc_mid mig_inter];% hc_pre mig_ict];
+        g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter))];%,2.*ones(1,length(hc_pre)),3.*ones(1,length(mig_ict))];
         
         if any(isnan(x)) || all(x==0)
             continue
@@ -258,12 +232,13 @@ for m=1:115
         c=multcompare(stats,'display','off');
         
         for idx_p=1:length(c(:,end))
-            if c(idx_p,end)<0.05
+            n_comparisons=(n_nodes*n_nodes-n_nodes)/2;
+            if c(idx_p,end)<0.05/n_comparisons
                 switch c(idx_p,4)>0
                     case 1
-                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) c(idx_p,end) 1];
+                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) c(idx_p,end)*n_comparisons 1];
                     case 0
-                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) c(idx_p,end) -1];
+                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) c(idx_p,end)*n_comparisons -1];
                 end
             end
         end
@@ -279,17 +254,61 @@ clear m hc_mid mig_inter hc_pre mig_ict x g c idx_p compare_anova table metrics_
 %% Determine hub nodes
 mean_matrices=calculate_mean_matrix(connectomes);
 node_labels = get_label_nodes("AAL116_labels.txt");
-hubnodes=strings(23,n_conditions);
-for i=1:n_conditions
+%node_labels=node_labels(subnetwork);
+hubnodes=strings(round(n_nodes*0.2),2); % SO 2 CONDITIONS
+for i=1:2 % SO 2 CONDITIONS
     idx=hub_nodes(mean_matrices(:,:,i)); %indices of nodes
     labels=node_labels(idx); %names of nodes
     hubnodes(:,i)=labels';
 end
-hubnodestable=array2table(hubnodes,'VariableNames',{'HC_midcycle','M_interictal','HC_premenstrual','M_ictal'});
+hubnodestable=array2table(hubnodes,'VariableNames',{'HC_midcycle','M_interictal'});%,'HC_premenstrual','M_ictal'});
 
-clear i idx labels
+color_size = hubnodes_color_size(hubnodes(:,1),hubnodes(:,2));
 
+matrix = makenodefile(color_size);
+T=table(matrix);
+writetable(T, 'hubnodes_HC.txt','Delimiter',' ','WriteVariableNames', 0);
+clear i idx labels T matrix
 
+%% Test alternative to anova
+compare_anova=zeros(1,5);
 
+for m=1:n_metrics
+    hc_mid=metrics{1}(m,:);
+    mig_inter=metrics{2}(m,:);
+    
+    x = [hc_mid mig_inter];
+    %g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter))];
+    
+    if any(isnan(x))
+        continue
+    end
+    
+    % check variance
+    switch vartest2(hc_mid,mig_inter)
+        case 1 % different varience
+            [h,p]=ttest2(hc_mid,mig_inter,'alpha',0.05/n_metrics,"vartype",'unequal');
+        case 0 % equal varience
+            [h,p]=ttest2(hc_mid,mig_inter,'alpha',0.05/n_metrics);
+    end
+    
+    
+    if h==1 % if significant difference
+        c=mean(hc_mid)-mean(mig_inter);
+        switch c>0 % difference is positive?
+            case 1
+                compare_anova=[compare_anova;m 1 2 p 1];
+            case 0
+                compare_anova=[compare_anova;m 1 2 p -1];
+        end
+    end
+    
+end
+compare_anova=compare_anova(2:end,:);
+table=array2table(compare_anova, "VariableNames", ["Metric index","Group 1", "Group 2", "P-value", "Difference"]);
+metrics_names=metrics_labels(compare_anova(:,1))';
+t_names=array2table(metrics_names, "VariableNames", ["Metric Name"]);
+ANOVA_results = [t_names table];
+clear m h p hc_mid mig_inter hc_pre mig_ict x g c idx_p compare_anova table metrics_names t_names stats compare_anova table metrics_names t_names
 
 
