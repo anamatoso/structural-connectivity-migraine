@@ -42,6 +42,23 @@ for i=1:n_conditions
 end
 [n_nodes,~,~]=size(connectomes{1});
 clear i
+
+%% Remap matrix (Optional)
+idx_map=[];
+for i=1:54
+ idx_map=[idx_map i*ones(1,2)];  
+end
+idx_map=[idx_map 55*ones(1,8)];
+
+newconnectome=cell(size(connectomes));
+for i=1:n_conditions
+    for p=1:n_people(i)
+        newconnectome{i}(:,:,p)=remap_matrix(connectomes{i}(:,:,p),idx_map);
+    end
+end
+[n_nodes,~,~]=size(newconnectome{1});
+connectomes=newconnectome;
+clear i p newconnectome
 %% Remove spurious connections
 %connectomes=rescale_connectomes(connectomes,n_people);
 [n_nodes,~,~]=size(connectomes{1});
@@ -59,7 +76,7 @@ clear i p
 % connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes=connectome2aal90(connectomes);
 
-version_metrics=2;%  1=703 metrics, 2=124 metrics, 3=8 metrics
+version_metrics=3;%  1=703 metrics, 2=124 metrics, 3=8 metrics
 clear metrics
 for i=1:n_conditions
     conmats=connectomes{i};
@@ -297,15 +314,15 @@ for m=1:n_metrics
         c=mean(hc_mid)-mean(mig_inter);
         switch c>0 % difference is positive?
             case 1
-                compare_anova=[compare_anova;m 1 2 p 1];
+                compare_anova=[compare_anova;m 1 2 p*n_metrics 1];
             case 0
-                compare_anova=[compare_anova;m 1 2 p -1];
+                compare_anova=[compare_anova;m 1 2 p*n_metrics -1];
         end
     end
     
 end
 compare_anova=compare_anova(2:end,:);
-table=array2table(compare_anova, "VariableNames", ["Metric index","Group 1", "Group 2", "P-value", "Difference"]);
+table=array2table(compare_anova, "VariableNames", ["Metric index","Group 1", "Group 2", "P-value corrected", "Difference"]);
 metrics_names=metrics_labels(compare_anova(:,1))';
 t_names=array2table(metrics_names, "VariableNames", ["Metric Name"]);
 ANOVA_results = [t_names table];
