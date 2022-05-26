@@ -1,14 +1,17 @@
-function [ANOVA_results] = anova_compare(metrics,metrics_labels,showall)
-
+function [ANOVA_results] = anova_compare(metrics,metrics_labels,varargin)
+% Given the metrics and the respective labels, this function calculates which metrics are significantly different. If varargin is set to "True" then it shows all metrics (instead of only the significant ones).
 
 n_metrics=length(metrics{1});
 compare_anova=zeros(1,5);
 
-if showall==1
-    threshold=inf;
-else 
-    threshold=0.05/n_metrics;
+if ~isempty(varargin)
+    if varargin{1}=="True"
+        threshold=inf;
+    else
+        threshold=0.05/n_metrics;
+    end
 end
+
 
 for m=1:n_metrics
     hc_mid=metrics{1}(m,:);
