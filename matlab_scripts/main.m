@@ -39,8 +39,7 @@ end
 node_labels=get_label_nodes("AAL116_labels.txt");
 clear dir s conmat i dir_roi HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
 %% Analyse only a subnetwork of the connectome (Optional)
-% subnetwork=[1 2 3 4 9 10 29 30 31 32 57 58 59 60 69 70 71 72 73 74 77 78];
-subnetwork=[1:90];
+%subnetwork=[1:90];
 
 for i=1:n_conditions
     connectomes{i}=connectomes{i}(subnetwork,subnetwork,:);
@@ -51,17 +50,17 @@ clear i subnetwork
 
 %% Remap matrix (Optional)
 
-% agregate L-R and all vermis 
-idx_map=[];
-for i=1:54
- idx_map=[idx_map i*ones(1,2)];  
-end
-idx_map=[idx_map 55*ones(1,8)];
-
-% idx_map=[ones(1,2) 2*ones(1,4) 3*ones(1,4) 4*ones(1,6) 5 5 6 6 7 7 8*ones(1,4) 9 9 10 10 ...
-%     11*ones(1,6) 12*ones(1,4) 13 13 14 14 15 15 16 16 17*ones(1,6) 18 18 19 19 20*ones(1,4) ...
-%     21 21 22 22 23 23 24 24 25 25 26 26 27 27 28 28 29 29 30*ones(1,10) ...
-%     31*ones(1,4) 32*ones(1,14) 33*ones(1,8)];
+% aggregate adjacent zones
+idx_map=[1 2 repmat([3 4],1,7) 5 6 7 8 9 10 repmat([3 4],1,2) 11 12 13 14 repmat([15 16],1,3)...
+    17 18 17 18 19 20 21 22 23 24 25 26 repmat([27 28],1,3) 29 30 1 2 repmat([31 32],1,2)...
+    33 34 35 36 37 38 1 2 39 40 41 42 43 44 45 46 47 48 repmat([49 50],1,5) 51*ones(1,18) 52*ones(1,8)];
+node_labels=["precentralL" "precentralR" "FrontalL" "FrontalR" "RolandicL" "RolandicR" "suppmotorL" "suppmotorR"...
+    "olfactoryL" "olfactoryR" "rectusL" "rectusR" "insulaL" "insulaR" "CingulumL" "cingulumR"...
+    "hippocampusL" "hippocampusR" "amygdalaL" "amygdalaR" "calcarineL" "calcarineR" "cuneusL" "cuneusR"...
+    "LingualL" "LingualR" "occipitalL" "occipitalR" "fusiforeL" "fusiformR" "parietalL" "parietalR"...
+    "suppramarginalL" "suppramarginalR" "angularL" "angularR" "precuneusL" "precuneusR" "caudateL" "caudateR"...
+    "putamenL" "putamenR" "pallidiumL" "pallidiumR" "thalamusL" "thalamusR" ...
+    "heschlL" "heschlR" "temporalL" "temporalR" "Cerebelum" "vermis"];
 newconnectome=cell(size(connectomes));
 for i=1:n_conditions
     for p=1:n_people(i)
