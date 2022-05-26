@@ -1,15 +1,16 @@
-function [ANOVA_results_conn] = anova_compare_conn(connectomes,node_labels,showall)
+function [ANOVA_results_conn] = anova_compare_conn(connectomes,node_labels,varargin)
 
 compare_anova=zeros(1,6);
 n_nodes=length(node_labels);
 n_comparisons=(n_nodes*n_nodes-n_nodes)/2;
 
-if showall==1
-    threshold=inf;
-else 
-    threshold=0.05/n_comparisons;
+if ~isempty(varargin)
+    if varargin{1}=="True"
+        threshold=inf;
+    else
+        threshold=0.05/n_comparisons;
+    end
 end
-
 for m=1:n_nodes-1
     for n=m+1:n_nodes
         hc_mid=squeeze(connectomes{1}(m,n,:))';
