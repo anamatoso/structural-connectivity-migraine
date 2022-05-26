@@ -1,4 +1,4 @@
-function [metrics_labels] = get_label_metrics(a)
+function [metrics_labels] = get_label_metrics(a,node_labels)
 % This funtion prints the labels of each metric
 if a==1
     BC=strings(1,116);
@@ -7,7 +7,7 @@ if a==1
     Qi=strings(1,116);
     D=strings(1,116);
     RC=strings(1,115);
-    node_labels=get_label_nodes("AAL116_labels.txt");
+    
     for i=1:116
         if i<=115
             BC(i)="BC_"+node_labels(i);
