@@ -366,3 +366,5 @@ matlab_scripts/matrix_data/*
 *.xlsx
 *.node
 *.edge
+*.mif
+*.gz
