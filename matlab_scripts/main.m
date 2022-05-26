@@ -106,7 +106,7 @@ metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 ANOVA_results = anova_compare(metrics,metrics_labels,"True");
 %% Analysis of connectivity between nodes- ANOVA
-ANOVA_results_conn = anova_compare_conn(connectomes,node_labels,1);
+ANOVA_results_conn = anova_compare_conn(connectomes,node_labels,"True");
 
 %% Determine hub nodes
 mean_matrices=calculate_mean_matrix(connectomes);
