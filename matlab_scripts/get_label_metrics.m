@@ -8,7 +8,7 @@ if a==1
     EC=strings(1,n_nodes);
     Qi=strings(1,n_nodes);
     D=strings(1,n_nodes);
-    RC=strings(1,n_nodes);
+    RC=strings(1,n_nodes-1);
     
     for i=1:n_nodes
         if i<=n_nodes-1
