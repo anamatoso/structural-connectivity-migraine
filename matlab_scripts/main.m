@@ -39,15 +39,15 @@ end
 node_labels=get_label_nodes("AAL116_labels.txt");
 clear dir s conmat i dir_roi HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
 %% Analyse only a subnetwork of the connectome (Optional)
-subnetwork=[1 2 3 4 9 10 29 30 31 32 57 58 59 60 69 70 71 72 73 74 77 78];
+% subnetwork=[1 2 3 4 9 10 29 30 31 32 57 58 59 60 69 70 71 72 73 74 77 78];
 subnetwork=[1:90];
+
 for i=1:n_conditions
     connectomes{i}=connectomes{i}(subnetwork,subnetwork,:);
 end
-[n_nodes,~,~]=size(connectomes{1});
-node_labels=get_label_nodes("AAL116_labels.txt");
+
 node_labels=node_labels(subnetwork);
-clear i
+clear i subnetwork
 
 %% Remap matrix (Optional)
 
@@ -72,6 +72,7 @@ connectomes=newconnectome;
 clear i p newconnectome idx_map
 %% Remove spurious connections
 %connectomes=rescale_connectomes(connectomes,n_people);
+[n_nodes,~,~]=size(connectomes{1});
 significance_mask=zeros(n_nodes,n_nodes,n_conditions);
 for i=1:n_conditions
     significance_mask(:,:,i) = signtest_mask(connectomes{i});
@@ -86,7 +87,7 @@ clear i p
 % connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=2;%  1=703 metrics, 2=124 metrics, 3=8 metrics
+version_metrics=1;%  1=all metrics, 2=degree + general metrics, 3=general metrics
 clear metrics
 for i=1:n_conditions
     conmats=connectomes{i};
@@ -98,39 +99,34 @@ for i=1:n_conditions
 end
 
 
-clear i p mat conmats m m2 version_metrics
-
-%% Set variables to the result analysis
-
-version_metrics=2;
-[n_metrics,~]=size(metrics{1});
-metrics_labels=get_label_metrics(version_metrics,node_labels);
+clear i p mat conmats m m2
 
 %% Analysis of results - ANOVA
+version_metrics=1;
+metrics_labels=get_label_metrics(version_metrics,node_labels);
 
-ANOVA_results = anova_compare(metrics,metrics_labels,1);
-
+ANOVA_results = anova_compare(metrics,metrics_labels,"True");
 %% Analysis of connectivity between nodes- ANOVA
 ANOVA_results_conn = anova_compare_conn(connectomes,node_labels,1);
 
 %% Determine hub nodes
 mean_matrices=calculate_mean_matrix(connectomes);
-node_labels = get_label_nodes("AAL116_labels.txt");
 %node_labels=node_labels(subnetwork);
-hubnodes=strings(round(n_nodes*0.2),2); % SO 2 CONDITIONS
+n_nodes=length(mean_matrices);
+hubnodes=strings(round(n_nodes*0.2),4); % SO 2 CONDITIONS
 for i=1:2 % SO 2 CONDITIONS
-    idx=hub_nodes(mean_matrices(:,:,i)); %indices of nodes
+    [idx, values]=hub_nodes(mean_matrices(:,:,i)); %indices of nodes
     labels=node_labels(idx); %names of nodes
-    hubnodes(:,i)=labels';
+    hubnodes(:,2*(i)-1:2*i)=[labels' values'];
 end
-hubnodestable=array2table(hubnodes,'VariableNames',{'HC_midcycle','M_interictal'});%,'HC_premenstrual','M_ictal'});
+hubnodestable=array2table(hubnodes,'VariableNames',{'HC_midcycle','HC_midcycle_BC','M_interictal','M_interictal_BC'});%,'HC_premenstrual','M_ictal'});
 
 color_size = hubnodes_color_size(hubnodes(:,1),hubnodes(:,2));
 
 matrix = makenodefile(color_size);
 T=table(matrix);
 writetable(T, 'hubnodes_HC.txt','Delimiter',' ','WriteVariableNames', 0);
-clear i idx labels T matrix
+clear i idx labels T matrix n_nodes values
 
 %% Test alternative to anova
 compare_anova=zeros(1,5);
@@ -217,13 +213,13 @@ hold off
 legend(["HC midcycle", "M interictal", "HC premenstrual", "M ictal"])
 clear m hc mig i met color
 %% Visualization of results
-idx1=[1 2 3 4 121 122 123 124]; % General metrics
-idx2=[94 82 109 100 87]; % metrics with smaller p
-plot_boxplots(metrics,idx1,metrics_labels)
+idx=[117 118 119 700 701 673 661 688 666 41]; 
+plot_boxplots(metrics,idx,metrics_labels)
 
 %% Visualization of results - Node Strength
 figure;
 x=["HC M"];
+metrics_mean=mean_met(metrics);
 
 title("Node Strength")
 xlabel("Node")
