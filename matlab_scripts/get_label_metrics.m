@@ -6,7 +6,7 @@ if a==1
     BC=strings(1,n_nodes);
     Ci=strings(1,n_nodes);
     EC=strings(1,n_nodes);
-    Qi=strings(1,n_nodes);
+    %Qi=strings(1,n_nodes);
     D=strings(1,n_nodes);
     RC=strings(1,n_nodes-1);
     
@@ -15,7 +15,7 @@ if a==1
             BC(i)="BC_"+node_labels(i);
             Ci(i)="Ci_"+node_labels(i);
             EC(i)="EC_"+node_labels(i);
-            Qi(i)="Qi_"+node_labels(i);
+            %Qi(i)="Qi_"+node_labels(i);
             D(i)="D_"+node_labels(i);
             RC(i)="RC_"+num2str(i);
             
@@ -23,11 +23,11 @@ if a==1
             BC(i)="BC_"+node_labels(i);
             Ci(i)="Ci_"+node_labels(i);
             EC(i)="EC_"+node_labels(i);
-            Qi(i)="Qi_"+node_labels(i);
+            %Qi(i)="Qi_"+node_labels(i);
             D(i)="D_"+node_labels(i);
         end
     end
-    metrics_labels=[BC "L" "GE" "C" Ci EC Qi "Q" RC D "mean_D" "T" "S" "A"];
+    metrics_labels=[BC "L" "GE" "C" Ci EC "Q" RC D "mean_D" "T" "S" "A"];
     
 elseif a==2
     D=strings(1,n_nodes);
