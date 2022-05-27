@@ -23,7 +23,7 @@ for m=1:n_metrics
     g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter))];%,2.*ones(1,length(hc_pre)),3.*ones(1,length(mig_ict))];
     
     if any(isnan(x))
-        compare_anova=[compare_anova;m 0 0 inf 0];
+        %compare_anova=[compare_anova;m 0 0 +inf 0];
         continue
     end
     
