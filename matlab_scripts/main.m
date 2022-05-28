@@ -39,7 +39,7 @@ end
 node_labels=get_label_nodes("AAL116_labels.txt");
 clear dir s conmat i dir_roi HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
 %% Analyse only a subnetwork of the connectome (Optional)
-%subnetwork=[1:90];
+subnetwork=[1:90];
 
 for i=1:n_conditions
     connectomes{i}=connectomes{i}(subnetwork,subnetwork,:);
@@ -53,14 +53,14 @@ clear i subnetwork
 % aggregate adjacent zones
 idx_map=[1 2 repmat([3 4],1,7) 5 6 7 8 9 10 repmat([3 4],1,2) 11 12 13 14 repmat([15 16],1,3)...
     17 18 17 18 19 20 21 22 23 24 25 26 repmat([27 28],1,3) 29 30 1 2 repmat([31 32],1,2)...
-    33 34 35 36 37 38 1 2 39 40 41 42 43 44 45 46 47 48 repmat([49 50],1,5) 51*ones(1,18) 52*ones(1,8)];
+    33 34 35 36 37 38 1 2 39 40 41 42 43 44 45 46 47 48 repmat([49 50],1,5) 51*ones(1,4) 52*ones(1,14) 53*ones(1,8)];
 node_labels=["precentralL" "precentralR" "FrontalL" "FrontalR" "RolandicL" "RolandicR" "suppmotorL" "suppmotorR"...
     "olfactoryL" "olfactoryR" "rectusL" "rectusR" "insulaL" "insulaR" "CingulumL" "cingulumR"...
     "hippocampusL" "hippocampusR" "amygdalaL" "amygdalaR" "calcarineL" "calcarineR" "cuneusL" "cuneusR"...
     "LingualL" "LingualR" "occipitalL" "occipitalR" "fusiforeL" "fusiformR" "parietalL" "parietalR"...
     "suppramarginalL" "suppramarginalR" "angularL" "angularR" "precuneusL" "precuneusR" "caudateL" "caudateR"...
     "putamenL" "putamenR" "pallidiumL" "pallidiumR" "thalamusL" "thalamusR" ...
-    "heschlL" "heschlR" "temporalL" "temporalR" "Cerebelum" "vermis"];
+    "heschlL" "heschlR" "temporalL" "temporalR" "Cerebelum_crus" "Cerebelum_crus" "vermis"];
 newconnectome=cell(size(connectomes));
 for i=1:n_conditions
     for p=1:n_people(i)
@@ -86,7 +86,7 @@ clear i p
 % connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=1;%  1=all metrics, 2=degree + general metrics, 3=general metrics
+version_metrics=2;%  1=all metrics, 2=degree + general metrics, 3=general metrics, 4=BC + general metrics
 clear metrics
 for i=1:n_conditions
     conmats=connectomes{i};
@@ -95,6 +95,7 @@ for i=1:n_conditions
         m(:,p)=calculate_metrics(mat,version_metrics);
     end
     metrics{i}=m;
+    clear m
 end
 
 
@@ -104,7 +105,14 @@ clear i p mat conmats m m2
 version_metrics=1;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
-ANOVA_results = anova_compare(metrics,metrics_labels,"True");
+ANOVA_results = anova_compare(metrics,metrics_labels,version_metrics,"True");
+
+pvalues=table2array(ANOVA_results(409:524,5));
+diff=table2array(ANOVA_results(409:524,6));
+nodes_degree_color = nodes_color_size(pvalues,diff,10,node_labels);
+nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
+writetable(nodefile, 'degree_nodes.txt','Delimiter',' ','WriteVariableNames', 0);
+
 %% Analysis of connectivity between nodes- ANOVA
 ANOVA_results_conn = anova_compare_conn(connectomes,node_labels,"True");
 
@@ -211,9 +219,13 @@ end
 hold off
 legend(["HC midcycle", "M interictal", "HC premenstrual", "M ictal"])
 clear m hc mig i met color
-%% Visualization of results
-idx=[117 118 119 700 701 673 661 688 666 41]; 
-plot_boxplots(metrics,idx,metrics_labels)
+%% Visualization of results metrics
+idx=[545 572 557];
+plot_boxplots(metrics,571,metrics_labels)
+clear idx
+%% Visualization of results connectivity
+idx=[16 66; 42 64;42 84;29 57; 72 78; 3 72]; 
+plot_boxplots_conn(connectomes,idx,node_labels)
 
 %% Visualization of results - Node Strength
 figure;
