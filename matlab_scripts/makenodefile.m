@@ -1,7 +1,7 @@
-function [matrix] = makenodefile(color_size)
+function [matrix] = makenodefile(nodecoord,labels,color_size)
 
-coord=importdata('aal116_MNIcoord.txt');
-labels=get_label_nodes("AAL116_labels.txt")';
+coord=importdata(nodecoord);
+labels=labels';
 
 matrix=[coord color_size labels];
 
