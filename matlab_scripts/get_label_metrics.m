@@ -38,6 +38,16 @@ elseif a==2
     
 elseif a==3
     metrics_labels=["L" "GE" "C" "Q" "mean_D" "T" "S" "A"];
+    
+elseif a==4
+    B=strings(1,n_nodes);
+    
+    for i=1:n_nodes
+        B(i)="BC_"+node_labels(i);
+    end
+    
+    metrics_labels=[B "L" "GE" "C" "Q" "mean_D" "T" "S" "A"];
+    
 end
 end
 
