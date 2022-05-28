@@ -368,3 +368,4 @@ matlab_scripts/matrix_data/*
 *.edge
 *.mif
 *.gz
+*.png
