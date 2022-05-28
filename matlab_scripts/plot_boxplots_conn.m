@@ -16,11 +16,12 @@ for i=1:length(idx)
     
     boxplot(x,g,'Labels',{'HC','M'})
     title(node_labels(index1)+"-"+node_labels(index2),'interpreter', 'none')
-    
-    if ttest2(hc_mid,mig_inter,'Alpha',0.05/n_comparisons)==1
+    [h,p]=ttest2(hc_mid,mig_inter,'Alpha',0.05/n_comparisons);
+    if h==1
         hold on
         text(2.1,1.01*quantile(mig_inter,0.75), '*','FontSize',15,'Color','black');
     end
+    text(2.5,1.01*max(mig_inter), 'p='+num2str(p*n_comparisons),'FontSize',15,'Color','black');
     hold off
 end
 

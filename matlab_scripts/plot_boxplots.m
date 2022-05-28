@@ -12,11 +12,13 @@ for i=1:length(idx)
     
     boxplot(x,g,'Labels',{'HC','M'})
     title(metrics_labels(index),'interpreter', 'none')
-    
-    if ttest2(hc_mid,mig_inter,'Alpha',0.05/n_metrics)==1
+    [h,p]=ttest2(hc_mid,mig_inter,'Alpha',0.05/n_metrics);
+    if h==1
         hold on
         text(2.1,1.01*quantile(mig_inter,0.75), '*','FontSize',15,'Color','black');
     end
+    text(2.2,max(max(mig_inter),max(hc_mid)), "p="+num2str(p*n_metrics),'FontSize',10,'Color','black');
+
     hold off
 end
 
