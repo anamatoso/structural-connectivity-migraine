@@ -1,21 +1,23 @@
-function [ANOVA_results] = anova_compare(metrics,metrics_labels,version_metrics,varargin)
-% Given the metrics and the respective labels, this function calculates which metrics are significantly different. If varargin is set to "True" then it shows all metrics (instead of only the significant ones).
-
+function [ANOVA_results] = anova_compare(metrics,metrics_labels,version_metrics,n_nodes,varargin)
+% Given the metrics and the respective labels, this function calculates
+% which metrics are significantly different. If varargin is set to "True"
+% then it shows all metrics (instead of only the significant ones).
 n_metrics=length(metrics_labels);
 compare_anova=zeros(1,5);
+
+if version_metrics==3
+    correction=1;
+else
+    correction=n_nodes;%n_metrics;
+end
 
 if ~isempty(varargin)
     if varargin{1}=="True"
         threshold=inf;
     else
-        if version_metrics==3
-            threshold=0.05;
-        else
-            threshold=0.05/n_metrics;
-        end
+        threshold=0.05/correction;
     end
 end
-
 
 for m=1:n_metrics
     hc_mid=metrics{1}(m,:);
@@ -32,18 +34,37 @@ for m=1:n_metrics
     end
     
     [~, ~, stats] = anova1(x,g,'off');
-    c=multcompare(stats,'display','off');
+    c=multcompare(stats,'display','off','alpha',0.05/correction);
     
-    for idx_p=1:length(c(:,end))
-        if c(idx_p,end)<threshold
-            switch c(idx_p,4)>0 % difference is positive?
-                case 1
-                    compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end)*n_metrics 1];
-                case 0
-                    compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end)*n_metrics -1];
+%     k=kstest(hc_mid) && kstest(mig_inter);
+%     if k==1
+%         [p,~] = ranksum(hc_mid,mig_inter,'alpha',0.05/correction);    
+%     else
+%         [~,p] = ttest2(hc_mid,mig_inter,'alpha',0.05/correction);
+%     end
+%     
+%     
+%     if p<threshold
+%         switch mean(hc_mid)-mean(mig_inter)>0 % difference is positive?
+%             case 1
+%                 compare_anova=[compare_anova;m 1 2 p*correction 1];
+%             case 0
+%                 compare_anova=[compare_anova;m 1 2 p*correction -1];
+%         end
+%     end
+    
+    
+        for idx_p=1:length(c(:,end))
+            if c(idx_p,end)<threshold
+                switch c(idx_p,4)>0 % difference is positive?
+                    case 1
+                        compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end)*correction 1];
+                    case 0
+                        compare_anova=[compare_anova;m c(idx_p,1) c(idx_p,2) c(idx_p,end)*correction -1];
+                end
             end
         end
-    end
+    
 end
 
 compare_anova=compare_anova(2:end,:);
