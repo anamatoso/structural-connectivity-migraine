@@ -5,24 +5,26 @@ format long
 dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data';
 dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
 
+atlas="MNI"; if atlas=="AAL116" pattern=""; else pattern="*"+atlas; end
+
 % Controls midcyle
-HC_midcycle_mrtrix=load_data_mrtrix(dir,'*midcycle*mrtrix*bval2.csv'); %116 x 116 x n_people
-%HC_midcycle_fsl=load_data_fsl(dir,'*midcycle*fsl*',dir_roi);
+HC_midcycle_mrtrix=load_data_mrtrix(dir,"*midcycle*mrtrix*bval2"+pattern+".csv"); %116 x 116 x n_people
+%HC_midcycle_fsl=load_data_fsl(dir,"*midcycle*fsl*",dir_roi);
 %HC_midcycle_mrtrix=cat(3,HC_midcycle_mrtrix,HC_midcycle_mrtrix);
 
 % Controls premenstrual
-HC_premenstrual_mrtrix=load_data_mrtrix(dir,'*premenstrual*mrtrix*bval2.csv'); %116 x 116 x n_people
-%HC_midcycle_fsl=load_data_fsl(dir,'*premenstrual*fsl*',dir_roi);
+HC_premenstrual_mrtrix=load_data_mrtrix(dir,"*premenstrual*mrtrix*bval2"+pattern+".csv"); %116 x 116 x n_people
+%HC_midcycle_fsl=load_data_fsl(dir,"*premenstrual*fsl*",dir_roi);
 %HC_premenstrual_mrtrix=cat(3,HC_premenstrual_mrtrix,HC_premenstrual_mrtrix);
 
 % Patients interictal
-M_interictal_mrtrix=load_data_mrtrix(dir,'*interictal*mrtrix*bval2.csv');
-%M_interictal_fsl=load_data_fsl(dir,'*interictal*fsl*',dir_roi);
+M_interictal_mrtrix=load_data_mrtrix(dir,"*interictal*mrtrix*bval2"+pattern+".csv");
+%M_interictal_fsl=load_data_fsl(dir,"*interictal*fsl*",dir_roi);
 %M_interictal_mrtrix=cat(3,M_interictal_mrtrix,M_interictal_mrtrix);
 
 % Patients ictal
-M_ictal_mrtrix=load_data_mrtrix(dir,'*-ictal*mrtrix*bval2.csv');
-%M_ictal_fsl=load_data_fsl(dir,'*ictal*fsl*',dir_roi);
+M_ictal_mrtrix=load_data_mrtrix(dir,"*-ictal*mrtrix*bval2"+pattern+".csv");
+%M_ictal_fsl=load_data_fsl(dir,"*ictal*fsl*",dir_roi);
 %M_ictal_mrtrix=cat(3,M_ictal_mrtrix,M_ictal_mrtrix);
 
 % Note: they are not normalized by number of streamlines
@@ -36,8 +38,8 @@ for i=1:n_conditions
     s=size(conmat);
     n_people(i)=s(end);
 end
-node_labels=get_label_nodes("AAL116_labels.txt");
-clear dir s conmat i dir_roi HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
+node_labels=get_label_nodes(atlas+"_labels.txt");
+clear pattern dir s conmat i dir_roi HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
 %% Analyse only a subnetwork of the connectome (Optional)
 subnetwork=[1:90];
 
@@ -86,7 +88,7 @@ clear i p
 % connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=2;%  1=all metrics, 2=degree + general metrics, 3=general metrics, 4=BC + general metrics
+version_metrics=1;%  1=all metrics, 2=degree + general metrics, 3=general metrics, 4=BC + general metrics
 clear metrics
 for i=1:n_conditions
     conmats=connectomes{i};
@@ -102,19 +104,25 @@ end
 clear i p mat conmats m m2
 
 %% Analysis of results - ANOVA
-version_metrics=1;
+version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
-ANOVA_results = anova_compare(metrics,metrics_labels,version_metrics,"True");
-
+ANOVA_results = anova_compare(metrics,metrics_labels,version_metrics,length(node_labels),"True");
+%writetable(ANOVA_results, 'ANOVA_results.xlsx');
+%% For visualization in BrainNet nodes AAL116
 pvalues=table2array(ANOVA_results(409:524,5));
 diff=table2array(ANOVA_results(409:524,6));
-nodes_degree_color = nodes_color_size(pvalues,diff,10,node_labels);
+nodes_degree_color = nodes_color_size(pvalues,diff,1,node_labels);
 nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
 writetable(nodefile, 'degree_nodes.txt','Delimiter',' ','WriteVariableNames', 0);
-
-%% Analysis of connectivity between nodes- ANOVA
+clear pvalues diff nodes_degree_color nodefile
+%% Analysis of connectivity - ANOVA
 ANOVA_results_conn = anova_compare_conn(connectomes,node_labels,"True");
+%writetable(ANOVA_results_conn, 'ANOVA_results_conn.xlsx');
+
+%% For visualization in BrainNet edges AAL116
+matrix = anova2matrix(ANOVA_results_conn);
+%writematrix(matrix, 'edges_AAL116.txt','Delimiter',' ');
 
 %% Determine hub nodes
 mean_matrices=calculate_mean_matrix(connectomes);
@@ -221,10 +229,10 @@ legend(["HC midcycle", "M interictal", "HC premenstrual", "M ictal"])
 clear m hc mig i met color
 %% Visualization of results metrics
 idx=[545 572 557];
-plot_boxplots(metrics,571,metrics_labels)
+plot_boxplots(metrics,[1 2],metrics_labels,version_metrics)
 clear idx
 %% Visualization of results connectivity
-idx=[16 66; 42 64;42 84;29 57; 72 78; 3 72]; 
+idx=[5 7; 4 6;1 9;3 7; 1 3; 2 8]; 
 plot_boxplots_conn(connectomes,idx,node_labels)
 
 %% Visualization of results - Node Strength
