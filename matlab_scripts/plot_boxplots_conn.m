@@ -21,7 +21,7 @@ for i=1:length(idx)
         hold on
         text(2.1,1.01*quantile(mig_inter,0.75), '*','FontSize',15,'Color','black');
     end
-    text(2.5,1.01*max(mig_inter), 'p='+num2str(p*n_comparisons),'FontSize',15,'Color','black');
+    text(2.2,1.01*max(max(mig_inter),max(hc_mid)), "p="+num2str(p*n_comparisons),'FontSize',10,'Color','black');
     hold off
 end
 
