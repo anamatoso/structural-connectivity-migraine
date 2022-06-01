@@ -25,7 +25,7 @@ for m=1:n_nodes-1
             continue
         end
         
-        [~, ~, stats] = anova1(x,g,'off');
+        [~, ~, stats] = anova1(x,g,'off');        
         c=multcompare(stats,'display','off');
         
         for idx_p=1:length(c(:,end))
