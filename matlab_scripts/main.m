@@ -5,7 +5,7 @@ format long
 dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data';
 dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
 
-atlas="MNI"; if atlas=="AAL116" pattern=""; else pattern="*"+atlas; end
+atlas="AAL116"; if atlas=="AAL116" pattern=""; else pattern="*"+atlas; end
 
 % Controls midcyle
 HC_midcycle_mrtrix=load_data_mrtrix(dir,"*midcycle*mrtrix*bval2"+pattern+".csv"); %116 x 116 x n_people
@@ -88,7 +88,7 @@ clear i p
 % connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=1;%  1=all metrics, 2=degree + general metrics, 3=general metrics, 4=BC + general metrics
+version_metrics=3;%  1=all metrics, 2=degree + general metrics, 3=general metrics, 4=BC + general metrics
 clear metrics
 for i=1:n_conditions
     conmats=connectomes{i};
@@ -109,6 +109,10 @@ metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 ANOVA_results = anova_compare(metrics,metrics_labels,version_metrics,length(node_labels),"True");
 %writetable(ANOVA_results, 'ANOVA_results.xlsx');
+
+%% Visualization of results metrics
+plot_boxplots(metrics,[42 11 49 40 10],metrics_labels,version_metrics,length(node_labels))
+
 %% For visualization in BrainNet nodes AAL116
 pvalues=table2array(ANOVA_results(409:524,5));
 diff=table2array(ANOVA_results(409:524,6));
@@ -119,6 +123,10 @@ clear pvalues diff nodes_degree_color nodefile
 %% Analysis of connectivity - ANOVA
 ANOVA_results_conn = anova_compare_conn(connectomes,node_labels,"True");
 %writetable(ANOVA_results_conn, 'ANOVA_results_conn.xlsx');
+
+%% Visualization of results connectivity
+idx=[5 7;4 6;1 3;3 7;2 8;2 9;1 9;1 7;4 9]; 
+plot_boxplots_conn(connectomes,idx,node_labels)
 
 %% For visualization in BrainNet edges AAL116
 matrix = anova2matrix(ANOVA_results_conn);
@@ -227,13 +235,6 @@ end
 hold off
 legend(["HC midcycle", "M interictal", "HC premenstrual", "M ictal"])
 clear m hc mig i met color
-%% Visualization of results metrics
-idx=[545 572 557];
-plot_boxplots(metrics,[1 2],metrics_labels,version_metrics)
-clear idx
-%% Visualization of results connectivity
-idx=[5 7; 4 6;1 9;3 7; 1 3; 2 8]; 
-plot_boxplots_conn(connectomes,idx,node_labels)
 
 %% Visualization of results - Node Strength
 figure;
