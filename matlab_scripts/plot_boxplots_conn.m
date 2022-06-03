@@ -6,7 +6,7 @@ n_comparisons=(n_nodes*n_nodes-n_nodes)/2;
 for i=1:length(idx)
     index1=idx(i,1);
     index2=idx(i,2);
-    figure;
+    figure('color','w');
     
     hc_mid=squeeze(connectomes{1}(index1,index2,:))';
     mig_inter=squeeze(connectomes{2}(index1,index2,:))';
