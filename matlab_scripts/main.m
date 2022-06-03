@@ -104,28 +104,28 @@ end
 clear i p mat conmats m m2
 
 %% Analysis of results - ANOVA
-version_metrics=3;
+version_metrics=1;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 ANOVA_results = anova_compare(metrics,metrics_labels,version_metrics,length(node_labels),"True");
 %writetable(ANOVA_results, 'ANOVA_results.xlsx');
 
 %% Visualization of results metrics
-plot_boxplots(metrics,[42 11 49 40 10],metrics_labels,version_metrics,length(node_labels))
+plot_boxplots(metrics,[1:8],metrics_labels,version_metrics,length(node_labels))
 
 %% For visualization in BrainNet nodes AAL116
-pvalues=table2array(ANOVA_results(409:524,5));
-diff=table2array(ANOVA_results(409:524,6));
+pvalues=table2array(ANOVA_results(32:40,5)); %409:524
+diff=table2array(ANOVA_results(32:40,6));
 nodes_degree_color = nodes_color_size(pvalues,diff,1,node_labels);
-nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-writetable(nodefile, 'degree_nodes.txt','Delimiter',' ','WriteVariableNames', 0);
+nodefile = table(makenodefile("MNI_atlas_coord.txt",node_labels,nodes_degree_color));
+writetable(nodefile, 'degree_nodes_MNI.txt','Delimiter',' ','WriteVariableNames', 0);
 clear pvalues diff nodes_degree_color nodefile
 %% Analysis of connectivity - ANOVA
 ANOVA_results_conn = anova_compare_conn(connectomes,node_labels,"True");
 %writetable(ANOVA_results_conn, 'ANOVA_results_conn.xlsx');
 
 %% Visualization of results connectivity
-idx=[5 7;4 6;1 3;3 7;2 8;2 9;1 9;1 7;4 9]; 
+idx=[2 4;1 6]; 
 plot_boxplots_conn(connectomes,idx,node_labels)
 
 %% For visualization in BrainNet edges AAL116
