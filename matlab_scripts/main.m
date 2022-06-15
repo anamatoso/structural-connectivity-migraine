@@ -6,7 +6,7 @@ dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data'
 dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
 
 atlas="AAL116"; if atlas=="AAL116" pattern=""; else pattern="*"+atlas; end
-
+pattern="_intersect";
 % Controls midcyle
 HC_midcycle_mrtrix=load_data_mrtrix(dir,"*midcycle*mrtrix*bval2"+pattern+".csv"); %116 x 116 x n_people
 %HC_midcycle_fsl=load_data_fsl(dir,"*midcycle*fsl*",dir_roi);
@@ -85,7 +85,7 @@ end
 clear i p
 
 %% Calculate metrics
-% connectomes=rescale_connectomes(connectomes,n_people);
+%connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
 version_metrics=3;%  1=all metrics, 2=degree + general metrics, 3=general metrics, 4=BC + general metrics
@@ -104,7 +104,7 @@ end
 clear i p mat conmats m m2
 
 %% Analysis of results - ANOVA
-version_metrics=1;
+version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 ANOVA_results = anova_compare(metrics,metrics_labels,version_metrics,length(node_labels),"True");
@@ -125,7 +125,7 @@ ANOVA_results_conn = anova_compare_conn(connectomes,node_labels,"True");
 %writetable(ANOVA_results_conn, 'ANOVA_results_conn.xlsx');
 
 %% Visualization of results connectivity
-idx=[2 4;1 6]; 
+idx=[51 78;82 96;27 64;89 102;37 60]; 
 plot_boxplots_conn(connectomes,idx,node_labels)
 
 %% For visualization in BrainNet edges AAL116
