@@ -8,7 +8,7 @@ if version==1
     d_mat= distance_wei(len_mat);   % distance matrix
     
     %calculate metrics
-    BC=betweenness_wei(len_mat)';                               % betweenness centrality 1-116
+    BC=betweenness_wei(len_mat)'/((n_nodes-1)*(n_nodes-2));     % betweenness centrality 1-116
     [L,GE]=charpath(d_mat,0,0);                                 % characteristic path length and global efficiency 117,118
     Ci=clustering_coef_wu(weight_conversion(mat, 'normalize'))';% local clustering coefficient 120-235
     C=mean(Ci);                                                 % global clustering coefficient 119
@@ -17,7 +17,7 @@ if version==1
     RC=rich_club_wu_norm(mat,n_nodes-1);                        % rich club coefficient 469-583
     strength=strengths_und(mat);                                % node strength 584-699
     mean_strength=mean(strength);                               % mean strength 700
-    T=transitivity_wu(mat);                                     % transitivity 701
+    T=transitivity_wu(weight_conversion(mat, 'normalize'));     % transitivity 701
     S=smallworldness(mat);                                      % smallworldness 702
     A=assortativity_wei(mat,0);                                 % assortivity 703
     
@@ -50,12 +50,12 @@ elseif version==3
     
     %calculate metrics
     [L,GE]=charpath(d_mat,0,0);                                     % characteristic path length and global efficiency 1,2
-    Ci=clustering_coef_wu(weight_conversion(mat, 'normalize'));    % local clustering coefficient 
+    Ci=clustering_coef_wu(weight_conversion(mat, 'normalize'));     % local clustering coefficient 
     C=mean(Ci);                                                     % global clustering coefficient 3    
-    [~, Q]=modularity_und(mat);                                          % modularity 4
+    [~, Q]=modularity_und(mat);                                     % modularity 4
     strength=strengths_und(mat);                                    % node strength 
     mean_strength=mean(strength);                                   % mean strength 5
-    T=transitivity_wu(mat);                                         % transitivity 6
+    T=transitivity_wu(weight_conversion(mat, 'normalize'));         % transitivity 6
     S=smallworldness(mat);                                          % smallworldness 7
     A=assortativity_wei(mat,0);                                     % assortivity 8
     
