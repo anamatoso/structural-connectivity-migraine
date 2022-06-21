@@ -7,10 +7,10 @@ else
     correction=n_nodes;
 end
 
-
+figure('color','w');
 for i=1:length(idx)
     index=idx(i);
-    figure('color','w');
+    subplot(1,length(idx),i)
     
     hc_mid=metrics{1}(index,:);
     mig_inter=metrics{2}(index,:);
@@ -23,9 +23,9 @@ for i=1:length(idx)
     [h,p]=ttest2(hc_mid,mig_inter,'Alpha',0.05/correction);
     if h==1
         hold on
-        %text(2.1,1.01*quantile(mig_inter,0.75), '*','FontSize',15,'Color','black');
+        text(2.1,1.01*quantile(mig_inter,0.75), '*','FontSize',15,'Color','black');
     end
-    text(2.2,1.01*max(max(mig_inter),max(hc_mid)), "p="+num2str(p*correction,2),'FontSize',15,'Color','black');
+    %text(2.2,1.01*max(max(mig_inter),max(hc_mid)), "p="+num2str(p*correction,2),'FontSize',15,'Color','black');
     hold off
 end
 
