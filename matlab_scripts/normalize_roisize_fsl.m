@@ -6,13 +6,14 @@ function [connectome] = normalize_roisize_fsl(filename,roi_size)
 
 connectome=importdata(filename);
 
-size_roi=importdata(roi_size).*8; %get size of rois in voxels and multiply by volume per voxel
+size_roi=importdata(roi_size);%.*8; %get size of rois in voxels and multiply by volume per voxel
 
 %Normalize FSL connectome with sizes of ROIs
-for n=1:116
-    for m=1:116
+n_nodes=length(connectome);
+for n=1:n_nodes
+    for m=1:n_nodes
         if n~=m
-            connectome(n,m)=connectome(n,m)/(size_roi(n)+size_roi(m));
+            connectome(n,m)=connectome(n,m)*2/(size_roi(n)+size_roi(m));
         end
     end
 end
