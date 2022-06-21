@@ -46,9 +46,9 @@ for m=1:n_nodes-1
             if p<threshold
                 switch c(idx_p,4)>0
                     case 1
-                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) p*n_comparisons stats.tstat 1];
+                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) p stats.tstat 1];
                     case 0
-                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) p*n_comparisons stats.tstat -1];
+                        compare_anova=[compare_anova;m n c(idx_p,1) c(idx_p,2) p stats.tstat -1];
                 end
             end
         end
@@ -56,7 +56,7 @@ for m=1:n_nodes-1
     end
 end
 compare_anova=compare_anova(2:end,:);
-table=array2table(compare_anova, "VariableNames", ["Node 1","Node 2","Group 1", "Group 2", "P-value corrected","T statistic","Difference"]);
+table=array2table(compare_anova, "VariableNames", ["Node 1","Node 2","Group 1", "Group 2", "P-value","T statistic","Difference"]);
 node_names=[node_labels(compare_anova(:,1));node_labels(compare_anova(:,2))]';
 t_names=array2table(node_names, "VariableNames", ["Node 1 Name","Node 2 Name"]);
 ANOVA_results_conn = [t_names table];
