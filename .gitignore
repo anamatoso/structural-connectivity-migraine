@@ -370,4 +370,4 @@ matlab_scripts/matrix_data/*
 *.gz
 *.png
 scripts antigos/*
-matlab_scripts/old functions/*
+matlab_scripts/old functions and data/*
