@@ -1,5 +1,6 @@
 %% Load data from matrices
 clear all
+close all
 format long
 % directory where connectivity matrices are
 dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data';
@@ -36,7 +37,30 @@ for i=1:n_conditions
     n_people(i)=s(end);
 end
 node_labels=get_label_nodes(atlas+"_labels.txt");
+figure('color','w');imagesc(connectomes{1}(:,:,9)); colormap jet;colorbar;title("MRTrix")
+figure('color','w');imagesc(connectomes{3}(:,:,9)); colormap jet;colorbar;title("FSL")
 clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
+
+%% Compare matrix entries between FSL and MRTrix
+nnodes=length(node_labels);
+X = randi(nnodes,4,2);
+difference_matrix=zeros(nnodes,nnodes);
+for i=1:nnodes-1
+    for j=i+1:nnodes
+            %figure('color','w')
+            mrtrix=squeeze(connectomes{1}(i,j,:))';
+            fsl=squeeze(connectomes{3}(i,j,:))';
+            [h,p] = ttest2(mrtrix,fsl,"alpha",0.05);%/(116*115/2));
+            difference_matrix(i,j)=p;
+            difference_matrix(j,i)=p;
+            %x=[mrtrix fsl];
+            %g=[zeros(size(mrtrix)) ones(size(fsl))];
+            %boxplot(x,g,'Labels',["MRtrix", "FSL"])
+    end
+end
+figure('color','w');imagesc(difference_matrix,[0 0.05/(116*115/2)]); colormap jet;colorbar;title("Pvalue of difference between fsl and mrtrix")
+clear mrtrix fsl x g
+
 %% Analyse only a subnetwork of the connectome (Optional)
 subnetwork=[1:90];
 
@@ -85,17 +109,17 @@ clear i p
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=3;%  1=all metrics, 2=general metrics
+version_metrics=3;%  1=nodal metrics, 2=general metrics
 clear metrics
 metrics=cell(size(connectomes));
 for i=1:n_conditions
     conmats=connectomes{i};
+    clear m
     for p=1:n_people(i)
         mat=conmats(:,:,p); % connectivity matrix
         m(:,p)=calculate_metrics(mat,version_metrics);
     end
     metrics{i}=m;
-    clear m
 end
 
 
@@ -111,21 +135,22 @@ ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node
 clear comparisons
 
 %% Visualization of results: metrics
-idx_metrics=[103 63 331 325];
-idx_groups=[1 2];
+idx_metrics=[4:6];idx_metrics=randi(464,1,5);
+idx_groups=[1 2 3 4];
+patient_labels=["HC-mrtrix" "M-mrtrix" "HC-fsl" "M-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
 
-plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,patient_labels)
+plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,patient_labels,version_metrics,116)
 
 clear idx_metrics idx_groups
 %% For visualization in BrainNet nodes AAL116
 % nodal metrics:
-nodestrength=(464:579); bc=(1:116);lC=(117:232);ec=(233:348);
+nodestrength=(349:464); bc=(1:116);lC=(117:232);ec=(233:348);
 
-pvalues=table2array(ttest_results(bc,5)); 
-diff=table2array(ttest_results(bc,6));
-nodes_degree_color = nodes_color_size(pvalues,diff,0.05,node_labels);
+qvalues=table2array(ttest_results(ec,8)); 
+diff=table2array(ttest_results(ec,6));
+nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);
 nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-writetable(nodefile, 'bc_significant.txt','Delimiter',' ','WriteVariableNames', 0);
+writetable(nodefile, 'ec_significant2.txt','Delimiter',' ','WriteVariableNames', 0);
 clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec
 %% Analysis of connectivity
 comparisons=[1 2];
