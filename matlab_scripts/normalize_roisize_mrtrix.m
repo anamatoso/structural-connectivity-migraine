@@ -13,7 +13,7 @@ n_nodes=length(connectome);
 for n=1:n_nodes
     for m=1:n_nodes
         if n~=m
-            connectome(n,m)=connectome(n,m)*mean_volume;
+            connectome(n,m)=connectome(n,m)*mean_volume/10000000;
         end
     end
 end
