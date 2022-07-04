@@ -26,8 +26,8 @@ elseif version==2
     strength=strengths_und(mat);                                    % node strength 
     mean_strength=mean(strength);                                   % mean strength 5
     T=transitivity_wu(weight_conversion(mat, 'normalize'));         % transitivity 6
-    S=smallworldness(mat);                                          % smallworldness 7
-    %A=assortativity_wei(mat,0);                                     % assortivity 8
+    S=smallworldness2(mat,20000);                                   % smallworldness 7
+    %A=assortativity_wei(mat,0);                                    % assortivity 8
     
     % insert metrics in matrix
     metrics=[L GE C Q mean_strength T S]';
