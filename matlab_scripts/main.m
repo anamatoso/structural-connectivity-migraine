@@ -37,8 +37,8 @@ for i=1:n_conditions
     n_people(i)=s(end);
 end
 node_labels=get_label_nodes(atlas+"_labels.txt");
-figure('color','w');imagesc(connectomes{1}(:,:,9)); colormap jet;colorbar;title("MRTrix")
-figure('color','w');imagesc(connectomes{3}(:,:,9)); colormap jet;colorbar;title("FSL")
+figure('color','w','Position', [100 100 2000 500]);subplot(1,2,1);imagesc(connectomes{1}(:,:,9)); colormap jet;colorbar;title("MRTrix")
+subplot(1,2,2);imagesc(connectomes{3}(:,:,9)); colormap jet;colorbar;title("FSL")
 clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
 
 %% Compare matrix entries between FSL and MRTrix
@@ -109,7 +109,7 @@ clear i p
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=3;%  1=nodal metrics, 2=general metrics
+version_metrics=1;%  1=nodal metrics, 2=general metrics
 clear metrics
 metrics=cell(size(connectomes));
 for i=1:n_conditions
@@ -126,16 +126,16 @@ end
 clear i p mat conmats m m2
 
 %% Analysis of results
-version_metrics=3;
+version_metrics=2;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[1 2];
+comparisons=[1 2;3 4];
 ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
-%writetable(ttest_results, 'ANOVA_results.xlsx');
+writetable(ttest_results, 'ANOVA_results.xlsx');
 clear comparisons
 
 %% Visualization of results: metrics
-idx_metrics=[4:6];idx_metrics=randi(464,1,5);
+idx_metrics=[1:7];%idx_metrics=randi(464,1,5);
 idx_groups=[1 2 3 4];
 patient_labels=["HC-mrtrix" "M-mrtrix" "HC-fsl" "M-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
 
@@ -147,7 +147,7 @@ clear idx_metrics idx_groups
 nodestrength=(349:464); bc=(1:116);lC=(117:232);ec=(233:348);
 
 qvalues=table2array(ttest_results(ec,8)); 
-diff=table2array(ttest_results(ec,6));
+diff=table2array(ttest_results(ec,7));
 nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);
 nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
 writetable(nodefile, 'ec_significant2.txt','Delimiter',' ','WriteVariableNames', 0);
