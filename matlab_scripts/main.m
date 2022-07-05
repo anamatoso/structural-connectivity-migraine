@@ -41,8 +41,8 @@ figure('color','w','Position', [100 100 2000 500]);subplot(1,2,1);imagesc(connec
 subplot(1,2,2);imagesc(connectomes{3}(:,:,9)); colormap jet;colorbar;title("FSL")
 
 figure;boxplot([reshape(connectomes{1}(:,:,9),116*116,1) reshape(connectomes{3}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);
-figure;histogram(reshape(connectomes{1}(:,:,9),116*116,1));title("MRTrix")
-figure;histogram(reshape(connectomes{3}(:,:,9),116*116,1));title("FSL")
+%figure;histogram(reshape(connectomes{1}(:,:,9),116*116,1));title("MRTrix")
+%figure;histogram(reshape(connectomes{3}(:,:,9),116*116,1));title("FSL")
 
 clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
 
@@ -56,15 +56,21 @@ for i=1:nnodes-1
             mrtrix=squeeze(connectomes{1}(i,j,:))';
             fsl=squeeze(connectomes{3}(i,j,:))';
             [h,p] = ttest2(mrtrix,fsl,"alpha",0.05);%/(116*115/2));
-            difference_matrix(i,j)=p;
-            difference_matrix(j,i)=p;
+            difference_matrix(i,j)=h; difference_matrix(j,i)=h;
             %x=[mrtrix fsl];
             %g=[zeros(size(mrtrix)) ones(size(fsl))];
             %boxplot(x,g,'Labels',["MRtrix", "FSL"])
     end
 end
-figure('color','w');imagesc(difference_matrix,[0 0.05/(116*115/2)]); colormap jet;colorbar;title("Pvalue of difference between fsl and mrtrix")
-clear mrtrix fsl x g
+connectomes2=connectomes;
+for i=1:n_conditions
+    for p=1:n_people(i)
+        connectomes2{i}(:,:,p)=connectomes{i}(:,:,p).*(ones(size(difference_matrix(:,:)))-difference_matrix(:,:));
+    end
+end
+
+figure('color','w');imagesc(difference_matrix); colormap jet;colorbar;title("Pvalue of difference between fsl and mrtrix")
+clear mrtrix fsl x g nnodes X difference_matrix i j h p
 
 %% Analyse only a subnetwork of the connectome (Optional)
 subnetwork=[1:90];
@@ -114,11 +120,11 @@ clear i p
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=1;%  1=nodal metrics, 2=general metrics
+version_metrics=3;%  1=nodal metrics, 2=general metrics
 clear metrics
-metrics=cell(size(connectomes));
+metrics=cell(size(connectomes2));
 for i=1:n_conditions
-    conmats=connectomes{i};
+    conmats=connectomes2{i};
     clear m
     for p=1:n_people(i)
         mat=conmats(:,:,p); % connectivity matrix
@@ -133,7 +139,7 @@ clear i p mat conmats m m2
 %% Analysis of results
 version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[3 4];
+comparisons=[1 2;3 4];
 ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
 %writetable(ttest_results, 'ANOVA_results.xlsx');
