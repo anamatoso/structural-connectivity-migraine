@@ -40,5 +40,22 @@ table=array2table(compare_ttest, "VariableNames", ["Node 1","Node 2","Group 1", 
 node_names=[node_labels(compare_ttest(:,1));node_labels(compare_ttest(:,2))]';
 t_names=array2table(node_names, "VariableNames", ["Node 1 Name","Node 2 Name"]);
 ttest_results_conn = [t_names table];
+
+
+% Calculate FDR 
+pvals=reshape(table2array(ttest_results_conn(:,7)),[],ncomp);
+[~,ncomparisons]=size(pvals);
+fdr=zeros(size(pvals));
+for i=1:ncomparisons
+    [~, q] = mafdr(pvals(:,i));
+    fdr(:,i)=q;
+end
+
+fdr=reshape(fdr,[],1);
+fdr_table=array2table(fdr, "VariableNames", ["q-value"]);
+ttest_results_conn = [t_names table fdr_table];
+
+
+
 end
 
