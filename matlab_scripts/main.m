@@ -37,6 +37,8 @@ for i=1:n_conditions
     n_people(i)=s(end);
 end
 node_labels=get_label_nodes(atlas+"_labels.txt");
+clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
+
 %% Compare matrices and matrix entries
 % Plot matrices
 figure('color','w','Position', [100 100 2000 500]);
@@ -50,8 +52,6 @@ annotation('rectangle',[0.18 0.14 0.24 0.1],'Color','green')
 subplot(1,2,2);boxplot([reshape(connectomes{2}(:,:,9),116*116,1) reshape(connectomes{4}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);title("Zoom")
 ylim([-0.02e-3 0.5e-3])
 
-clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
-
 %% Compute differences between matrices
 nnodes=length(node_labels);
 %X = randi(nnodes,4,2);
@@ -62,6 +62,7 @@ for i=1:nnodes-1
             fsl=squeeze(connectomes{3}(i,j,:))';
             [h,p] = ttest2(mrtrix,fsl,"alpha",0.05/(116*115/2));
             difference_matrix(i,j)=h; difference_matrix(j,i)=h;
+            difference_matrix_p(i,j)=p; difference_matrix_p(j,i)=p;
     end
 end
 connectomes2=connectomes;
@@ -71,13 +72,16 @@ for i=1:n_conditions
     end
 end
 
-figure('color','w');imagesc(difference_matrix); colormap jet;colorbar;title("Coherence between fsl and mrtrix")
+figure('color','w');
+subplot(1,2,1);imagesc(difference_matrix); colormap jet;colorbar;title("Coherence between fsl and mrtrix")
+subplot(1,2,2);imagesc(difference_matrix_p); colormap jet;colorbar;title("Coherence between fsl and mrtrix-pvalue")
+
 
 figure('color','w','Position', [100 100 2000 1000]);
-subplot(2,2,1);imagesc(connectomes{2}(:,:,9)); colormap jet;colorbar;title("MRTrix")
-subplot(2,2,2);imagesc(connectomes{4}(:,:,9)); colormap jet;colorbar;title("FSL")
-subplot(2,2,3);imagesc(connectomes2{2}(:,:,9)); colormap jet;colorbar;title("MRTrix only coherent")
-subplot(2,2,4);imagesc(connectomes2{4}(:,:,9)); colormap jet;colorbar;title("FSL only coherent")
+subplot(2,2,1);imagesc(connectomes{1}(:,:,9)); colormap jet;colorbar;title("MRTrix")
+subplot(2,2,2);imagesc(connectomes{3}(:,:,9)); colormap jet;colorbar;title("FSL")
+subplot(2,2,3);imagesc(connectomes2{1}(:,:,9)); colormap jet;colorbar;title("MRTrix only coherent")
+subplot(2,2,4);imagesc(connectomes2{3}(:,:,9)); colormap jet;colorbar;title("FSL only coherent")
 clear mrtrix fsl x g nnodes X difference_matrix i j h p
 
 %% Analyse only a subnetwork of the connectome (Optional)
@@ -145,17 +149,17 @@ end
 clear i p mat conmats m m2
 
 %% Analysis of results
-version_metrics=2;
+version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[1 2;3 4];
+comparisons=[3 4];
 ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
-%writetable(ttest_results, 'ANOVA_results.xlsx');
+writetable(ttest_results, 'ttest_results.xlsx');
 clear comparisons
 
 %% Visualization of results: metrics
-idx_metrics=[1:7];idx_metrics=[103 63 447 374];%randi(464,1,5);
-idx_groups=[1 2];
+idx_metrics=[1:7];idx_metrics=[66];%randi(464,1,5);
+idx_groups=[3 4];
 patient_labels=["HC-mrtrix" "M-mrtrix" "HC-fsl" "M-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
 
 plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,patient_labels,version_metrics,116)
@@ -165,11 +169,11 @@ clear idx_metrics idx_groups
 % nodal metrics:
 nodestrength=(349:464); bc=(1:116);lC=(117:232);ec=(233:348);
 
-qvalues=table2array(ttest_results(lC,8)); 
+qvalues=table2array(ttest_results(lC,6)); 
 diff=table2array(ttest_results(lC,7));
 nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);
 nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-writetable(nodefile, 'lC_significant2_fsl.txt','Delimiter',' ','WriteVariableNames', 0);
+writetable(nodefile, 'lC_significant_fsl.txt','Delimiter',' ','WriteVariableNames', 0);
 clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec
 %% Analysis of connectivity
 comparisons=[1 2;3 4];
