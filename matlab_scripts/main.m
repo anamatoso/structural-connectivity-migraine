@@ -37,29 +37,31 @@ for i=1:n_conditions
     n_people(i)=s(end);
 end
 node_labels=get_label_nodes(atlas+"_labels.txt");
-figure('color','w','Position', [100 100 2000 500]);subplot(1,2,1);imagesc(connectomes{1}(:,:,9)); colormap jet;colorbar;title("MRTrix")
-subplot(1,2,2);imagesc(connectomes{3}(:,:,9)); colormap jet;colorbar;title("FSL")
+%% Compare matrices and matrix entries
+% Plot matrices
+figure('color','w','Position', [100 100 2000 500]);
+subplot(1,2,1);imagesc(connectomes{2}(:,:,9)); colormap jet;colorbar;title("MRTrix")
+subplot(1,2,2);imagesc(connectomes{4}(:,:,9)); colormap jet;colorbar;title("FSL")
 
-figure;boxplot([reshape(connectomes{1}(:,:,9),116*116,1) reshape(connectomes{3}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);
-%figure;histogram(reshape(connectomes{1}(:,:,9),116*116,1));title("MRTrix")
-%figure;histogram(reshape(connectomes{3}(:,:,9),116*116,1));title("FSL")
+% Plot boxplots
+figure('color','w');
+subplot(1,2,1);boxplot([reshape(connectomes{2}(:,:,9),116*116,1) reshape(connectomes{4}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);title("Distribution of matrix values")
+annotation('rectangle',[0.18 0.14 0.24 0.1],'Color','green')
+subplot(1,2,2);boxplot([reshape(connectomes{2}(:,:,9),116*116,1) reshape(connectomes{4}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);title("Zoom")
+ylim([-0.02e-3 0.5e-3])
 
 clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
 
-%% Compare matrix entries between FSL and MRTrix
+%% Compute differences between matrices
 nnodes=length(node_labels);
-X = randi(nnodes,4,2);
+%X = randi(nnodes,4,2);
 difference_matrix=zeros(nnodes,nnodes);
 for i=1:nnodes-1
     for j=i+1:nnodes
-            %figure('color','w')
             mrtrix=squeeze(connectomes{1}(i,j,:))';
             fsl=squeeze(connectomes{3}(i,j,:))';
-            [h,p] = ttest2(mrtrix,fsl,"alpha",0.05);%/(116*115/2));
+            [h,p] = ttest2(mrtrix,fsl,"alpha",0.05/(116*115/2));
             difference_matrix(i,j)=h; difference_matrix(j,i)=h;
-            %x=[mrtrix fsl];
-            %g=[zeros(size(mrtrix)) ones(size(fsl))];
-            %boxplot(x,g,'Labels',["MRtrix", "FSL"])
     end
 end
 connectomes2=connectomes;
@@ -69,7 +71,13 @@ for i=1:n_conditions
     end
 end
 
-figure('color','w');imagesc(difference_matrix); colormap jet;colorbar;title("Pvalue of difference between fsl and mrtrix")
+figure('color','w');imagesc(difference_matrix); colormap jet;colorbar;title("Coherence between fsl and mrtrix")
+
+figure('color','w','Position', [100 100 2000 1000]);
+subplot(2,2,1);imagesc(connectomes{2}(:,:,9)); colormap jet;colorbar;title("MRTrix")
+subplot(2,2,2);imagesc(connectomes{4}(:,:,9)); colormap jet;colorbar;title("FSL")
+subplot(2,2,3);imagesc(connectomes2{2}(:,:,9)); colormap jet;colorbar;title("MRTrix only coherent")
+subplot(2,2,4);imagesc(connectomes2{4}(:,:,9)); colormap jet;colorbar;title("FSL only coherent")
 clear mrtrix fsl x g nnodes X difference_matrix i j h p
 
 %% Analyse only a subnetwork of the connectome (Optional)
@@ -122,9 +130,9 @@ clear i p
 
 version_metrics=3;%  1=nodal metrics, 2=general metrics
 clear metrics
-metrics=cell(size(connectomes2));
+metrics=cell(size(connectomes));
 for i=1:n_conditions
-    conmats=connectomes2{i};
+    conmats=connectomes{i};
     clear m
     for p=1:n_people(i)
         mat=conmats(:,:,p); % connectivity matrix
@@ -137,7 +145,7 @@ end
 clear i p mat conmats m m2
 
 %% Analysis of results
-version_metrics=3;
+version_metrics=2;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 comparisons=[1 2;3 4];
 ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
@@ -157,21 +165,21 @@ clear idx_metrics idx_groups
 % nodal metrics:
 nodestrength=(349:464); bc=(1:116);lC=(117:232);ec=(233:348);
 
-qvalues=table2array(ttest_results(ec,8)); 
-diff=table2array(ttest_results(ec,7));
+qvalues=table2array(ttest_results(lC,8)); 
+diff=table2array(ttest_results(lC,7));
 nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);
 nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-writetable(nodefile, 'ec_significant2_mrtrix.txt','Delimiter',' ','WriteVariableNames', 0);
+writetable(nodefile, 'lC_significant2_fsl.txt','Delimiter',' ','WriteVariableNames', 0);
 clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec
 %% Analysis of connectivity
-comparisons=[1 2];
+comparisons=[1 2;3 4];
 ttest_results_conn = ttest_compare_conn(connectomes,node_labels,comparisons);
 
 %writetable(ANOVA_results_conn, 'ttest_results_conn.xlsx');
 clear comparisons
 %% Visualization of results connectivity
-idx_metrics=[27 64;5 74;28 54;84 95];
-idx_groups=[1 2];
+idx_metrics=[61 63;1 11;1 35;1 52];
+idx_groups=[3 4];
 plot_boxplots_conn(connectomes,idx_metrics,idx_groups,patient_labels,node_labels)
 
 %% For visualization in BrainNet edges AAL116
