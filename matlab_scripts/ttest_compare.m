@@ -42,10 +42,6 @@ metrics_names=metrics_labels(compare_ttest(:,1))';
 t_names=array2table(metrics_names, "VariableNames", ["Metric Name"]);
 ttest_results = [t_names table];
 
-%[fdr,q] = mafdr(table2array(ttest_results(:,5)));
-%fdr_table=array2table([fdr q], "VariableNames", ["FDR", "Q"]);
-
-ttest_results = [t_names table];
 if version_metrics==3
     % Calculate FDR for nodal metrics
     pvals=reshape(table2array(ttest_results(:,5)),116,[]);
