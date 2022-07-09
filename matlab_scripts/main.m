@@ -56,6 +56,8 @@ ylim([-0.02e-3 0.5e-3])
 nnodes=length(node_labels);
 %X = randi(nnodes,4,2);
 difference_matrix=zeros(nnodes,nnodes);
+
+k=0;
 for i=1:nnodes-1
     for j=i+1:nnodes
             mrtrix=squeeze(connectomes{1}(i,j,:))';
@@ -65,6 +67,9 @@ for i=1:nnodes-1
             difference_matrix_p(i,j)=p; difference_matrix_p(j,i)=p;
     end
 end
+
+
+
 connectomes2=connectomes;
 for i=1:n_conditions
     for p=1:n_people(i)
@@ -82,7 +87,32 @@ subplot(2,2,1);imagesc(connectomes{1}(:,:,9)); colormap jet;colorbar;title("MRTr
 subplot(2,2,2);imagesc(connectomes{3}(:,:,9)); colormap jet;colorbar;title("FSL")
 subplot(2,2,3);imagesc(connectomes2{1}(:,:,9)); colormap jet;colorbar;title("MRTrix only coherent")
 subplot(2,2,4);imagesc(connectomes2{3}(:,:,9)); colormap jet;colorbar;title("FSL only coherent")
-clear mrtrix fsl x g nnodes X difference_matrix i j h p
+clear mrtrix fsl x g X difference_matrix i j h p
+
+%% Scatter plot
+
+% scatterv=[[],[]];
+% for c=1:2
+%     for p=1:n_people(c)
+%         for i=1:nnodes-1
+%             for j=i+1:nnodes
+%                 scatterv=[scatterv; connectomes{c}(i,j,p) connectomes{c+2}(i,j,p)];
+%             end
+%         end
+%     end
+% end
+
+R= corr(scatterv,"Type","Pearson");
+disp("Pearson's correlation coefficient: "+ num2str(R(1,2)))
+%R= corr(scatterv,"Type","Kendall");
+disp("Kendall's correlation coefficient: "+ num2str(R(1,2)))
+R= corr(scatterv,"Type","Spearman");
+disp("Spearman's correlation coefficient: "+ num2str(R(1,2)))
+
+figure('color','w');
+subplot(1,2,1);scatter(scatterv(:,1),scatterv(:,2)); title("Normal Scale");xlabel("Mrtrix");ylabel("FSL");
+subplot(1,2,2);scatter(scatterv(:,1),scatterv(:,2));set(gca,'xscale','log');set(gca,'yscale','log');title("Logarithmic Scale");xlabel("Mrtrix");ylabel("FSL");
+
 
 %% Analyse only a subnetwork of the connectome (Optional)
 subnetwork=[1:90];
@@ -149,17 +179,17 @@ end
 clear i p mat conmats m m2
 
 %% Analysis of results
-version_metrics=3;
+version_metrics=2;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[3 4];
+comparisons=[1 5];
 ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
 writetable(ttest_results, 'ttest_results.xlsx');
 clear comparisons
 
 %% Visualization of results: metrics
-idx_metrics=[1:7];idx_metrics=[66];%randi(464,1,5);
-idx_groups=[3 4];
+idx_metrics=[1:7];
+idx_groups=[1 5];
 patient_labels=["HC-mrtrix" "M-mrtrix" "HC-fsl" "M-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
 
 plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,patient_labels,version_metrics,116)
