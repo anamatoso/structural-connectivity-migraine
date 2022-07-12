@@ -41,7 +41,7 @@ clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midc
 
 %% Compare matrices and matrix entries
 % Plot matrices
-figure('color','w','Position', [100 100 2000 500]);
+figure('color','w');
 subplot(1,2,1);imagesc(connectomes{2}(:,:,9)); colormap jet;colorbar;title("MRTrix")
 subplot(1,2,2);imagesc(connectomes{4}(:,:,9)); colormap jet;colorbar;title("FSL")
 
@@ -51,6 +51,15 @@ subplot(1,2,1);boxplot([reshape(connectomes{2}(:,:,9),116*116,1) reshape(connect
 annotation('rectangle',[0.18 0.14 0.24 0.1],'Color','green')
 subplot(1,2,2);boxplot([reshape(connectomes{2}(:,:,9),116*116,1) reshape(connectomes{4}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);title("Zoom")
 ylim([-0.02e-3 0.5e-3])
+
+% Plot histograms
+figure('color','w');
+subplot(2,2,1);histogram(connectomes{1}(:,:,:),40);title("Distribution of matrix values in MRtrix HC");set(gca, 'YScale', 'log')
+subplot(2,2,2);histogram(connectomes{2}(:,:,:),40);title("Distribution of matrix values in MRtrix M");set(gca, 'YScale', 'log')
+subplot(2,2,3);histogram(connectomes{3}(:,:,:),40);title("Distribution of matrix values in FSL HC");set(gca, 'YScale', 'log')
+subplot(2,2,4);histogram(connectomes{4}(:,:,:),40);title("Distribution of matrix values in FSL M");set(gca, 'YScale', 'log')
+
+
 
 %% Compute differences between matrices
 nnodes=length(node_labels);
@@ -90,30 +99,58 @@ subplot(2,2,4);imagesc(connectomes2{3}(:,:,9)); colormap jet;colorbar;title("FSL
 clear mrtrix fsl x g X difference_matrix i j h p
 
 %% Scatter plot
+npeople=[12 14];
+nnodes=length(node_labels);
+scatterv=[[],[]];
+for c=1:2
+    for p=1:npeople(c)
+        for i=1:nnodes-1
+            for j=i+1:nnodes
+                scatterv=[scatterv; connectomes{c}(i,j,p) connectomes{c+2}(i,j,p)];
+            end
+        end
+    end
+end
 
-% scatterv=[[],[]];
-% for c=1:2
-%     for p=1:n_people(c)
-%         for i=1:nnodes-1
-%             for j=i+1:nnodes
-%                 scatterv=[scatterv; connectomes{c}(i,j,p) connectomes{c+2}(i,j,p)];
-%             end
-%         end
-%     end
-% end
+scattervlog=log10(scatterv);
+todelete=[];
+for i=1:length(scattervlog)
+    if isinf(scattervlog(i,1)) || isinf(scattervlog(i,2))
+        todelete=[todelete i];
+    end
+end
+todelete=flip(todelete);
+for i=1:length(todelete)
+    scattervlog(todelete(i),:)=[];
+end
 
+mdl = fitlm(scatterv(:,1),scatterv(:,2));
+disp("r^2 with normal scale: " +num2str(mdl.Rsquared.Ordinary))
+mdllog = fitlm(scattervlog(:,1),scattervlog(:,2));
+disp("r^2 with log-log scale: " +num2str(mdllog.Rsquared.Ordinary))
+figure('color','w');
+subplot(1,2,1);plot(mdl);text(6.5e-3,0.25e-3,"R^2="+num2str(mdl.Rsquared.Ordinary))
+title("Normal Scale");xlabel("Mrtrix");ylabel("FSL");
+subplot(1,2,2);plot(mdllog);text(-7.5,-2.5,"R^2="+num2str(mdllog.Rsquared.Ordinary))
+title("Logarithm Scale");xlabel("Mrtrix");ylabel("FSL");
+
+disp("Normal Scale")
 R= corr(scatterv,"Type","Pearson");
 disp("Pearson's correlation coefficient: "+ num2str(R(1,2)))
-%R= corr(scatterv,"Type","Kendall");
+R= corr(scatterv,"Type","Kendall");
 disp("Kendall's correlation coefficient: "+ num2str(R(1,2)))
 R= corr(scatterv,"Type","Spearman");
 disp("Spearman's correlation coefficient: "+ num2str(R(1,2)))
+disp(" ")
+disp("Logarithmic Scale")
+R= corr(scattervlog,"Type","Pearson");
+disp("Pearson's correlation coefficient: "+ num2str(R(1,2)))
+R= corr(scattervlog,"Type","Kendall");
+disp("Kendall's correlation coefficient: "+ num2str(R(1,2)))
+R= corr(scattervlog,"Type","Spearman");
+disp("Spearman's correlation coefficient: "+ num2str(R(1,2)))
 
-figure('color','w');
-subplot(1,2,1);scatter(scatterv(:,1),scatterv(:,2)); title("Normal Scale");xlabel("Mrtrix");ylabel("FSL");
-subplot(1,2,2);scatter(scatterv(:,1),scatterv(:,2));set(gca,'xscale','log');set(gca,'yscale','log');title("Logarithmic Scale");xlabel("Mrtrix");ylabel("FSL");
-
-
+clear R npeople nnodes scatterv c p i j scattervlog todelete mdl mdllog R
 %% Analyse only a subnetwork of the connectome (Optional)
 subnetwork=[1:90];
 
@@ -175,13 +212,12 @@ for i=1:n_conditions
     metrics{i}=m;
 end
 
-
 clear i p mat conmats m m2
 
 %% Analysis of results
-version_metrics=2;
+version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[1 5];
+comparisons=[1 2];
 ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
 writetable(ttest_results, 'ttest_results.xlsx');
