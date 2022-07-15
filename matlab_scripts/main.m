@@ -216,7 +216,7 @@ clear i p mat conmats m m2
 %% Analysis of results
 version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[3 4];
+comparisons=[1 3];
 
 ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
@@ -233,14 +233,18 @@ plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,patient_labels,versi
 clear idx_metrics idx_groups
 %% For visualization in BrainNet nodes AAL116
 % nodal metrics:
-nodestrength=(349:464); bc=(1:116);lC=(117:232);ec=(233:348);
+nodestrength=(349:464); bc=(1:116); lC=(117:232); ec=(233:348);
+m=[nodestrength;bc;lC;ec];
+names=["nodestrength" "bc" "lC" "ec"];
 
-qvalues=table2array(ttest_results(nodestrength,6)); 
-diff=table2array(ttest_results(nodestrength,7));
-nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);
-nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-writetable(nodefile, 'nodestrength_significant_fsl.txt','Delimiter',' ','WriteVariableNames', 0);
-clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec
+for i=1:4
+    qvalues=table2array(ttest_results(m(i,:),6)); 
+    diff=table2array(ttest_results(m(i,:),7));
+    nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);
+    nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
+    writetable(nodefile, names(i)+'_significant_methods.txt','Delimiter',' ','WriteVariableNames', 0);
+end
+clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i
 %% Analysis of connectivity
 comparisons=[1 2;3 4];
 ttest_results_conn = ttest_compare_conn(connectomes,node_labels,comparisons);
