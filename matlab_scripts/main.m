@@ -198,7 +198,7 @@ clear i p
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=3;%  1=nodal metrics, 2=general metrics
+version_metrics=1;%  1=nodal metrics, 2=general metrics
 clear metrics
 metrics=cell(size(connectomes));
 for i=1:n_conditions
@@ -216,17 +216,17 @@ clear i p mat conmats m m2
 %% Analysis of results
 version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[1 3];
+comparisons=[3 4];
 
 ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
-writetable(ttest_results, 'ttest_results.xlsx');
+%writetable(ttest_results, 'ttest_results.xlsx');
 clear comparisons
 
 %% Visualization of results: metrics
 idx_metrics=[1:7];
 idx_groups=[1 5];
-patient_labels=["HC-mrtrix" "M-mrtrix" "HC-fsl" "M-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
+patient_labels=["HC-midcycle-mrtrix" "M-mrtrix" "HC-fsl" "M-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
 
 plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,patient_labels,version_metrics,116)
 
