@@ -6,14 +6,10 @@ len_mat=1./mat; % conection-length matrix
 if version==1
   
     % metrics
-    BC=betweenness_wei(len_mat)'/((n_nodes-1)*(n_nodes-2));     % betweenness centrality 1-116
-    Ci=clustering_coef_wu(weight_conversion(mat, 'normalize'))';% local clustering coefficient 117-232
-    EC=eigenvector_centrality_und(mat)';                        % eigenvector centrality 233-348
     RC=rich_club_wu_norm(mat,n_nodes-1);                        % rich club coefficient 249-463
-    strength=strengths_und(mat);                                % node strength 464-579
     
     % insert metrics in matrix
-    metrics=[BC Ci EC RC strength]';
+    metrics=RC';
     
 elseif version==2
     d_mat= distance_wei(len_mat);   % distance matrix
