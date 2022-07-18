@@ -185,20 +185,22 @@ clear i p newconnectome idx_map
 %connectomes=rescale_connectomes(connectomes,n_people);
 [n_nodes,~,~]=size(connectomes{1});
 significance_mask=zeros(n_nodes,n_nodes,n_conditions);
+
 for i=1:n_conditions
-    significance_mask(:,:,i) = signtest_mask(connectomes{i});
+    significance_mask(:,:,i) = remove_spurious(connectomes{i},2,30);
     for p=1:n_people(i)
         connectomes{i}(:,:,p)=connectomes{i}(:,:,p).*significance_mask(:,:,i);
     end
 end
-% imagesc(significance_mask(:,:,1)); colormap jet;colorbar
+
+imagesc(significance_mask(:,:,2)); colormap jet;colorbar
 clear i p
 
 %% Calculate metrics
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=1;%  1=nodal metrics, 2=general metrics
+version_metrics=3;%  1=nodal metrics, 2=general metrics
 clear metrics
 metrics=cell(size(connectomes));
 for i=1:n_conditions
@@ -214,9 +216,9 @@ end
 clear i p mat conmats m m2
 
 %% Analysis of results
-version_metrics=3;
+version_metrics=2;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[3 4];
+comparisons=[1 2;3 4];
 
 ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
