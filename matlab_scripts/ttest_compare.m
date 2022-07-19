@@ -21,8 +21,11 @@ for c=1:ncomp
         x = [data1 data2];
         g = [zeros(1,length(data1)),ones(1,length(data2))];
         
-        if any(isnan(x)) || all(x==0)
+        if any(isnan(x))
             compare_ttest=[compare_ttest;m g1 g2 1 correction 0];
+            continue
+        elseif all(x==0)
+            compare_ttest=[compare_ttest;m g1 g2 0 0 0];
             continue
         end
         
