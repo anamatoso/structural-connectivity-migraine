@@ -1,4 +1,4 @@
-function [connectomes] = load_data(folder_matrix,pattern,folder_roi_sizes,algorithm)
+function [connectomes] = load_data(folder_matrix,pattern,folder_roi_sizes,algorithm,threshold)
 % This function loads the data from a given folder which have a given
 % pattern
 
@@ -19,12 +19,12 @@ for k = 1 : length(theFiles)
     if algorithm=="fsl"
         roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-17),"_roi_size.txt"); %17
         fullFileName = fullfile(theFiles(k).folder, baseFileName);
-        c=normalize_roisize_fsl(fullFileName,roi_file);
+        c=normalize_roisize_fsl(fullFileName,roi_file,threshold);
         
     elseif algorithm=="mrtrix"
         roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-34),"_roi_size_intersect.txt"); %17
         fullFileName = fullfile(theFiles(k).folder, baseFileName);
-        c=normalize_roisize_mrtrix(fullFileName,roi_file);
+        c=normalize_roisize_mrtrix(fullFileName,roi_file,threshold);
     
     else
         disp ('Error: Algorithm not known. Please choose either fsl or mrtrix.')
