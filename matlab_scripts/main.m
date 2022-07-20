@@ -9,21 +9,23 @@ dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_size
 atlas="AAL116"; 
 if atlas=="AAL116" pattern="_intersect"; else pattern="*"+atlas; end
 
+threshold=0;
+
 % Controls midcyle
-HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix"); 
-HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*",dir_roi, "fsl");
+HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold); 
+HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*",dir_roi, "fsl",threshold);
 
 % Controls premenstrual
-HC_premenstrual_mrtrix=load_data(dir,"*premenstrual*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix");
-% HC_premenstrual_fsl=load_data_fsl(dir,"*premenstrual*fsl*",dir_roi, "fsl");
+HC_premenstrual_mrtrix=load_data(dir,"*premenstrual*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
+% HC_premenstrual_fsl=load_data_fsl(dir,"*premenstrual*fsl*",dir_roi, "fsl",threshold);
 
 % Patients interictal
-M_interictal_mrtrix=load_data(dir,"*interictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix");
-M_interictal_fsl=load_data(dir,"*interictal*fsl*",dir_roi, "fsl");
+M_interictal_mrtrix=load_data(dir,"*interictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
+M_interictal_fsl=load_data(dir,"*interictal*fsl*",dir_roi, "fsl",threshold);
 
 % Patients ictal
-M_ictal_mrtrix=load_data(dir,"*-ictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix");
-% M_ictal_fsl=load_data_fsl(dir,"*ictal*fsl*",dir_roi, "fsl");
+M_ictal_mrtrix=load_data(dir,"*-ictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
+% M_ictal_fsl=load_data_fsl(dir,"*ictal*fsl*",dir_roi, "fsl",threshold);
 
 connectomes={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix;M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix};
 patient_labels=["HC-midcycle-mrtrix" "M-interictal-mrtrix" "HC-midcycle-fsl" "M-interictal-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
@@ -181,19 +183,19 @@ for i=1:n_conditions
 end
 connectomes=newconnectome;
 clear i p newconnectome idx_map
-%% Remove spurious connections
+%% Remove spurious connections based on sparsity
 %connectomes=rescale_connectomes(connectomes,n_people);
 [n_nodes,~,~]=size(connectomes{1});
-significance_mask=zeros(n_nodes,n_nodes,n_conditions);
+percentile_mask=zeros(n_nodes,n_nodes,n_conditions);
 
 for i=1:n_conditions
-    significance_mask(:,:,i) = remove_spurious(connectomes{i},2,30);
+    percentile_mask(:,:,i) = create_percentile_mask(connectomes{i},25);
     for p=1:n_people(i)
-        connectomes{i}(:,:,p)=connectomes{i}(:,:,p).*significance_mask(:,:,i);
+        connectomes{i}(:,:,p)=connectomes{i}(:,:,p).*percentile_mask(:,:,i);
     end
 end
 
-imagesc(significance_mask(:,:,2)); colormap jet;colorbar
+imagesc(percentile_mask(:,:,2)); colormap jet;colorbar
 clear i p
 
 %% Calculate metrics
