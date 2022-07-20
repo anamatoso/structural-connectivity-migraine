@@ -1,4 +1,4 @@
-function [connectome] = normalize_roisize_fsl(filename,roi_size)
+function [connectome] = normalize_roisize_fsl(filename,roi_size,threshold)
 % This function normalizes the connectivity matrix by the volume of the
 % ROIs.
 % As input, besides the connectivity matrix the list of ROI sizes in voxel
@@ -14,8 +14,12 @@ n_nodes=length(connectome);
 for n=1:n_nodes
     for m=1:n_nodes
         if n~=m
-            connectome(n,m)=(connectome(n,m)/(5000*sum_volume))*2*mean_volume/(size_roi(n)+size_roi(m)); %Normalized by sizes of rois and number of streamlines
-            %connectome(n,m)=connectome(n,m)/(5000*sum_volume);%Normalized by number of streamlines
+            if connectome(n,m)>threshold
+                connectome(n,m)=(connectome(n,m)/(5000*sum_volume))*2*mean_volume/(size_roi(n)+size_roi(m)); %Normalized by sizes of rois and number of streamlines
+                %connectome(n,m)=connectome(n,m)/(5000*sum_volume);%Normalized by number of streamlines
+            else 
+               connectome(n,m)=0;
+            end
         end
     end
 end
