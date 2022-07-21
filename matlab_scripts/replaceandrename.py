@@ -1,12 +1,11 @@
 from pathlib import Path
 import glob
 
-fsllist = glob.glob('*fsl.txt')
-mrtrixlist = glob.glob('*mrtrix.txt')
+fsllist = glob.glob('*fsl_ttest2.txt')
+mrtrixlist = glob.glob('*mrtrix_ttest2.txt')
 list_all=fsllist + mrtrixlist
 #list_all=glob.glob('*methods.txt')
 for filename in list_all:
-    print(filename)
     # creating a variable and storing the text that we want to search
     search_text = "_"
 
