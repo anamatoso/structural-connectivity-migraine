@@ -1,4 +1,4 @@
-function [ttest_results] = ttest_compare(metrics,metrics_labels,version_metrics,n_nodes,comparisons)
+function [ttest_results] = ttest_compare_v2(metrics,metrics_labels,version_metrics,n_nodes,comparisons)
 % Given the metrics and the respective labels, this function calculates
 % which metrics are significantly different.
 
@@ -19,15 +19,25 @@ for c=1:ncomp
         data2=metrics{g2}(m,:);
         
         x = [data1 data2];
-        g = [zeros(1,length(data1)),ones(1,length(data2))];
+        %g = [zeros(1,length(data1)),ones(1,length(data2))];
         
         if any(isnan(x)) || all(x==0)
             compare_ttest=[compare_ttest;m g1 g2 1 correction 0];
             continue
         end
         
-        [~,p] = ttest2(data1,data2);
-        switch mean(data2)>mean(data1)
+        if ~kstest(data1) && ~kstest(data2) && ~vartest2(data1,data2)   % normal with equal variances
+            [~,p] = ttest2(data1,data2);
+            dif=mean(data2)-mean(data1);
+        elseif ~kstest(data1) && ~kstest(data2) && vartest2(data1,data2)% normal with unequal variances
+            [~,p] = ttest2(data1,data2,'vartype', 'unequal');
+            dif=mean(data2)-mean(data1);
+        else                                                            % not normal with unequal variances
+            p = ranksum(data1,data2);
+            dif=median(data2)-median(data1);
+        end
+        
+        switch dif>0
             case 1
                 compare_ttest=[compare_ttest;m g1 g2 p p*correction 1];
             case 0
