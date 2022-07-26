@@ -22,7 +22,7 @@ for k = 1 : length(theFiles)
         c=normalize_roisize_fsl(fullFileName,roi_file,threshold);
         
     elseif algorithm=="mrtrix"
-        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-34),"_roi_size_intersect.txt"); %17
+        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-34),"_roi_size_intersect.txt"); %34
         fullFileName = fullfile(theFiles(k).folder, baseFileName);
         c=normalize_roisize_mrtrix(fullFileName,roi_file,threshold);
     
