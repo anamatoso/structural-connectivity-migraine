@@ -1,5 +1,5 @@
 %% Load data from matrices
-clear all
+%clear all
 close all
 format long
 % directory where connectivity matrices are
@@ -9,7 +9,7 @@ dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_size
 atlas="AAL116"; 
 if atlas=="AAL116" pattern="_intersect"; else pattern="*"+atlas; end
 
-threshold=0;
+threshold=1000;
 
 % Controls midcyle
 HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold); 
@@ -186,16 +186,16 @@ clear i p newconnectome idx_map
 %% Remove spurious connections based on sparsity
 %connectomes=rescale_connectomes(connectomes,n_people);
 [n_nodes,~,~]=size(connectomes{1});
-percentile_mask=zeros(n_nodes,n_nodes,n_conditions);
+percentile_mask=cell(size(connectomes));
 
 for i=1:n_conditions
-    percentile_mask(:,:,i) = create_percentile_mask(connectomes{i},25);
+    percentile_mask{i} = create_percentile_mask(connectomes{i},25);
     for p=1:n_people(i)
-        connectomes{i}(:,:,p)=connectomes{i}(:,:,p).*percentile_mask(:,:,i);
+        connectomes{i}(:,:,p)=connectomes{i}(:,:,p).*percentile_mask{i}(:,:,p);
     end
 end
 
-imagesc(percentile_mask(:,:,2)); colormap jet;colorbar
+%imagesc(percentile_mask(:,:,2)); colormap jet;colorbar
 clear i p
 
 %% Calculate metrics
@@ -218,18 +218,18 @@ end
 clear i p mat conmats m m2
 
 %% Analysis of results
-version_metrics=2;
+version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 comparisons=[1 2;3 4];
 
-ttest_results = ttest_compare(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
+ttest_results = ttest_compare_v2(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
 %writetable(ttest_results, 'ttest_results.xlsx');
 clear comparisons
 
 %% Visualization of results: metrics
 idx_metrics=[1:7];
-idx_groups=[1 5];
+idx_groups=[1:4];
 patient_labels=["HC-midcycle-mrtrix" "M-mrtrix" "HC-fsl" "M-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
 
 plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,patient_labels,version_metrics,116)
@@ -242,11 +242,11 @@ m=[nodestrength;bc;lC;ec];
 names=["nodestrength" "bc" "lC" "ec"];
 
 for i=1:4
-    qvalues=table2array(ttest_results(m(i,:),6)); 
+    qvalues=table2array(ttest_results(m(i,:),8)); 
     diff=table2array(ttest_results(m(i,:),7));
     nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);
     nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-    writetable(nodefile, names(i)+'_significant_methods.txt','Delimiter',' ','WriteVariableNames', 0);
+    writetable(nodefile, names(i)+'_significantq_fsl_ttest2.txt','Delimiter',' ','WriteVariableNames', 0);
 end
 clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i
 %% Analysis of connectivity
