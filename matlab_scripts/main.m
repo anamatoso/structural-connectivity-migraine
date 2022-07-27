@@ -9,7 +9,7 @@ dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_size
 atlas="AAL116"; 
 if atlas=="AAL116" pattern="_intersect"; else pattern="*"+atlas; end
 
-threshold=1000;
+threshold=000;
 
 % Controls midcyle
 HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold); 
@@ -39,6 +39,9 @@ for i=1:n_conditions
     n_people(i)=s(end);
 end
 node_labels=get_label_nodes(atlas+"_labels.txt");
+
+%imagesc(connectomes{3}(:,:,4));colorbar;colormap jet
+
 clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
 
 %% Compare matrices and matrix entries
