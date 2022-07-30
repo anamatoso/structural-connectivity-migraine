@@ -17,6 +17,7 @@ for n=1:n_nodes
             if connectome(n,m)>threshold
                 connectome(n,m)=(connectome(n,m)/(5000*sum_volume))*2*mean_volume/(size_roi(n)+size_roi(m)); %Normalized by sizes of rois and number of streamlines
                 %connectome(n,m)=connectome(n,m)/(5000*sum_volume);%Normalized by number of streamlines
+                %connectome(n,m)=(connectome(n,m))*2*mean_volume/(size_roi(n)+size_roi(m));
             else 
                connectome(n,m)=0;
             end
