@@ -1,5 +1,5 @@
 %% Load data from matrices
-%clear all
+clear all
 close all
 format long
 % directory where connectivity matrices are
@@ -13,21 +13,23 @@ threshold=000;
 
 % Controls midcyle
 HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold); 
-HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*",dir_roi, "fsl",threshold);
+HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*bval2",dir_roi, "fsl",threshold);
 
 % Controls premenstrual
 HC_premenstrual_mrtrix=load_data(dir,"*premenstrual*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
-% HC_premenstrual_fsl=load_data_fsl(dir,"*premenstrual*fsl*",dir_roi, "fsl",threshold);
+% HC_premenstrual_fsl=load_data_fsl(dir,"*premenstrual*fsl*bval2",dir_roi, "fsl",threshold);
 
 % Patients interictal
 M_interictal_mrtrix=load_data(dir,"*interictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
-M_interictal_fsl=load_data(dir,"*interictal*fsl*",dir_roi, "fsl",threshold);
+M_interictal_fsl=load_data(dir,"*interictal*fsl*bval2",dir_roi, "fsl",threshold);
 
 % Patients ictal
 M_ictal_mrtrix=load_data(dir,"*-ictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
-% M_ictal_fsl=load_data_fsl(dir,"*ictal*fsl*",dir_roi, "fsl",threshold);
+% M_ictal_fsl=load_data_fsl(dir,"*ictal*fsl*bval2",dir_roi, "fsl",threshold);
 
-connectomes={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix;M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix};
+%connectomes={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix;M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix};
+connectomes={HC_midcycle_mrtrix M_interictal_mrtrix};
+
 patient_labels=["HC-midcycle-mrtrix" "M-interictal-mrtrix" "HC-midcycle-fsl" "M-interictal-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
 n_conditions=numel(connectomes);
 
@@ -40,7 +42,7 @@ for i=1:n_conditions
 end
 node_labels=get_label_nodes(atlas+"_labels.txt");
 
-%imagesc(connectomes{3}(:,:,4));colorbar;colormap jet
+% figure("color","w");imagesc(connectomes{3}(:,:,4));colorbar;colormap jet
 
 clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
 
@@ -213,6 +215,7 @@ for i=1:n_conditions
     clear m
     for p=1:n_people(i)
         mat=conmats(:,:,p); % connectivity matrix
+        disp(i+","+p)
         m(:,p)=calculate_metrics(mat,version_metrics);
     end
     metrics{i}=m;
@@ -223,7 +226,7 @@ clear i p mat conmats m m2
 %% Analysis of results
 version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[1 2;3 4];
+comparisons=[1 2];
 
 ttest_results = ttest_compare_v2(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
@@ -232,7 +235,7 @@ clear comparisons
 
 %% Visualization of results: metrics
 idx_metrics=[1:7];
-idx_groups=[1:4];
+idx_groups=[1:2];
 patient_labels=["HC-midcycle-mrtrix" "M-mrtrix" "HC-fsl" "M-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
 
 plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,patient_labels,version_metrics,116)
@@ -249,11 +252,11 @@ for i=1:4
     diff=table2array(ttest_results(m(i,:),7));
     nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);
     nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-    writetable(nodefile, names(i)+'_significantq_fsl_ttest2.txt','Delimiter',' ','WriteVariableNames', 0);
+    writetable(nodefile, names(i)+'_significantq_fsl_sym.txt','Delimiter',' ','WriteVariableNames', 0);
 end
 clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i
 %% Analysis of connectivity
-comparisons=[1 2;3 4];
+comparisons=[1 2];
 ttest_results_conn = ttest_compare_conn(connectomes,node_labels,comparisons);
 
 %writetable(ANOVA_results_conn, 'ttest_results_conn.xlsx');
@@ -285,47 +288,6 @@ matrix = makenodefile(color_size);
 T=table(matrix);
 writetable(T, 'hubnodes_HC.txt','Delimiter',' ','WriteVariableNames', 0);
 clear i idx labels T matrix n_nodes values
-
-%% Test alternative to anova
-compare_anova=zeros(1,5);
-
-for m=1:n_metrics
-    hc_mid=metrics{1}(m,:);
-    mig_inter=metrics{2}(m,:);
-    
-    x = [hc_mid mig_inter];
-    %g = [zeros(1,length(hc_mid)),ones(1,length(mig_inter))];
-    
-    if any(isnan(x))
-        continue
-    end
-    
-    % check variance
-    switch vartest2(hc_mid,mig_inter)
-        case 1 % different varience
-            [h,p]=ttest2(hc_mid,mig_inter,'alpha',0.05/n_metrics,"vartype",'unequal');
-        case 0 % equal varience
-            [h,p]=ttest2(hc_mid,mig_inter,'alpha',0.05/n_metrics);
-    end
-    
-    
-    if h==1 % if significant difference
-        c=mean(hc_mid)-mean(mig_inter);
-        switch c>0 % difference is positive?
-            case 1
-                compare_anova=[compare_anova;m 1 2 p*n_metrics 1];
-            case 0
-                compare_anova=[compare_anova;m 1 2 p*n_metrics -1];
-        end
-    end
-    
-end
-compare_anova=compare_anova(2:end,:);
-table=array2table(compare_anova, "VariableNames", ["Metric index","Group 1", "Group 2", "P-value corrected", "Difference"]);
-metrics_names=metrics_labels(compare_anova(:,1))';
-t_names=array2table(metrics_names, "VariableNames", ["Metric Name"]);
-ANOVA_results = [t_names table];
-clear m h p hc_mid mig_inter hc_pre mig_ict x g c idx_p compare_anova table metrics_names t_names stats compare_anova table metrics_names t_names
 
 %% Visualization of results - Rich club
 
