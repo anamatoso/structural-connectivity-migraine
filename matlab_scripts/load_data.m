@@ -20,16 +20,19 @@ for k = 1 : length(theFiles)
         roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-17),"_roi_size.txt"); %17
         fullFileName = fullfile(theFiles(k).folder, baseFileName);
         c=normalize_roisize_fsl(fullFileName,roi_file,threshold);
+        c=(c+c')/2;
         
     elseif algorithm=="mrtrix"
-        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-34),"_roi_size_intersect.txt"); %34
+        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-34),"_roi_size_intersect.txt"); %34 aal, 32 desikan
         fullFileName = fullfile(theFiles(k).folder, baseFileName);
+        %disp(roi_file)
         c=normalize_roisize_mrtrix(fullFileName,roi_file,threshold);
     
     else
         disp ('Error: Algorithm not known. Please choose either fsl or mrtrix.')
         return
     end
+    %c=c/sum(sum(c));
     connectomes(:,:,k)=c;
 end
 end
