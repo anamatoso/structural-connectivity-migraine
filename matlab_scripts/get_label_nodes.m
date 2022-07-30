@@ -4,7 +4,7 @@ cell_labels=importdata(file);
 n_nodes=length(cell_labels);
 labels=strings(1,n_nodes);
 for i=1:n_nodes
-    labels(i)=cell_labels{i};
+    labels(i)=cell_labels(i);
 end
 end
 
