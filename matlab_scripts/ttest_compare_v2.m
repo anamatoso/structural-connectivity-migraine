@@ -54,7 +54,7 @@ ttest_results = [t_names table];
 
 if version_metrics==3
     % Calculate FDR for nodal metrics
-    pvals=reshape(table2array(ttest_results(:,5)),116,[]);
+    pvals=reshape(table2array(ttest_results(:,5)),n_nodes,[]);
     [~,nmetrics]=size(pvals);
     fdr=zeros(size(pvals));
     for i=1:nmetrics
