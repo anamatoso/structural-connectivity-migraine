@@ -17,10 +17,10 @@ connectomes=zeros(length(c),length(c),length(theFiles));
 for k = 1 : length(theFiles)
     baseFileName = theFiles(k).name;
     if algorithm=="fsl"
-        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-17),"_roi_size.txt"); %17
+        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-23),"_roi_size.txt"); %17, or 23 for omat3
         fullFileName = fullfile(theFiles(k).folder, baseFileName);
         c=normalize_roisize_fsl(fullFileName,roi_file,threshold);
-        c=(c+c')/2;
+        %c=(c+c')/2;
         
     elseif algorithm=="mrtrix"
         roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-34),"_roi_size_intersect.txt"); %34 aal, 32 desikan
