@@ -1,5 +1,5 @@
 %% Load data from matrices
-clear all
+clear variables
 close all
 format long
 % directory where connectivity matrices are
@@ -7,13 +7,13 @@ dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data'
 dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
 
 atlas="AAL116"; 
-if atlas=="AAL116" pattern="_intersect"; else pattern="*"+atlas; end
+if atlas=="AAL116"; pattern="_intersect"; else; pattern="*"+atlas; end
 
 threshold=000;
 
 % Controls midcyle
 HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold); 
-HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*bval2",dir_roi, "fsl",threshold);
+HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*bval2_omat3",dir_roi, "fsl",threshold);
 
 % Controls premenstrual
 HC_premenstrual_mrtrix=load_data(dir,"*premenstrual*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
@@ -21,16 +21,15 @@ HC_premenstrual_mrtrix=load_data(dir,"*premenstrual*mrtrix*bval2"+pattern+".csv"
 
 % Patients interictal
 M_interictal_mrtrix=load_data(dir,"*interictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
-M_interictal_fsl=load_data(dir,"*interictal*fsl*bval2",dir_roi, "fsl",threshold);
+M_interictal_fsl=load_data(dir,"*interictal*fsl*bval2_omat3",dir_roi, "fsl",threshold);
 
 % Patients ictal
 M_ictal_mrtrix=load_data(dir,"*-ictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
 % M_ictal_fsl=load_data_fsl(dir,"*ictal*fsl*bval2",dir_roi, "fsl",threshold);
 
-%connectomes={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix;M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix};
-connectomes={HC_midcycle_mrtrix M_interictal_mrtrix};
+connectomes={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix;M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix};
+%connectomes={HC_midcycle_mrtrix M_interictal_mrtrix};
 
-patient_labels=["HC-midcycle-mrtrix" "M-interictal-mrtrix" "HC-midcycle-fsl" "M-interictal-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
 n_conditions=numel(connectomes);
 
 % Calculate people per situation
@@ -108,7 +107,7 @@ clear mrtrix fsl x g X difference_matrix i j h p
 nnodes=length(node_labels);
 scatterv=[[],[]];
 for c=1:2
-    for p=1:n_people(c)
+    for p=1:10%n_people(c)
         for i=1:nnodes-1
             for j=i+1:nnodes
                 scatterv=[scatterv; connectomes{c}(i,j,p) connectomes{c+2}(i,j,p)];
