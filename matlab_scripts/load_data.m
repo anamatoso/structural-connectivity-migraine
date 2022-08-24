@@ -27,7 +27,6 @@ for k = 1 : length(theFiles)
         return
     end
     c=normalize_matrix(fullFileName,roi_file,threshold,algorithm);
-    %c=c/sum(sum(c));
     connectomes(:,:,k)=c;
 end
 end
