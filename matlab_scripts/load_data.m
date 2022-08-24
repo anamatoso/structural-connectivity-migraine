@@ -26,7 +26,7 @@ for k = 1 : length(theFiles)
         disp ('Error: Algorithm not known. Please choose either fsl or mrtrix.')
         return
     end
-    c=normalize_roisize(fullFileName,roi_file,threshold,algorithm);
+    c=normalize_matrix(fullFileName,roi_file,threshold,algorithm);
     %c=c/sum(sum(c));
     connectomes(:,:,k)=c;
 end

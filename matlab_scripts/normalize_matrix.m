@@ -1,4 +1,4 @@
-function [connectome] = normalize_roisize(filename,roi_size,threshold,algorithm)
+function [connectome] = normalize_matrix(filename,roi_size,threshold,algorithm)
 % This function normalizes the connectivity matrix by the sum of volumes of
 % all ROIs. As input, besides the connectivity matrix the list of ROI sizes
 % in voxel count is given.
@@ -19,7 +19,6 @@ for n=1:n_nodes
                 connthreshold=threshold;
             else
                 connthreshold=threshold*2/(size_roi(n)+size_roi(m));
-
             end
             
             if connectome(n,m)>connthreshold
