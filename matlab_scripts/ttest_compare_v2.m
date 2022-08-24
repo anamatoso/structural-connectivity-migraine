@@ -58,11 +58,17 @@ if version_metrics==3
     [~,nmetrics]=size(pvals);
     fdr=zeros(size(pvals));
     for i=1:nmetrics
-        [~, q] = mafdr(pvals(:,i));
+        [~,q] = mafdr(pvals(:,i));
+        %[fdr2_v,q2_v] = mafdr(pvals(:,i));
         fdr(:,i)=q;
+        %fdr2(:,i)=fdr2_v;
+        %q2(:,i)=q2_v;
     end
     
     fdr=reshape(fdr,[],1);
+    %fdr2=reshape(fdr2,[],1);
+    %q2=reshape(q2,[],1);
+    %fdr_table=array2table([fdr fdr2 q2], "VariableNames", ["q-value(BH)" "FDR" "qvalue(S)"]);
     fdr_table=array2table(fdr, "VariableNames", ["q-value"]);
     ttest_results = [t_names table fdr_table];
 end
