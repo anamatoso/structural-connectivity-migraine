@@ -20,6 +20,7 @@ for i=1:nmetrics
     end
     
     
+
     boxplot(x,group,'Labels',labels)
     title(metrics_labels(metric),'interpreter', 'none','FontSize',15,'FontWeight','normal','FontName','Arial')
 %     for g1=1:length(idx_groups)-1
@@ -36,7 +37,9 @@ for i=1:nmetrics
 %             end
 %         end
 %     end
-    
+    if log(max(x))-log(min(x))>2
+        set(gca, 'YScale', 'log')
+    end
     
     
     
