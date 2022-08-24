@@ -51,9 +51,18 @@ clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midc
 %% Compare matrices and matrix entries
 % Plot matrices
 figure('color','w');
+x1=1;
+x2=5;
 for i=1:8
-    subplot(2,4,i);imagesc(connectomes{i}(:,:,8)); colormap jet;colorbar;title(condition_names(i))
+    if rem(i,2) %odd
+        subplot(2,4,x1);imagesc(connectomes{i}(:,:,8)); colormap jet;colorbar;title(condition_names(i))
+        x1=x1+1;
+    else
+        subplot(2,4,x2);imagesc(connectomes{i}(:,:,8)); colormap jet;colorbar;title(condition_names(i))
+        x2=x2+1;
+    end
 end
+clear x1 x2
 
 % Plot boxplots
 % figure('color','w');
@@ -63,20 +72,30 @@ end
 % subplot(1,2,2);
 % boxplot([reshape(connectomes{1}(:,:,9),116*116,1) reshape(connectomes{3}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);title("Zoom")
 % ylim([-0.02e-3 0.5e-3])
+
 % Plot histograms
+x1=1;
+x2=5;
 figure('color','w');
 for i=1:8
-    subplot(2,4,i);histogram(connectomes{i}(:,:,:),40);title(condition_names(i));set(gca, 'YScale', 'log')
+    if rem(i,2) %odd
+        subplot(2,4,x1);histogram(connectomes{i}(:,:,:),40);title(condition_names(i));set(gca, 'YScale', 'log')
+        x1=x1+1;
+    else
+        subplot(2,4,x2);histogram(connectomes{i}(:,:,:),40);title(condition_names(i));set(gca, 'YScale', 'log')
+        x2=x2+1;
+    end
 end
+clear x1 x2
 
 %% Scatter plot and correlation coefficients
 nnodes=length(node_labels);
 scatterv=[[],[]];
-for c=1:2
-    for p=1:14 %n_people(c)
+for c=linspace(1,7,4)
+    for p=min(n_people(c),n_people(c+1))
         for i=1:nnodes-1
             for j=i+1:nnodes
-                scatterv=[scatterv; connectomes{c}(i,j,p) connectomes{c+2}(i,j,p)];
+                scatterv=[scatterv; connectomes{c}(i,j,p) connectomes{c+1}(i,j,p)];
             end
         end
     end
@@ -123,7 +142,7 @@ disp("Spearman's correlation coefficient: "+ num2str(R(1,2)))
 clear R npeople nnodes scatterv c p i j scattervlog todelete mdl mdllog R
 
 %% Analyse only a subnetwork of the connectome (Optional)
-subnetwork=[1:90];
+subnetwork=1:90;
 
 for i=1:n_conditions
     connectomes{i}=connectomes{i}(subnetwork,subnetwork,:);
@@ -155,7 +174,6 @@ connectomes=newconnectome;
 clear i p newconnectome idx_map
 %% Remove spurious connections based on sparsity
 %connectomes=rescale_connectomes(connectomes,n_people);
-[n_nodes,~,~]=size(connectomes{1});
 percentile_mask=cell(size(connectomes));
 
 for i=1:n_conditions
@@ -172,7 +190,7 @@ clear i p
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=3;%  1=nodal metrics, 2=general metrics
+version_metrics=2;%  1=nodal metrics, 2=general metrics
 clear metrics
 metrics=cell(size(connectomes));
 topprogress=sum(n_people);
@@ -195,7 +213,7 @@ textprogressbar('done');
 clear i p mat conmats m m2 topprogress progress
 
 %% Analysis of results
-version_metrics=3;
+version_metrics=2;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 comparisons=[1 2;3 4;5 6;7 8];
 
@@ -205,11 +223,12 @@ ttest_results = ttest_compare_v2(metrics,metrics_labels,version_metrics,length(n
 clear comparisons
 
 %% Visualization of results: metrics
-idx_metrics=[1:7];
-idx_groups=[1:2];
-patient_labels=["HC-midcycle-mrtrix" "M-mrtrix" "HC-fsl" "M-fsl" "HC-premenstrual-mrtrix" "M-ictal-mrtrix"];
+idx_metrics=1:7;
+idx_groups=[1 2 3 4];
 
-plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,patient_labels,version_metrics,116)
+condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
+
+plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,condition_names,version_metrics,116)
 
 clear idx_metrics idx_groups
 %% For visualization in BrainNet nodes AAL116
@@ -227,7 +246,7 @@ for i=1:4
 end
 clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i
 %% Analysis of connectivity
-comparisons=[1 2];
+comparisons=[1 2;3 4;5 6;7 8];
 ttest_results_conn = ttest_compare_conn(connectomes,node_labels,comparisons);
 
 %writetable(ANOVA_results_conn, 'ttest_results_conn.xlsx');
