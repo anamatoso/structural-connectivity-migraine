@@ -17,7 +17,7 @@ HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*bval2_omat3",dir_roi, "fsl",thresho
 
 % Controls premenstrual
 HC_premenstrual_mrtrix=load_data(dir,"*premenstrual*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
-% HC_premenstrual_fsl=load_data_fsl(dir,"*premenstrual*fsl*bval2",dir_roi, "fsl",threshold);
+HC_premenstrual_fsl=load_data(dir,"*premenstrual*fsl*bval2_omat3",dir_roi, "fsl",threshold);
 
 % Patients interictal
 M_interictal_mrtrix=load_data(dir,"*interictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
@@ -25,9 +25,11 @@ M_interictal_fsl=load_data(dir,"*interictal*fsl*bval2_omat3",dir_roi, "fsl",thre
 
 % Patients ictal
 M_ictal_mrtrix=load_data(dir,"*-ictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
-% M_ictal_fsl=load_data_fsl(dir,"*ictal*fsl*bval2",dir_roi, "fsl",threshold);
+M_ictal_fsl=load_data(dir,"*-ictal*fsl*bval2_omat3",dir_roi, "fsl",threshold);
 
-connectomes={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix;M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix};
+connectomes={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix HC_premenstrual_fsl;...
+    M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix M_ictal_fsl};
+
 %connectomes={HC_midcycle_mrtrix M_interictal_mrtrix};
 
 n_conditions=numel(connectomes);
@@ -67,47 +69,11 @@ subplot(2,2,2);histogram(connectomes{2}(:,:,:),40);title("Distribution of matrix
 subplot(2,2,3);histogram(connectomes{3}(:,:,:),40);title("Distribution of matrix values in FSL HC");set(gca, 'YScale', 'log')
 subplot(2,2,4);histogram(connectomes{4}(:,:,:),40);title("Distribution of matrix values in FSL M");set(gca, 'YScale', 'log')
 
-%% Compute differences between matrices
-nnodes=length(node_labels);
-%X = randi(nnodes,4,2);
-difference_matrix=zeros(nnodes,nnodes);
-difference_matrix_p=ones(nnodes,nnodes);
-for i=1:nnodes-1
-    for j=i+1:nnodes
-            mrtrix=squeeze(connectomes{1}(i,j,:))';
-            fsl=squeeze(connectomes{3}(i,j,:))';
-            [h,p] = ttest2(mrtrix,fsl,"alpha",0.05/(116*115/2));
-            difference_matrix(i,j)=h; difference_matrix(j,i)=h;
-            difference_matrix_p(i,j)=p; difference_matrix_p(j,i)=p;
-    end
-end
-
-
-
-connectomes2=connectomes;
-for i=1:n_conditions
-    for p=1:n_people(i)
-        connectomes2{i}(:,:,p)=connectomes{i}(:,:,p).*(ones(size(difference_matrix(:,:)))-difference_matrix(:,:));
-    end
-end
-
-figure('color','w');
-subplot(1,2,1);imagesc(difference_matrix); colormap jet;colorbar;title("Coherence between fsl and mrtrix")
-subplot(1,2,2);imagesc(difference_matrix_p); colormap jet;colorbar;title("Coherence between fsl and mrtrix-pvalue")
-
-
-figure('color','w','Position', [100 100 2000 1000]);
-subplot(2,2,1);imagesc(connectomes{1}(:,:,9)); colormap jet;colorbar;title("MRTrix")
-subplot(2,2,2);imagesc(connectomes{3}(:,:,9)); colormap jet;colorbar;title("FSL")
-subplot(2,2,3);imagesc(connectomes2{1}(:,:,9)); colormap jet;colorbar;title("MRTrix only coherent")
-subplot(2,2,4);imagesc(connectomes2{3}(:,:,9)); colormap jet;colorbar;title("FSL only coherent")
-clear mrtrix fsl x g X difference_matrix i j h p
-
 %% Scatter plot and correlation coefficients
 nnodes=length(node_labels);
 scatterv=[[],[]];
 for c=1:2
-    for p=1:10%n_people(c)
+    for p=1:14 %n_people(c)
         for i=1:nnodes-1
             for j=i+1:nnodes
                 scatterv=[scatterv; connectomes{c}(i,j,p) connectomes{c+2}(i,j,p)];
@@ -209,23 +175,29 @@ clear i p
 version_metrics=3;%  1=nodal metrics, 2=general metrics
 clear metrics
 metrics=cell(size(connectomes));
+topprogress=sum(n_people);
+progress=0;
+textprogressbar('calculating metrics: ')
 for i=1:n_conditions
     conmats=connectomes{i};
     clear m
     for p=1:n_people(i)
         mat=conmats(:,:,p); % connectivity matrix
-        disp(i+","+p)
+        %disp(i+","+p)
         m(:,p)=calculate_metrics(mat,version_metrics);
+        progress=progress+1;
+        textprogressbar(progress/topprogress*100);
     end
     metrics{i}=m;
 end
+textprogressbar('done');
 
 clear i p mat conmats m m2
 
 %% Analysis of results
 version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[1 2];
+comparisons=[1 2;3 4;5 6;7 8];
 
 ttest_results = ttest_compare_v2(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
