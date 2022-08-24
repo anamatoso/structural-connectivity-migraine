@@ -42,32 +42,32 @@ for i=1:n_conditions
     n_people(i)=s(end);
 end
 node_labels=get_label_nodes(atlas+"_labels.txt");
+condition_names=["MRtrix HC midcycle" "MRtrix M interictal" "FSL HC midcycle" "FSL M interictal" "MRtrix M premenstrual" "MRtrix M ictal" "FSL M premenstrual" "FSL M ictal"];
 
 % figure("color","w");imagesc(connectomes{3}(:,:,4));colorbar;colormap jet
 
-clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix M_interictal_mrtrix M_ictal_mrtrix
+clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix HC_premenstrual_fsl M_interictal_mrtrix M_ictal_mrtrix M_ictal_fsl
 
 %% Compare matrices and matrix entries
 % Plot matrices
 figure('color','w');
-subplot(1,2,1);imagesc(connectomes{2}(:,:,9)); colormap jet;colorbar;title("MRTrix")
-subplot(1,2,2);imagesc(connectomes{4}(:,:,9)); colormap jet;colorbar;title("FSL")
+for i=1:8
+    subplot(2,4,i);imagesc(connectomes{i}(:,:,8)); colormap jet;colorbar;title(condition_names(i))
+end
 
 % Plot boxplots
-figure('color','w');
-subplot(1,2,1);
-boxplot([reshape(connectomes{1}(:,:,9),116*116,1) reshape(connectomes{3}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);title("Distribution of matrix values")
-annotation('rectangle',[0.18 0.14 0.24 0.1],'Color','green')
-subplot(1,2,2);
-boxplot([reshape(connectomes{1}(:,:,9),116*116,1) reshape(connectomes{3}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);title("Zoom")
-ylim([-0.02e-3 0.5e-3])
-
+% figure('color','w');
+% subplot(1,2,1);
+% boxplot([reshape(connectomes{1}(:,:,9),116*116,1) reshape(connectomes{3}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);title("Distribution of matrix values")
+% annotation('rectangle',[0.18 0.14 0.24 0.1],'Color','green')
+% subplot(1,2,2);
+% boxplot([reshape(connectomes{1}(:,:,9),116*116,1) reshape(connectomes{3}(:,:,9),116*116,1)],"Labels",["MRTrix" "FSL"]);title("Zoom")
+% ylim([-0.02e-3 0.5e-3])
 % Plot histograms
 figure('color','w');
-subplot(2,2,1);histogram(connectomes{1}(:,:,:),40);title("Distribution of matrix values in MRtrix HC");set(gca, 'YScale', 'log')
-subplot(2,2,2);histogram(connectomes{2}(:,:,:),40);title("Distribution of matrix values in MRtrix M");set(gca, 'YScale', 'log')
-subplot(2,2,3);histogram(connectomes{3}(:,:,:),40);title("Distribution of matrix values in FSL HC");set(gca, 'YScale', 'log')
-subplot(2,2,4);histogram(connectomes{4}(:,:,:),40);title("Distribution of matrix values in FSL M");set(gca, 'YScale', 'log')
+for i=1:8
+    subplot(2,4,i);histogram(connectomes{i}(:,:,:),40);title(condition_names(i));set(gca, 'YScale', 'log')
+end
 
 %% Scatter plot and correlation coefficients
 nnodes=length(node_labels);
@@ -192,7 +192,7 @@ for i=1:n_conditions
 end
 textprogressbar('done');
 
-clear i p mat conmats m m2
+clear i p mat conmats m m2 topprogress progress
 
 %% Analysis of results
 version_metrics=3;
