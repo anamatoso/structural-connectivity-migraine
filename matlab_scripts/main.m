@@ -189,8 +189,7 @@ clear i p
 %% Calculate metrics
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
-
-version_metrics=2;%  1=nodal metrics, 2=general metrics
+version_metrics=3;%  1=nodal metrics, 2=general metrics
 clear metrics
 metrics=cell(size(connectomes));
 topprogress=sum(n_people);
@@ -213,18 +212,21 @@ textprogressbar('done');
 clear i p mat conmats m m2 topprogress progress
 
 %% Analysis of results
-version_metrics=2;
+version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-comparisons=[1 2;3 4;5 6;7 8];
+comparison_HCvsP=[1 2;3 4;5 6;7 8];
+comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
+comparison_cycle=[1 5;3 7;2 6;4 8];
 
+comparisons=comparison_HCvsP;
 ttest_results = ttest_compare_v2(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 
 %writetable(ttest_results, 'ttest_results.xlsx');
-clear comparisons
+clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle
 
 %% Visualization of results: metrics
-idx_metrics=1:7;
-idx_groups=[1 2 3 4];
+idx_metrics=[1 7];
+idx_groups=[2 6 4 8];
 
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
 
@@ -246,11 +248,15 @@ for i=1:4
 end
 clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i
 %% Analysis of connectivity
-comparisons=[1 2;3 4;5 6;7 8];
+comparison_HCvsP=[1 2;3 4;5 6;7 8];
+comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
+comparison_cycle=[1 5;3 7;2 6;4 8];
+
+comparisons=comparison_cycle;
 ttest_results_conn = ttest_compare_conn(connectomes,node_labels,comparisons);
 
 %writetable(ANOVA_results_conn, 'ttest_results_conn.xlsx');
-clear comparisons
+clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle
 %% Visualization of results connectivity
 idx_metrics=[61 63;1 11;1 35;1 52];
 idx_groups=[3 4];
