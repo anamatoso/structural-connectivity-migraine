@@ -10,28 +10,28 @@ atlas="AAL116";
 if atlas=="AAL116"; pattern="_intersect"; else; pattern="*"+atlas; end
 
 threshold=000;
+for norm=1:2
+    % Controls midcyle
+    HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold,norm); 
+    HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*bval2_omat3",dir_roi, "fsl",threshold,norm);
+    
+    % Controls premenstrual
+    HC_premenstrual_mrtrix=load_data(dir,"*premenstrual*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold,norm);
+    HC_premenstrual_fsl=load_data(dir,"*premenstrual*fsl*bval2_omat3",dir_roi, "fsl",threshold,norm);
+    
+    % Patients interictal
+    M_interictal_mrtrix=load_data(dir,"*interictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold,norm);
+    M_interictal_fsl=load_data(dir,"*interictal*fsl*bval2_omat3",dir_roi, "fsl",threshold,norm);
+    
+    % Patients ictal
+    M_ictal_mrtrix=load_data(dir,"*-ictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold,norm);
+    M_ictal_fsl=load_data(dir,"*-ictal*fsl*bval2_omat3",dir_roi, "fsl",threshold,norm);
 
-% Controls midcyle
-HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold); 
-HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*bval2_omat3",dir_roi, "fsl",threshold);
-
-% Controls premenstrual
-HC_premenstrual_mrtrix=load_data(dir,"*premenstrual*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
-HC_premenstrual_fsl=load_data(dir,"*premenstrual*fsl*bval2_omat3",dir_roi, "fsl",threshold);
-
-% Patients interictal
-M_interictal_mrtrix=load_data(dir,"*interictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
-M_interictal_fsl=load_data(dir,"*interictal*fsl*bval2_omat3",dir_roi, "fsl",threshold);
-
-% Patients ictal
-M_ictal_mrtrix=load_data(dir,"*-ictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold);
-M_ictal_fsl=load_data(dir,"*-ictal*fsl*bval2_omat3",dir_roi, "fsl",threshold);
-
-connectomes={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix HC_premenstrual_fsl;...
+    allconnectomes{norm}={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix HC_premenstrual_fsl;...
     M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix M_ictal_fsl};
-
+end
 %connectomes={HC_midcycle_mrtrix M_interictal_mrtrix};
-
+connectomes=allconnectomes{1};
 n_conditions=numel(connectomes);
 
 % Calculate people per situation
@@ -46,7 +46,7 @@ condition_names=["MRtrix HC midcycle" "MRtrix M interictal" "FSL HC midcycle" "F
 
 % figure("color","w");imagesc(connectomes{3}(:,:,4));colorbar;colormap jet
 
-clear pattern dir s conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix HC_premenstrual_fsl M_interictal_mrtrix M_ictal_mrtrix M_ictal_fsl
+clear pattern dir s norm conmat i dir_roi M_interictal_fsl HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix HC_premenstrual_fsl M_interictal_mrtrix M_ictal_mrtrix M_ictal_fsl
 
 %% Compare matrices and matrix entries
 % Plot matrices
@@ -79,10 +79,10 @@ x2=5;
 figure('color','w');
 for i=1:8
     if rem(i,2) %odd
-        subplot(2,4,x1);histogram(connectomes{i}(:,:,:),40);title(condition_names(i));set(gca, 'YScale', 'log')
+        subplot(2,4,x1);histogram(log10(connectomes{i}(:,:,:)),40);title(condition_names(i));set(gca, 'YScale', 'log');xlim([-12 -2])
         x1=x1+1;
     else
-        subplot(2,4,x2);histogram(connectomes{i}(:,:,:),40);title(condition_names(i));set(gca, 'YScale', 'log')
+        subplot(2,4,x2);histogram(log10(connectomes{i}(:,:,:)),40);title(condition_names(i));set(gca, 'YScale', 'log');xlim([-12 -2])
         x2=x2+1;
     end
 end
@@ -91,11 +91,16 @@ clear x1 x2
 %% Scatter plot and correlation coefficients
 nnodes=length(node_labels);
 scatterv=[[],[]];
-for c=linspace(1,7,4)
-    for p=min(n_people(c),n_people(c+1))
+topprogress=(sum(n_people)/2)*((nnodes*nnodes-nnodes)/2);
+progress=0;
+textprogressbar('Getting values: ')
+for c=[1 2 5 6]%linspace(1,7,4)
+    for p=1:n_people(c)
         for i=1:nnodes-1
             for j=i+1:nnodes
-                scatterv=[scatterv; connectomes{c}(i,j,p) connectomes{c+1}(i,j,p)];
+                scatterv=[scatterv; connectomes{c}(i,j,p) connectomes{c+2}(i,j,p)];
+                progress=progress+1;
+                textprogressbar(progress/topprogress*100);
             end
         end
     end
@@ -113,10 +118,14 @@ for i=1:length(todelete)
     scattervlog(todelete(i),:)=[];
 end
 
+figure('color','w')
+scatterhist(scattervlog(:,1),scattervlog(:,2), 'NBins',[40,40],'Direction','out',Marker='x'); xlabel('MRTrix');ylabel('FSL')
+%%
 mdl = fitlm(scatterv(:,1),scatterv(:,2));
 disp("r^2 with normal scale: " +num2str(mdl.Rsquared.Ordinary))
 mdllog = fitlm(scattervlog(:,1),scattervlog(:,2));
 disp("r^2 with log-log scale: " +num2str(mdllog.Rsquared.Ordinary))
+
 figure('color','w');
 subplot(1,2,1);plot(mdl);text(6.5e-3,0.25e-3,"R^2="+num2str(mdl.Rsquared.Ordinary))
 title("Normal Scale");xlabel("Mrtrix");ylabel("FSL");
@@ -126,20 +135,20 @@ title("Logarithm Scale");xlabel("Mrtrix");ylabel("FSL");
 disp("Normal Scale")
 R= corr(scatterv,"Type","Pearson");
 disp("Pearson's correlation coefficient: "+ num2str(R(1,2)))
-R= corr(scatterv,"Type","Kendall");
-disp("Kendall's correlation coefficient: "+ num2str(R(1,2)))
+% R= corr(scatterv,"Type","Kendall");
+% disp("Kendall's correlation coefficient: "+ num2str(R(1,2)))
 R= corr(scatterv,"Type","Spearman");
 disp("Spearman's correlation coefficient: "+ num2str(R(1,2)))
 disp(" ")
 disp("Logarithmic Scale")
 R= corr(scattervlog,"Type","Pearson");
 disp("Pearson's correlation coefficient: "+ num2str(R(1,2)))
-R= corr(scattervlog,"Type","Kendall");
-disp("Kendall's correlation coefficient: "+ num2str(R(1,2)))
+% R= corr(scattervlog,"Type","Kendall");
+% disp("Kendall's correlation coefficient: "+ num2str(R(1,2)))
 R= corr(scattervlog,"Type","Spearman");
 disp("Spearman's correlation coefficient: "+ num2str(R(1,2)))
 
-clear R npeople nnodes scatterv c p i j scattervlog todelete mdl mdllog R
+clear R npeople nnodes c p i j mdl mdllog R
 
 %% Analyse only a subnetwork of the connectome (Optional)
 subnetwork=1:90;
@@ -189,27 +198,9 @@ clear i p
 %% Calculate metrics
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
-version_metrics=3;%  1=nodal metrics, 2=general metrics
-clear metrics
-metrics=cell(size(connectomes));
-topprogress=sum(n_people);
-progress=0;
-textprogressbar('calculating metrics: ')
-for i=1:n_conditions
-    conmats=connectomes{i};
-    clear m
-    for p=1:n_people(i)
-        mat=conmats(:,:,p); % connectivity matrix
-        %disp(i+","+p)
-        m(:,p)=calculate_metrics(mat,version_metrics);
-        progress=progress+1;
-        textprogressbar(progress/topprogress*100);
-    end
-    metrics{i}=m;
-end
-textprogressbar('done');
+version_metrics=2;%  1=nodal metrics, 2=general metrics
 
-clear i p mat conmats m m2 topprogress progress
+metrics=get_metrics(connectomes,version_metrics);
 
 %% Analysis of results
 version_metrics=3;
