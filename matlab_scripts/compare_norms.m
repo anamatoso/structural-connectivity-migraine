@@ -8,7 +8,7 @@ dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data'
 dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
 atlas="AAL116"; 
 threshold=0;
-normalizations=[1 3];
+normalizations=[1 2];
 [allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,false);
 
 clear threshold atlas dir dir_roi
@@ -41,10 +41,25 @@ for metric=1:7
     colordata=[];
     groups_position=[1 2 1 2 3 4 3 4 5 6 5 6 7 8 7 8];
     groups_color=[1 1 2 2 1 1 2 2 1 1 2 2 1 1 2 2];
+    
     for i=1:length(data)
         positionaldata=[positionaldata groups_position(i)*ones(1,length(data{i}))];
         colordata=[colordata groups_color(i)*ones(1,length(data{i}))];
+        
     end
+
+    disp(metrics_labels(metric))
+    for i=1:length(data)-1
+        for j=i+1:length(data)
+            p=stattest(data{i},data{j});
+            if p<0.05/(16*15)
+                disp(num2str(i)+"-"+num2str(j)+": p="+num2str(p))
+            end
+        end
+    end
+
+
+
     data=cell2mat(data);
     colorlabels={'MRTrix' 'FSL'};
     xlabels={'HCmid-N1' 'Mint-N1' 'HCpre-N1' 'Mict-N1' 'HCmid-N2' 'Mint-N2' 'HCpre-N2' 'Mict-N2'};
