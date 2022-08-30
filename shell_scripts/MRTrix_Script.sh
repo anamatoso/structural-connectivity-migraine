@@ -45,7 +45,6 @@ mrconvert $DWI dwi.mif -fslgrad $BVEC $BVAL -force
 mrconvert $ANAT anat.mif -force
 
 # Convert mask do mif fomat
-#mrconvert $ANATMASK anatmask.mif
 mrconvert $DWIMASK mask.mif -force
 
 ########################### STEP 3 ###################################
@@ -104,12 +103,12 @@ mrcalc atlas_coreg.mif -round -datatype uint32 atlas.mif -force
 # Restric the GM/WM boundary to the atlas
 mrcalc atlas.mif gmwmSeed_coreg.mif -mult gmwmseed_atlas.mif -force
 
-# Create file with sizes of ROIs (in voxels)
+# Create file with sizes of ROIs (in voxels) - for use in matlab
 mrconvert atlas.mif atlas.nii.gz -force
 fslstats atlas.nii.gz -h 117 >> roi_size_w0.txt
 tail -n +2 roi_size_w0.txt >> roi_size.txt
 rm roi_size_w0.txt
-
+cp roi_size.txt "${MAINDIR}/roi_sizes/${SUBDIR}_roi_size.txt"
 ########################### STEP 6 ###################################
 #                 Run the streamline analysis                        #
 ######################################################################

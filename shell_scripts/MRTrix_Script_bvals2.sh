@@ -21,7 +21,7 @@ SUB=${DIR:0:14} # example name: sub-control019
 ########################### STEP 1 ###################################
 #             		  Prepare data and directories					 #
 ######################################################################
-
+ATLAS=/home/amatoso/tese/data/AAL116_intersect.nii.gz
 SUBDIR="${MAINDIR}/${DIR}" 
 ANATDIR="${MAINDIR}/${SUB}" #example name: sub-control019
 ANAT="${ANATDIR}/${SUB}_restored-MPRAGE_brain.nii.gz"
@@ -91,7 +91,7 @@ mrtransform 5tt_nocoreg.mif -linear diff2struct_mrtrix.txt -inverse 5tt_coreg.mi
 ######################################################################
 
 #Coregister atlas to struct space and convert to mrtrix format
-applywarp -i /home/amatoso/tese/data/AAL116_MNI152-2mm.nii.gz -r $ANAT --out=atlas_2struct --warp="${ANATDIR}/reg_nonlinear_invwarp_T1tostandard_2mm.nii.gz"
+applywarp -i $ATLAS -r $ANAT --out=atlas_2struct --warp="${ANATDIR}/reg_nonlinear_invwarp_T1tostandard_2mm.nii.gz"
 mrconvert atlas_2struct.nii.gz atlas_2struct.mif -force
 
 #Coregister atlas to diff space
@@ -102,6 +102,9 @@ mrcalc atlas_coreg.mif -round -datatype uint32 atlas.mif -force
 
 # Restric the GM/WM boundary to the atlas
 mrcalc atlas.mif gmwmSeed_coreg.mif -mult gmwmseed_atlas.mif -force
+
+# for probtrackx
+mrconvert gmwmseed_atlas.mif gmwmseed_atlas.nii.gz
 
 # Create file with sizes of ROIs (in voxels) - for use in matlab
 mrconvert atlas.mif atlas.nii.gz -force
@@ -124,6 +127,9 @@ tcksift2 -act 5tt_coreg.mif -out_mu sift_mu.txt -out_coeffs sift_coeffs.txt trac
 ######################################################################
 
 #Creating the connectome 
-tck2connectome -symmetric -zero_diagonal -scale_invnodevol -tck_weights_in sift.txt tracks.tck atlas.mif "${MAINDIR}/matrix_data/${DIR}_mrtrix_matrix_bval2.csv" -force
+tck2connectome -symmetric -zero_diagonal -scale_invnodevol -tck_weights_in sift.txt tracks.tck atlas.mif "${MAINDIR}/matrix_data/${DIR}_mrtrix_matrix_bval2_intersect.csv" -force
+
+rm -f 5tt_nocoreg.nii.gz 5tt_nocoreg.mif mean_b0_processed.mif mean_b0_processed.nii.gz 5tt_vol0.nii.gz anat.mif atlas_2struct_desikan.nii.gz atlas_2struct_desikan.mif atlas_coreg_desikan.mif atlas_desikan.nii.gz atlas_coreg.mif gmfod.mif gmfod_norm.mif csffod.mif csffod_norm.mif mask.mif wmfod.mif dwi.mif wm.txt gm.txt csf.txt
+
 
 cd $MAINDIR
