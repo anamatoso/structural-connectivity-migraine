@@ -1,4 +1,4 @@
-function [connectomes] = load_data(folder_matrix,pattern,folder_roi_sizes,algorithm,threshold)
+function [connectomes] = load_data(folder_matrix,pattern,folder_roi_sizes,algorithm,threshold,normalization)
 % This function loads the data from a given folder which have a given
 % pattern
 
@@ -26,7 +26,7 @@ for k = 1 : length(theFiles)
         disp ('Error: Algorithm not known. Please choose either fsl or mrtrix.')
         return
     end
-    c=normalize_matrix(fullFileName,roi_file,threshold,algorithm);
+    c=normalize_matrix(fullFileName,roi_file,threshold,algorithm,normalization);
     connectomes(:,:,k)=c;
 end
 end
