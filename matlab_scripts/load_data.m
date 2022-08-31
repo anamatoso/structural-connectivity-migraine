@@ -19,7 +19,7 @@ for k = 1 : length(theFiles)
     fullFileName = fullfile(theFiles(k).folder, baseFileName);
 
     if algorithm=="fsl"
-        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-23),"_roi_size.txt"); %17, or 23 for omat3
+        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-23),"_roi_size_intersect.txt"); %17, or 23 for omat3
     elseif algorithm=="mrtrix"
         roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-34),"_roi_size_intersect.txt"); %34 aal, 32 desikan
     else
