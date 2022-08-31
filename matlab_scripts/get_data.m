@@ -5,7 +5,7 @@ if atlas=="AAL116"
 else
     pattern="*"+atlas; 
 end
-
+i=1;
 for norm=normalizations
     % Controls midcyle
     HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold,norm); 
@@ -23,8 +23,9 @@ for norm=normalizations
     M_ictal_mrtrix=load_data(dir,"*-ictal*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold,norm);
     M_ictal_fsl=load_data(dir,"*-ictal*fsl*bval2_omat3",dir_roi, "fsl",threshold,norm);
 
-    allconnectomes{norm}={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix HC_premenstrual_fsl;...
+    allconnectomes{i}={HC_midcycle_mrtrix HC_midcycle_fsl HC_premenstrual_mrtrix HC_premenstrual_fsl;...
     M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix M_ictal_fsl};
+    i=i+1;
 end
 %connectomes={HC_midcycle_mrtrix M_interictal_mrtrix};
 connectomes=allconnectomes{1};
