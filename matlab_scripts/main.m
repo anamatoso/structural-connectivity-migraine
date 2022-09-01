@@ -10,7 +10,7 @@ atlas="AAL116";
 if atlas=="AAL116"; pattern="_intersect"; else; pattern="*"+atlas; end
 
 threshold=000;
-for norm=1:2
+for norm=1:4
     % Controls midcyle
     HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold,norm); 
     HC_midcycle_fsl=load_data(dir,"*midcycle*fsl*bval2_omat3",dir_roi, "fsl",threshold,norm);
@@ -31,13 +31,13 @@ for norm=1:2
     M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix M_ictal_fsl};
 end
 %connectomes={HC_midcycle_mrtrix M_interictal_mrtrix};
-connectomes=allconnectomes{1};
-n_conditions=numel(connectomes);
+%connectomes=allconnectomes{1};
+n_conditions=numel(allconnectomes{1});
 
 % Calculate people per situation
 n_people=zeros(1,n_conditions);
 for i=1:n_conditions
-    conmat=connectomes{i};
+    conmat=allconnectomes{1}{i};
     s=size(conmat);
     n_people(i)=s(end);
 end
@@ -198,27 +198,39 @@ clear i p
 %% Calculate metrics
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
+
 version_metrics=2;%  1=nodal metrics, 2=general metrics
+% load('allmetrics3.mat')
 
-metrics=get_metrics(connectomes,version_metrics);
+allmetrics=cell(size(allconnectomes));
+for i=1:length(allconnectomes)
+    connectomes=allconnectomes{i};
+    allmetrics{i}=get_metrics(connectomes,version_metrics);
+end
 
+clear i
 %% Analysis of results
-version_metrics=3;
+version_metrics=2;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 
 comparisons=comparison_HCvsP;
-ttest_results = ttest_compare_v2(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
+
+ttest_results=cell(size(allconnectomes));
+for i=1:length(allconnectomes)
+    metrics=allmetrics{i};
+    ttest_results{i} = ttest_compare_v2(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
+end
 
 %writetable(ttest_results, 'ttest_results.xlsx');
-clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle
+clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle i
 
 %% Visualization of results: metrics
 idx_metrics=[1 7];
-idx_groups=[2 6 4 8];
-
+idx_groups=[1:8];
+metrics=allmetrics{1};
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
 
 plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,condition_names,version_metrics,116)
@@ -227,10 +239,10 @@ clear idx_metrics idx_groups
 %% For visualization in BrainNet nodes AAL116
 % nodal metrics:
 nodestrength=(349:464); bc=(1:116); lC=(117:232); ec=(233:348);
-m=[nodestrength;bc;lC;ec];
-names=["nodestrength" "bc" "lC" "ec"];
-
-for i=1:4
+m=[nodestrength];
+names=["nodestrength"];
+ttest_results=ttest_results{4};
+for i=1:1
     qvalues=table2array(ttest_results(m(i,:),8)); 
     diff=table2array(ttest_results(m(i,:),7));
     nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);

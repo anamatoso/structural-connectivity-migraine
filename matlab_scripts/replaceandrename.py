@@ -1,9 +1,8 @@
 from pathlib import Path
 import glob
 
-fsllist = glob.glob('*fsl_ttest2.txt')
-mrtrixlist = glob.glob('*mrtrix_ttest2.txt')
-list_all=fsllist + mrtrixlist
+filelist = glob.glob('*norm4.txt')
+list_all=filelist
 #list_all=glob.glob('*methods.txt')
 for filename in list_all:
     # creating a variable and storing the text that we want to search
