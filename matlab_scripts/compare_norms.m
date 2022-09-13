@@ -1,5 +1,5 @@
 %% Compare Normalizations/Algorithms/conditions
-
+clc
 clear variables
 close all
 format long
@@ -62,7 +62,7 @@ clear i j p c R Rlog scatterv idx con
 
 allmetrics=cell(size(allconnectomes));
 version_metrics=2;%  3=nodal metrics, 2=general metrics
-load('allmetrics2.mat')
+%load('allmetrics2.mat')
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)
@@ -97,23 +97,20 @@ for metric=1:length(metrics_labels) % for all metrics
                     end
                 end
             end
-            [p,~,stats] = kruskalwallis(data,g_cond,"off");
-            
-            if p<0.05
-                disp("p-value "+metrics_labels(metric)+" for N"+norm+", A"+alg+ ": "+p)
-                
+            [p_group,~,stats] = kruskalwallis(data,g_cond,"off");
+            if p_group <= 0.05
+                disp("p-value "+metrics_labels(metric)+" for N"+norm+", A"+alg+ ": "+p_group)
                 if txt=='y'
                     figure;
                     multcompare(stats)
-                else
+                else %txt=='n'
                     for cond1=1:numel(metrics_norm)-1
                         for cond2=cond1+1:numel(metrics_norm)
+                            [x,y] = extract_groups(data,g_cond,cond1,cond2);
                             if all([cond1 cond2]==[1 2]) || all([cond1 cond2]==[3 4]) % HC vs M->wilcoxon ranksum
-                                [x,y] = extract_groups(data,g_cond,cond1,cond2);
                                 p=ranksum(x,y);
-                                disp("p-value "+metrics_labels(metric)+" for N"+norm+", A"+alg+ ": "+p)
-                            elseif all([cond1 cond2]==[1 3]) || all([cond1 cond2]==[2 4]) % Cycle->wilcoxon signed rank
-                                [x,y] = extract_groups(data,g_cond,cond1,cond2);
+                                disp("p-value "+cond1+"-"+cond2+ ": "+p)
+                            elseif length(x)==length(y) && (all([cond1 cond2]==[1 3]) || all([cond1 cond2]==[2 4])) % Cycle->wilcoxon signed rank
                                 p=signrank(x,y);
                                 disp("p-value "+cond1+"-"+cond2+ ": "+p)
                             end
@@ -125,27 +122,28 @@ for metric=1:length(metrics_labels) % for all metrics
     end
 end
 
-clear cond data i g_cond metric norm conds metrics_norm metrics data_point p stats tbl
+clear cond data i g_cond metric norm conds metrics_norm metrics data_point p stats tbl x y txt cond1 cond2 g_alg
 
-%% Do Friedman test - Compare Normalization (in each condition and algorithm)
+%% Do Friedman test - Compare Normalization (in each condition and algorithm) DONT USE
 
 n_norms=length(allmetrics);
 reps=sum(n_people)/2;
 
 for metric=1:length(metrics_labels) % for all metrics
     data=zeros(sum(n_people),n_norms);
-    for conds=1:numel(metrics_norm)% for all conditions 
+    for conds=1:4% for all conditions 
         for alg=1:2
             data=[];
             for norm=1:n_norms % for all normalizations
                 i=1;
-                metrics_norm=allmetrics{norm};            
-                metrics=cell2mat(metrics_norm(conds));
-                for data_point=1:length(metrics(metric,:))
-                    data(i,norm)=metrics(metric,data_point);
-                    i=i+1;
-                end
+                metrics_norm=allmetrics{norm};  
                 
+                    metrics=cell2mat(metrics_norm(conds));
+                    for data_point=1:length(metrics(metric,:))
+                        data(i,norm)=metrics(metric,data_point);
+                        i=i+1;
+                    
+                end
             end
             [p,~,stats]=friedman(data,1,"off");
             if p<0.05
@@ -161,18 +159,19 @@ end
 n_norms=length(allmetrics);
 
 g_alg=[1 1 2 2 1 1 2 2];
-reps=sum(n_people)/2;
+reps=sum(n_people);
+txt = input("Do you want to use multcompare?[y/n]");
 
 for metric=1:length(metrics_labels) % for all metrics
     data=zeros(sum(n_people),n_norms);
     for norm=1:n_norms % for all normalizations
         i=1;
         metrics_norm=allmetrics{norm};
-        for alg=1:2
+        for alg=1:2 % for all algorithms
             for conds=1:numel(metrics_norm)% for all conditions
-                if g_alg(conds)==alg
-                    metrics=cell2mat(metrics_norm(conds));
-                    for data_point=1:length(metrics(metric,:))
+                metrics=cell2mat(metrics_norm(conds));
+                for data_point=1:length(metrics(metric,:))
+                    if alg==g_alg(conds)
                         data(i,norm)=metrics(metric,data_point);
                         i=i+1;
                     end
@@ -180,19 +179,30 @@ for metric=1:length(metrics_labels) % for all metrics
             end
         end
     end
+    disp(" ")
     [p,~,stats]=friedman(data,reps,"off");
+
     if p<0.05
         disp("p-value "+metrics_labels(metric)+ " : "+p)
-%         for n1=1:3
-%             for n2=n1+1:4
-%                 [p,~,stats]=signrank(data(:,n1),data(:,n2));
-%                 disp(n1+"-"+n2+": "+p)
-% 
-%             end
-%         end
-        multcompare(stats,"Display","off")
-    end
 
+        if txt=='y'
+            multcompare(stats, "Display","off")
+        else
+            for cond1=1:numel(metrics_norm)
+                for norm1=1:3
+                    for norm2=norm1+1:4
+                        idx=1+sum(n_people(1:cond1))-n_people(cond1):sum(n_people(1:cond1));
+                        x=data(idx,norm1);
+                        y=data(idx,norm2);
+                        p=signrank(x,y);
+                        if p>0.05
+                            disp("p-value "+cond1+ ": "+p)
+                        end
+                    end
+                end
+            end
+        end
+    end
 end
 
 %% Do Friedman test - Compare Algorithm (for all normalizations and conditions and for each normalization)
