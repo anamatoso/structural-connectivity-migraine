@@ -62,7 +62,7 @@ clear i j p c R Rlog scatterv idx con
 
 allmetrics=cell(size(allconnectomes));
 version_metrics=2;%  3=nodal metrics, 2=general metrics
-%load('allmetrics2.mat')
+load('allmetrics2.mat')
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)
@@ -124,63 +124,40 @@ end
 
 clear cond data i g_cond metric norm conds metrics_norm metrics data_point p stats tbl x y txt cond1 cond2 g_alg
 
-%% Do Friedman test - Compare Normalization (in each condition and algorithm) DONT USE
-
-n_norms=length(allmetrics);
-reps=sum(n_people)/2;
-
-for metric=1:length(metrics_labels) % for all metrics
-    data=zeros(sum(n_people),n_norms);
-    for conds=1:4% for all conditions 
-        for alg=1:2
-            data=[];
-            for norm=1:n_norms % for all normalizations
-                i=1;
-                metrics_norm=allmetrics{norm};  
-                
-                    metrics=cell2mat(metrics_norm(conds));
-                    for data_point=1:length(metrics(metric,:))
-                        data(i,norm)=metrics(metric,data_point);
-                        i=i+1;
-                    
-                end
-            end
-            [p,~,stats]=friedman(data,1,"off");
-            if p<0.05
-                disp("p-value "+metrics_labels(metric)+" for C"+conds+", A"+alg+ ": "+p)
-                multcompare(stats,"Display","off")
-            end
-        end
-    end
-end
-
 %% Do Friedman test - Compare Normalization (for all conditions and algorithms)
 
 n_norms=length(allmetrics);
 
 g_alg=[1 1 2 2 1 1 2 2];
-reps=sum(n_people);
+reps=sum(n_people)/2;
 txt = input("Do you want to use multcompare?[y/n]");
+Table =zeros (length(metrics_labels)*sum(n_people),n_norms)
 
+%T = table(LastName,Gender,Age,Height,Weight,Smoker,Systolic,Diastolic);
 for metric=1:length(metrics_labels) % for all metrics
-    data=zeros(sum(n_people),n_norms);
+    data1=zeros(sum(n_people),n_norms);
+    data2=zeros(sum(n_people),n_norms);
     for norm=1:n_norms % for all normalizations
-        i=1;
+        i=1;j=1;
         metrics_norm=allmetrics{norm};
         for alg=1:2 % for all algorithms
             for conds=1:numel(metrics_norm)% for all conditions
                 metrics=cell2mat(metrics_norm(conds));
                 for data_point=1:length(metrics(metric,:))
                     if alg==g_alg(conds)
-                        data(i,norm)=metrics(metric,data_point);
+                        data1(i,norm)=metrics(metric,data_point);
                         i=i+1;
                     end
+                    if alg==1
+                        data2(j,norm)=metrics(metric,data_point);
+                    end
+                    j=j+1;
                 end
             end
         end
     end
     disp(" ")
-    [p,~,stats]=friedman(data,reps,"off");
+    [p,~,stats]=friedman(data1,reps,"off");
 
     if p<0.05
         disp("p-value "+metrics_labels(metric)+ " : "+p)
@@ -192,11 +169,11 @@ for metric=1:length(metrics_labels) % for all metrics
                 for norm1=1:3
                     for norm2=norm1+1:4
                         idx=1+sum(n_people(1:cond1))-n_people(cond1):sum(n_people(1:cond1));
-                        x=data(idx,norm1);
-                        y=data(idx,norm2);
-                        p=signrank(x,y);
-                        if p>0.05
-                            disp("p-value "+cond1+ ": "+p)
+                        x=data2(idx,norm1);
+                        y=data2(idx,norm2);
+                        p_signrank=signrank(x,y);
+                        if p_signrank>0.05
+                            disp("p-value "+cond1+", "+norm1 +"-"+norm2+": "+p_signrank)
                         end
                     end
                 end
