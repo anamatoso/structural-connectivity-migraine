@@ -102,7 +102,7 @@ for metric=1:length(metrics_labels) % for all metrics
                 disp("p-value "+metrics_labels(metric)+" for N"+norm+", A"+alg+ ": "+p_group)
                 if txt=='y'
                     figure;
-                    multcompare(stats)
+                    multcompare(stats,"Display","off")
                 else %txt=='n'
                     for cond1=1:numel(metrics_norm)-1
                         for cond2=cond1+1:numel(metrics_norm)
@@ -131,9 +131,9 @@ n_norms=length(allmetrics);
 g_alg=[1 1 2 2 1 1 2 2];
 reps=sum(n_people)/2;
 txt = input("Do you want to use multcompare?[y/n]");
-Table =zeros (length(metrics_labels)*sum(n_people),n_norms)
+Table=zeros(length(metrics_labels)*length(n_people)*6,5);
+t=1;
 
-%T = table(LastName,Gender,Age,Height,Weight,Smoker,Systolic,Diastolic);
 for metric=1:length(metrics_labels) % for all metrics
     data1=zeros(sum(n_people),n_norms);
     data2=zeros(sum(n_people),n_norms);
@@ -150,8 +150,9 @@ for metric=1:length(metrics_labels) % for all metrics
                     end
                     if alg==1
                         data2(j,norm)=metrics(metric,data_point);
+                        j=j+1;
                     end
-                    j=j+1;
+                    
                 end
             end
         end
@@ -172,21 +173,49 @@ for metric=1:length(metrics_labels) % for all metrics
                         x=data2(idx,norm1);
                         y=data2(idx,norm2);
                         p_signrank=signrank(x,y);
-                        if p_signrank>0.05
+                        if p_signrank<0.05
                             disp("p-value "+cond1+", "+norm1 +"-"+norm2+": "+p_signrank)
                         end
+                        
                     end
                 end
             end
         end
     end
+    for cond1=1:numel(metrics_norm)
+        for norm1=1:3
+            for norm2=norm1+1:4
+                idx=1+sum(n_people(1:cond1))-n_people(cond1):sum(n_people(1:cond1));
+                x=data2(idx,norm1);
+                y=data2(idx,norm2);
+                p_signrank=signrank(x,y);
+                Table(t,:)=[metric cond1 norm1 norm2 p_signrank];t=t+1;
+            end
+        end
+    end
+
 end
 
-%% Do Friedman test - Compare Algorithm (for all normalizations and conditions and for each normalization)
+table1=cell(length(Table),2);
+for i=1:length(Table)
+    table1{i,1}=metrics_labels(Table(i,1));
+    table1{i,2}=condition_names(Table(i,2));
+end
+
+table=array2table(Table(:,3:end),'VariableNames',{'Norm1','Norm2','pvalue'});
+table1=cell2table(table1,'VariableNames',{'Metric','Condition'});
+final_table=[table1 table];
+
+writetable(final_table, 'comparison_normalisation.xlsx');
+
+clear alg cond1 conds data_point g_alg i j idx  metric n_norms  reps x y txt stats p p_signrank norm1 norm2 table1 table Table data 1 data2 data
+
+%% Do Friedman test - Compare Algorithm (for all normalizations and conditions and for each normalization) 
 
 n_norms=length(allmetrics);
 
 g_alg=[1 1 2 2 1 1 2 2];
+condspeople=[14 14 16 9 14 14 16 19]
 reps=sum(n_people)/2;
 txt = input("Do you want to account for all normalizations?[y/n]");
 for metric=1:length(metrics_labels) % for all metrics
@@ -222,9 +251,38 @@ for metric=1:length(metrics_labels) % for all metrics
             end
         end
     end 
+    for norm=1:4
+        for cond=1:4
+            
+            idx=1+sum(n_people(1:cond1))-n_people(cond1):sum(n_people(1:cond1));
+            x=data2(idx,norm1);
+            y=data2(idx,norm2);
+            p_signrank=signrank(x,y);
+            Table(t,:)=[metric cond1 norm1 norm2 p_signrank];t=t+1;
+            Table(t,:)=[metric cond norm p_signrank];t=t+1;
+            
+        end
+    end
+
 end
-clear txt p norm i conds alg data_point metric reps
-%% Do Friedman test - Compare Cycle stages
+
+table1=cell(length(Table),2);
+for i=1:length(Table)
+    table1{i,1}=metrics_labels(Table(i,1));
+    table1{i,2}=condition_names(Table(i,2));
+end
+
+table=array2table(Table(:,3:end),'VariableNames',{'Norm1','Norm2','pvalue'});
+table1=cell2table(table1,'VariableNames',{'Metric','Condition'});
+final_table=[table1 table];
+
+writetable(final_table, 'comparison_normalisation.xlsx');
+
+
+
+
+clear txt p norm i conds alg data_point metric reps tbl
+%% Do Friedman test - Compare Cycle stages (NOT NEEDED)
 n_norms=length(allmetrics);
 
 cond=[1 2 1 2 3 4 3 4];
