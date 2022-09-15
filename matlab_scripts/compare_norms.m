@@ -61,8 +61,8 @@ clear i j p c R Rlog scatterv idx con
 
 
 allmetrics=cell(size(allconnectomes));
-version_metrics=2;%  3=nodal metrics, 2=general metrics
-load('allmetrics2.mat')
+version_metrics=3;%  3=nodal metrics, 2=general metrics
+load('allmetrics3.mat')
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)
@@ -101,7 +101,6 @@ for metric=1:length(metrics_labels) % for all metrics
             if p_group <= 0.05
                 disp("p-value "+metrics_labels(metric)+" for N"+norm+", A"+alg+ ": "+p_group)
                 if txt=='y'
-                    figure;
                     multcompare(stats,"Display","off")
                 else %txt=='n'
                     for cond1=1:numel(metrics_norm)-1
