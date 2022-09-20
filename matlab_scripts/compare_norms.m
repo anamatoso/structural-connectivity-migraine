@@ -167,7 +167,7 @@ n_norms=length(allmetrics);
 g_alg=[1 1 2 2 1 1 2 2];
 reps=sum(n_people)/2;
 txt = input("Do you want to use multcompare?[y/n]");
-Table=zeros(length(metrics_labels)*length(n_people)*6,5);
+Table=zeros(length(metrics_labels)*length(n_people)*6,6);
 t=1;
 data_all=cell(1,length(metrics_labels));
 for metric=1:length(metrics_labels) % for all metrics
@@ -177,7 +177,7 @@ for metric=1:length(metrics_labels) % for all metrics
         i=1;j=1;
         metrics_norm=allmetrics{norm};
         for alg=1:2 % for all algorithms
-            for conds=1:numel(metrics_norm)% for all conditions
+            for conds=1:n_conditions% for all conditions
                 metrics=cell2mat(metrics_norm(conds));
                 for data_point=1:length(metrics(metric,:))
                     if alg==g_alg(conds)
@@ -202,14 +202,14 @@ for metric=1:length(metrics_labels) % for all metrics
         if txt=='y'
             multcompare(stats, "Display","off")
         else
-            for cond1=1:numel(metrics_norm)
+            for cond1=1:n_conditions
                 for norm1=1:3
                     for norm2=norm1+1:4
                         idx=1+sum(n_people(1:cond1))-n_people(cond1):sum(n_people(1:cond1));
                         x=data_table(idx,norm1);
                         y=data_table(idx,norm2);
                         p_signrank=signrank(x,y);
-                        if p_signrank<0.05/6
+                        if p_signrank<0.05/6/8
                             disp("p-value cond:"+cond1+", N"+norm1 +"-N"+norm2+": "+p_signrank)
                         end
                         
@@ -218,14 +218,14 @@ for metric=1:length(metrics_labels) % for all metrics
             end
         end
     end
-    for cond1=1:numel(metrics_norm)
+    for cond1=1:n_conditions
         for norm1=1:3
             for norm2=norm1+1:4
                 idx=1+sum(n_people(1:cond1))-n_people(cond1):sum(n_people(1:cond1));
                 x=data_table(idx,norm1);
                 y=data_table(idx,norm2);
                 p_signrank=signrank(x,y);
-                Table(t,:)=[metric cond1 norm1 norm2 p_signrank];t=t+1;
+                Table(t,:)=[metric cond1 norm1 norm2 p_signrank median(y)>median(x)];t=t+1;
             end
         end
     end
@@ -238,7 +238,7 @@ for i=1:length(Table)
     table1{i,2}=condition_names(Table(i,2));
 end
 
-table=array2table(Table(:,3:end),'VariableNames',{'Norm1','Norm2','pvalue'});
+table=array2table(Table(:,3:end),'VariableNames',{'Norm1','Norm2','pvalue', 'Variation'});
 table1=cell2table(table1,'VariableNames',{'Metric','Condition'});
 final_table=[table1 table];
 
@@ -249,9 +249,12 @@ clear alg metrics metrics_norm cond1 conds data_point g_alg i j idx t metric n_n
 %% Do Friedman test - Compare Algorithm (for all normalizations and conditions and for each normalization)
 
 n_norms=length(allmetrics);
-
+n_people2=[14 14 16 9];
 reps=sum(n_people)/2;
+conds=["Midcycle" "Interictal" "Premenstrual" "Ictal"];
 txt = input("Do you want to use multcompare?[y/n]");
+Table=zeros(length(metrics_labels)*length(n_people),5);
+t=1;
 
 for metric=1:length(metrics_labels) % for all metrics
     data_friedman=data_all{metric};    
@@ -265,37 +268,54 @@ for metric=1:length(metrics_labels) % for all metrics
 
     [p,~,stats]=friedman(data1,reps,"off");
 
-    data4=reshape(data1,[1,424]);
-    group = [ones([1,212]) 2.*ones([1,212])];
-
     if p<0.05
         disp("p-value "+metrics_labels(metric)+ " : "+p)
-
         if txt=='y'
             multcompare(stats, "Display","off")
-            [p_group,~,stats] = kruskalwallis(data4,group,"off");
-            disp("p-value "+metrics_labels(metric)+ " : "+p_group)
-            multcompare(stats,"Display","off")
         else
-            for cond1=1:numel(metrics_norm)
-                for norm1=1:3
-                    for norm2=norm1+1:4
-                        idx=1+sum(n_people(1:cond1))-n_people(cond1):sum(n_people(1:cond1));
-                        x=data_table(idx,norm1);
-                        y=data_table(idx,norm2);
+            for norm1=1:4
+                for cond1=1:4
+                        idx=norm1*(1+sum(n_people2(1:cond1))-n_people2(cond1)):norm1*(sum(n_people2(1:cond1)));
+                        x=data1(idx,1);
+                        y=data1(idx,2);
                         p_signrank=signrank(x,y);
-                        if p_signrank<0.05/6/7
-                            disp("p-value cond:"+cond1+", N"+norm1 +"-N"+norm2+": "+p_signrank)
-                        end
-                        
-                    end
+                        if p_signrank>=0.05/6/7
+                            disp("p-value N"+norm1+", "+conds(cond1)+": "+p_signrank)
+                        end                        
                 end
             end
         end
     end
+    for norm1=1:4
+        for cond1=1:4
+            idx=norm1*(1+sum(n_people2(1:cond1))-n_people2(cond1)):norm1*(sum(n_people2(1:cond1)));
+            x=data1(idx,1);
+            y=data1(idx,2);
+            p_signrank=signrank(x,y);
+            Table(t,:)=[metric cond1 norm1 p_signrank median(y)>median(x)];t=t+1;
+
+        end
+    end
+
+
 end
 
-clear alg metrics metrics_norm cond1 conds data_point g_alg i j idx t metric n_norms norm reps x y txt stats p p_signrank norm1 norm2 table1 table Table data 1 data_table data
+
+table1=cell(length(Table),2);
+for i=1:length(Table)
+    table1{i,1}=metrics_labels(Table(i,1));
+    table1{i,2}=conds(Table(i,2));
+end
+
+table=array2table(Table(:,3:end),'VariableNames',{'Normalisation','Pvalue','Variation'});
+table1=cell2table(table1,'VariableNames',{'Metric','Condition'});
+final_table=[table1 table];
+
+writetable(final_table, 'comparison_algorithm.xlsx');
+
+
+
+clear alg metrics Table table table1  metrics_norm cond1 conds data_point g_alg i j idx t metric n_norms norm reps x y txt stats p p_signrank norm1 norm2 table1 table Table data 1 data_table data
 
 %% Do ANOVA
 alg=[1 1 2 2 1 1 2 2];
