@@ -142,12 +142,12 @@ for metric=1:length(metrics_labels) % for all metrics
                             if all([cond1 cond2]==[1 2]) || all([cond1 cond2]==[3 4]) % HC vs M->wilcoxon ranksum
                                 p=ranksum(x,y);
                                 if p<=0.05
-                                    %disp("p-value "+cond1+"-"+cond2+ ": "+p)
+                                    disp("p-value "+cond1+"-"+cond2+ ": "+p)
                                 end
                             elseif length(x)==length(y) && (all([cond1 cond2]==[1 3]) || all([cond1 cond2]==[2 4])) % Cycle->wilcoxon signed rank
                                 p=signrank(x,y);
                                 if p<=0.05
-                                    %disp("p-value "+cond1+"-"+cond2+ ": "+p)
+                                    disp("p-value "+cond1+"-"+cond2+ ": "+p)
                                 end
                             end
                         end
