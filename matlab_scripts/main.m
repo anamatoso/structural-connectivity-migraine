@@ -200,7 +200,7 @@ clear i p
 % connectomes =connectome2aal90(connectomes);
 
 version_metrics=2;%  1=nodal metrics, 2=general metrics
-% load('allmetrics3.mat')
+ load('allmetrics3_paired.mat')
 
 allmetrics=cell(size(allconnectomes));
 for i=1:length(allconnectomes)
@@ -210,13 +210,13 @@ end
 
 clear i
 %% Analysis of results
-version_metrics=2;
+version_metrics=3;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 
-comparisons=comparison_HCvsP;
+comparisons=comparison_cycle;
 
 ttest_results=cell(size(allconnectomes));
 for i=1:length(allconnectomes)

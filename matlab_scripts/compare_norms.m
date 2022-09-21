@@ -94,8 +94,8 @@ clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
 %% Get metrics
 
 allmetrics=cell(size(allconnectomes));
-version_metrics=2;%  3=nodal metrics, 2=general metrics
-load('allmetrics2.mat')
+version_metrics=3;%  3=nodal metrics, 2=general metrics
+load('allmetrics3.mat')
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)
@@ -114,6 +114,31 @@ g_alg=[1 1 2 2 1 1 2 2];
 txt = input("Do you want to use multcompare?[y/n]");
 
 for metric=1:length(metrics_labels) % for all metrics
+%     i=1;data=[];g_cond=[];
+%     for norm=1:n_norms
+%         metrics_norm=allmetrics{norm};
+%         for conds=1:numel(metrics_norm)% for all conditions
+%             metrics=cell2mat(metrics_norm(conds));
+%             for data_point=1:length(metrics(metric,:))
+%                 data=[data metrics(metric,data_point)];
+%                 g_cond=[g_cond cond(conds)];
+%                 i=i+1;
+%             end
+%         end   
+%     end
+%     [p_group,~,~] = kruskalwallis(data,g_cond,"off");
+%     disp(metrics_labels(metric)+" group pvalue: "+p_group)
+%     for cond1=1:3
+%         for cond2=cond1+1:4
+%             [x,y] = extract_groups(data,g_cond,cond1,cond2);
+%             if length(x)==length(y)
+%                 disp("posthoc test,"+ "C"+cond1 +"-C"+cond2+": "+signrank(x,y))
+%             else
+%                 disp("posthoc test,"+ "C"+cond1 +"-C"+cond2+": "+ranksum(x,y))
+%             end
+%         end
+%     end
+
     for norm=1:n_norms % for all normalizations
         metrics_norm=allmetrics{norm};
         for alg=1:2 % for all algorithms
@@ -142,12 +167,12 @@ for metric=1:length(metrics_labels) % for all metrics
                             if all([cond1 cond2]==[1 2]) || all([cond1 cond2]==[3 4]) % HC vs M->wilcoxon ranksum
                                 p=ranksum(x,y);
                                 if p<=0.05
-                                    disp("p-value "+cond1+"-"+cond2+ ": "+p)
+                                    %disp("p-value "+cond1+"-"+cond2+ ": "+p)
                                 end
                             elseif length(x)==length(y) && (all([cond1 cond2]==[1 3]) || all([cond1 cond2]==[2 4])) % Cycle->wilcoxon signed rank
                                 p=signrank(x,y);
                                 if p<=0.05
-                                    disp("p-value "+cond1+"-"+cond2+ ": "+p)
+                                    %disp("p-value "+cond1+"-"+cond2+ ": "+p)
                                 end
                             end
                         end
@@ -202,6 +227,12 @@ for metric=1:length(metrics_labels) % for all metrics
         if txt=='y'
             multcompare(stats, "Display","off")
         else
+            for norm1=1:3
+                    for norm2=norm1+1:4
+                            disp("posthoc test,"+ "N"+norm1 +"-N"+norm2+": "+signrank(data_friedman(:,norm1),data_friedman(:,norm2)))
+                    end
+            end
+            
             for cond1=1:n_conditions
                 for norm1=1:3
                     for norm2=norm1+1:4
@@ -209,7 +240,7 @@ for metric=1:length(metrics_labels) % for all metrics
                         x=data_table(idx,norm1);
                         y=data_table(idx,norm2);
                         p_signrank=signrank(x,y);
-                        if p_signrank<0.05/6/8
+                        if p_signrank<0.05/6/8/length(metrics_labels) % correct for comparisons of norms and conditions
                             disp("p-value cond:"+cond1+", N"+norm1 +"-N"+norm2+": "+p_signrank)
                         end
                         
@@ -242,7 +273,7 @@ table=array2table(Table(:,3:end),'VariableNames',{'Norm1','Norm2','pvalue', 'Var
 table1=cell2table(table1,'VariableNames',{'Metric','Condition'});
 final_table=[table1 table];
 
-writetable(final_table, 'comparison_normalisation.xlsx');
+%writetable(final_table, 'comparison_normalisation.xlsx');
 
 clear alg metrics metrics_norm cond1 conds data_point g_alg i j idx t metric n_norms norm reps x y txt stats p p_signrank norm1 norm2 table1 table Table data_friedman data_table data
 
@@ -273,13 +304,14 @@ for metric=1:length(metrics_labels) % for all metrics
         if txt=='y'
             multcompare(stats, "Display","off")
         else
+            disp("posthoc test: "+signrank(data1(:,1),data1(:,2)))
             for norm1=1:4
                 for cond1=1:4
                         idx=norm1*(1+sum(n_people2(1:cond1))-n_people2(cond1)):norm1*(sum(n_people2(1:cond1)));
                         x=data1(idx,1);
                         y=data1(idx,2);
                         p_signrank=signrank(x,y);
-                        if p_signrank>=0.05/6/7
+                        if p_signrank<0.05/6/4/length(metrics_labels) % correct for norms, conds and n_metrics
                             disp("p-value N"+norm1+", "+conds(cond1)+": "+p_signrank)
                         end                        
                 end
@@ -311,7 +343,7 @@ table=array2table(Table(:,3:end),'VariableNames',{'Normalisation','Pvalue','Vari
 table1=cell2table(table1,'VariableNames',{'Metric','Condition'});
 final_table=[table1 table];
 
-writetable(final_table, 'comparison_algorithm.xlsx');
+%writetable(final_table, 'comparison_algorithm.xlsx');
 
 
 

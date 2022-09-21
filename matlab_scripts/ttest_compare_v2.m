@@ -1,6 +1,11 @@
 function [ttest_results] = ttest_compare_v2(metrics,metrics_labels,version_metrics,n_nodes,comparisons)
 % Given the metrics and the respective labels, this function calculates
 % which metrics are significantly different.
+cycle=[1 5;3 7;2 6;4 8];
+
+if all(comparisons==cycle)
+    paired=true;
+end
 
 n_metrics=length(metrics_labels);
 compare_ttest=zeros(1,6);
@@ -27,13 +32,22 @@ for c=1:ncomp
         end
         
         if ~kstest(data1) && ~kstest(data2) && ~vartest2(data1,data2)   % normal with equal variances
-            [~,p] = ttest2(data1,data2);
+            if paired
+                [~,p] = ttest(data1,data2);
+            else
+                [~,p] = ttest2(data1,data2);
+            end
             dif=mean(data2)-mean(data1);
+        
         elseif ~kstest(data1) && ~kstest(data2) && vartest2(data1,data2)% normal with unequal variances
             [~,p] = ttest2(data1,data2,'vartype', 'unequal');
             dif=mean(data2)-mean(data1);
         else                                                            % not normal with unequal variances
-            p = ranksum(data1,data2);
+            if paired
+                p = signrank(data1,data2);
+            else
+                p = ranksum(data1,data2);
+            end
             dif=median(data2)-median(data1);
         end
         
