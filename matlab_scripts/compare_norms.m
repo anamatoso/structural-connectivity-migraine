@@ -94,8 +94,8 @@ clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
 %% Get metrics
 
 allmetrics=cell(size(allconnectomes));
-version_metrics=3;%  3=nodal metrics, 2=general metrics
-load('allmetrics3.mat')
+version_metrics=2;%  3=nodal metrics, 2=general metrics
+load('allmetrics2.mat')
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)
@@ -167,12 +167,12 @@ for metric=1:length(metrics_labels) % for all metrics
                             if all([cond1 cond2]==[1 2]) || all([cond1 cond2]==[3 4]) % HC vs M->wilcoxon ranksum
                                 p=ranksum(x,y);
                                 if p<=0.05
-                                    %disp("p-value "+cond1+"-"+cond2+ ": "+p)
+                                    disp("p-value "+cond1+"-"+cond2+ ": "+p)
                                 end
                             elseif length(x)==length(y) && (all([cond1 cond2]==[1 3]) || all([cond1 cond2]==[2 4])) % Cycle->wilcoxon signed rank
                                 p=signrank(x,y);
                                 if p<=0.05
-                                    %disp("p-value "+cond1+"-"+cond2+ ": "+p)
+                                    disp("p-value "+cond1+"-"+cond2+ ": "+p)
                                 end
                             end
                         end
@@ -221,15 +221,18 @@ for metric=1:length(metrics_labels) % for all metrics
     disp(" ")
     [p,~,stats]=friedman(data_friedman,reps,"off");
     data_all{metric}=data_friedman;
+    disp("p-value "+metrics_labels(metric)+ " : "+p)
     if p<0.05
-        disp("p-value "+metrics_labels(metric)+ " : "+p)
 
         if txt=='y'
             multcompare(stats, "Display","off")
         else
             for norm1=1:3
                     for norm2=norm1+1:4
-                            disp("posthoc test,"+ "N"+norm1 +"-N"+norm2+": "+signrank(data_friedman(:,norm1),data_friedman(:,norm2)))
+                        p=signrank(data_friedman(:,norm1),data_friedman(:,norm2));
+                        if p<0.05/6/length(metrics_labels)
+                            disp("posthoc test,"+ "N"+norm1 +"-N"+norm2+": "+p)
+                        end
                     end
             end
             
@@ -299,12 +302,16 @@ for metric=1:length(metrics_labels) % for all metrics
 
     [p,~,stats]=friedman(data1,reps,"off");
 
+    disp("p-value "+metrics_labels(metric)+ " : "+p)
     if p<0.05
-        disp("p-value "+metrics_labels(metric)+ " : "+p)
         if txt=='y'
             multcompare(stats, "Display","off")
         else
-            disp("posthoc test: "+signrank(data1(:,1),data1(:,2)))
+            p=signrank(data1(:,1),data1(:,2));
+            if p<0.05/length(metrics_labels)
+                disp("posthoc test: "+p)
+            end
+            disp("posthoc test: "+p)               
             for norm1=1:4
                 for cond1=1:4
                         idx=norm1*(1+sum(n_people2(1:cond1))-n_people2(cond1)):norm1*(sum(n_people2(1:cond1)));
