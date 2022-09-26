@@ -199,8 +199,8 @@ clear i p
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=2;%  1=nodal metrics, 2=general metrics
- load('allmetrics3_paired.mat')
+version_metrics=3;%  1=nodal metrics, 2=general metrics
+%load('allmetrics3_paired.mat')
 
 allmetrics=cell(size(allconnectomes));
 for i=1:length(allconnectomes)
@@ -216,7 +216,7 @@ comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 
-comparisons=comparison_cycle;
+comparisons=comparison_HCvsP;
 
 ttest_results=cell(size(allconnectomes));
 for i=1:length(allconnectomes)
