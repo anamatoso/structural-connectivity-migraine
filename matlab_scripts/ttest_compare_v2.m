@@ -5,6 +5,8 @@ cycle=[1 5;3 7;2 6;4 8];
 
 if all(comparisons==cycle)
     paired=true;
+else 
+    paired=false;
 end
 
 n_metrics=length(metrics_labels);
@@ -72,7 +74,7 @@ if version_metrics==3
     [~,nmetrics]=size(pvals);
     fdr=zeros(size(pvals));
     for i=1:nmetrics
-        [~,q] = mafdr(pvals(:,i));
+        [q] = mafdr(pvals(:,i),'BHFDR',true);
         %[fdr2_v,q2_v] = mafdr(pvals(:,i));
         fdr(:,i)=q;
         %fdr2(:,i)=fdr2_v;
