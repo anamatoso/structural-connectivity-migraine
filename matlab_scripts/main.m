@@ -223,7 +223,6 @@ for i=1:length(allconnectomes)
     metrics=allmetrics{i};
     ttest_results{i} = ttest_compare_v2(metrics,metrics_labels,version_metrics,length(node_labels),comparisons);
 end
-
 %writetable(ttest_results, 'ttest_results.xlsx');
 clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle i
 
