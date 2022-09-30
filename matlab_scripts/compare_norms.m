@@ -105,8 +105,7 @@ end
 
 clear connectomes i version_metrics
 
-
-%% Do kruskall wallis - Compare Groups
+%% Do kruskall wallis - Compare Groups (match)
 n_norms=length(allmetrics);
 
 cond=[1 2 1 2 3 4 3 4];
@@ -175,6 +174,56 @@ for metric=1:length(metrics_labels) % for all metrics
                                     disp("p-value "+cond1+"-"+cond2+ ": "+p)
                                 end
                             end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+clear cond data i alg p_group ans g_cond metric norm conds metrics_norm metrics data_point p stats tbl x y txt cond1 cond2 g_alg
+
+%% Do kruskall wallis - Compare Groups (not matched)
+n_norms=length(allmetrics);
+
+cond=[1 2 1 2 3 4 3 4];
+g_alg=[1 1 2 2 1 1 2 2];
+txt = input("Do you want to use multcompare?[y/n]");
+
+for metric=1:length(metrics_labels) % for all metrics
+    for norm=1:n_norms % for all normalizations
+        metrics_norm=allmetrics{norm};
+        for alg=1:2 % for all algorithms
+            i=1;
+            data=[];
+            g_cond=[];
+            for conds=1:numel(metrics_norm)% for all conditions
+                if g_alg(conds)==alg
+                    metrics=cell2mat(metrics_norm(conds));
+                    for data_point=1:length(metrics(metric,:))
+                        data=[data metrics(metric,data_point)];
+                        g_cond=[g_cond cond(conds)];
+                        i=i+1;
+                    end
+                end
+            end
+            [p_group,~,stats] = kruskalwallis(data,g_cond,"off");
+            if p_group <= 0.05
+                disp("p-value "+metrics_labels(metric)+" for N"+norm+", A"+alg+ ": "+p_group)
+                if txt=='y'
+                    multcompare(stats,"Display","off")
+                else %txt=='n'
+                    for cond1=1:4-1
+                        for cond2=cond1+1:4
+                            [x,y] = extract_groups(data,g_cond,cond1,cond2);
+                            p=ranksum(x,y);
+                            if p<=0.05/4
+                                disp("p-value "+cond1+"-"+cond2+ ": "+p)
+                            end
+
+                                
+                        
                         end
                     end
                 end
