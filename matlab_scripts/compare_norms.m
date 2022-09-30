@@ -10,7 +10,13 @@ dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_size
 atlas="AAL116";
 threshold=0;
 normalizations=[1 2 3 4];
-[allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,false);
+%[allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,false);
+
+load("allconnectomes.mat")
+n_people=[15 14 15 14 15 9 15 9];
+n_conditions=length(n_people);
+condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
+node_labels=get_label_nodes(atlas+"_labels.txt");
 
 clear threshold atlas dir dir_roi
 %% Scatter plot and correlation coefficients
@@ -85,7 +91,7 @@ end
 condition={'Midcycle', 'Interictal', 'Prementrual', 'Ictal'};
 for k=1:4
     figure('color','w')
-    histogram(roisizes{k},'Normalization', 'probability')
+    histogram(roisizes{k},'Normalization', 'cdf')
     title("ROI sizes in "+ condition(k))
 end
 
@@ -279,7 +285,7 @@ for metric=1:length(metrics_labels) % for all metrics
             for norm1=1:3
                     for norm2=norm1+1:4
                         p=signrank(data_friedman(:,norm1),data_friedman(:,norm2));
-                        if p<0.05/6/length(metrics_labels)
+                        if p<2%0.05/6/length(metrics_labels)
                             disp("posthoc test,"+ "N"+norm1 +"-N"+norm2+": "+p)
                         end
                     end
@@ -352,27 +358,27 @@ for metric=1:length(metrics_labels) % for all metrics
     [p,~,stats]=friedman(data1,reps,"off");
 
     disp("p-value "+metrics_labels(metric)+ " : "+p)
-    if p<0.05
-        if txt=='y'
-            multcompare(stats, "Display","off")
-        else
-            p=signrank(data1(:,1),data1(:,2));
-            if p<0.05/length(metrics_labels)
-                disp("posthoc test: "+p)
-            end
-            disp("posthoc test: "+p)               
-            for norm1=1:4
-                for cond1=1:4
-                        idx=norm1*(1+sum(n_people2(1:cond1))-n_people2(cond1)):norm1*(sum(n_people2(1:cond1)));
-                        x=data1(idx,1);
-                        y=data1(idx,2);
-                        p_signrank=signrank(x,y);
-                        if p_signrank<0.05/6/4/length(metrics_labels) % correct for norms, conds and n_metrics
-                            disp("p-value N"+norm1+", "+conds(cond1)+": "+p_signrank)
-                        end                        
-                end
+
+    if txt=='y'
+        multcompare(stats, "Display","off")
+    else
+        p=signrank(data1(:,1),data1(:,2));
+        if p<0.05/length(metrics_labels)
+            %disp("posthoc test: "+p)
+        end
+        disp("posthoc test: "+p)               
+        for norm1=1:4
+            for cond1=1:4
+                    idx=norm1*(1+sum(n_people2(1:cond1))-n_people2(cond1)):norm1*(sum(n_people2(1:cond1)));
+                    x=data1(idx,1);
+                    y=data1(idx,2);
+                    p_signrank=signrank(x,y);
+                    if p_signrank<0.05/6/4/length(metrics_labels) % correct for norms, conds and n_metrics
+                        disp("p-value N"+norm1+", "+conds(cond1)+": "+p_signrank)
+                    end                        
             end
         end
+        
     end
     for norm1=1:4
         for cond1=1:4
@@ -496,7 +502,6 @@ clear notlog positionaldata xlabels colorlabels data colordata groups_color grou
 %% Plot Boxchart (color=condition)
 
 notlog=[3 4 6 7];
-
 for metric=1:7
     clear data;i=1;
     for norm=1:length(normalizations)
@@ -528,6 +533,7 @@ for metric=1:7
 
     figure('color','w','units','normalized','Position',[0.2,0.2,0.8,0.5])
     boxchart(positionaldata,data,'GroupByColor',colordata);
+    
     if ~ismember(metric,notlog)
         set(gca, 'YScale', 'log');
     end
