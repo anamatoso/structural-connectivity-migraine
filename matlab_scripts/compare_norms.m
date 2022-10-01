@@ -100,8 +100,8 @@ clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
 %% Get metrics
 
 allmetrics=cell(size(allconnectomes));
-version_metrics=2;%  3=nodal metrics, 2=general metrics
-load('allmetrics2.mat')
+version_metrics=3;%  3=nodal metrics, 2=general metrics
+load('allmetrics3.mat')
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)
@@ -285,8 +285,8 @@ for metric=1:length(metrics_labels) % for all metrics
             for norm1=1:3
                     for norm2=norm1+1:4
                         p=signrank(data_friedman(:,norm1),data_friedman(:,norm2));
-                        if p<2%0.05/6/length(metrics_labels)
-                            disp("posthoc test,"+ "N"+norm1 +"-N"+norm2+": "+p)
+                        if p<0.05/6/length(metrics_labels)
+                            %disp("posthoc test,"+ "N"+norm1 +"-N"+norm2+": "+p)
                         end
                     end
             end
@@ -338,7 +338,7 @@ clear alg metrics metrics_norm cond1 conds data_point g_alg i j idx t metric n_n
 %% Do Friedman test - Compare Algorithm (for all normalizations and conditions and for each normalization)
 
 n_norms=length(allmetrics);
-n_people2=[14 14 16 9];
+n_people2=[15 14 15 9];
 reps=sum(n_people)/2;
 conds=["Midcycle" "Interictal" "Premenstrual" "Ictal"];
 txt = input("Do you want to use multcompare?[y/n]");
@@ -357,16 +357,15 @@ for metric=1:length(metrics_labels) % for all metrics
 
     [p,~,stats]=friedman(data1,reps,"off");
 
-    disp("p-value "+metrics_labels(metric)+ " : "+p)
+    %disp("p-value "+metrics_labels(metric)+ " : "+p)
 
     if txt=='y'
         multcompare(stats, "Display","off")
     else
         p=signrank(data1(:,1),data1(:,2));
-        if p<0.05/length(metrics_labels)
-            %disp("posthoc test: "+p)
+        if p<2%0.05/length(metrics_labels)
+            disp(metrics_labels(metric) +" signranktest: "+p)
         end
-        disp("posthoc test: "+p)               
         for norm1=1:4
             for cond1=1:4
                     idx=norm1*(1+sum(n_people2(1:cond1))-n_people2(cond1)):norm1*(sum(n_people2(1:cond1)));
@@ -374,7 +373,7 @@ for metric=1:length(metrics_labels) % for all metrics
                     y=data1(idx,2);
                     p_signrank=signrank(x,y);
                     if p_signrank<0.05/6/4/length(metrics_labels) % correct for norms, conds and n_metrics
-                        disp("p-value N"+norm1+", "+conds(cond1)+": "+p_signrank)
+                        %disp("p-value N"+norm1+", "+conds(cond1)+": "+p_signrank)
                     end                        
             end
         end
@@ -411,6 +410,27 @@ final_table=[table1 table];
 
 clear alg metrics Table table table1  metrics_norm cond1 conds data_point g_alg i j idx t metric n_norms norm reps x y txt stats p p_signrank norm1 norm2 table1 table Table data 1 data_table data
 
+%% Compare algs - Just for N1
+
+metrics=allmetrics{1};
+mrtrix=[1 2 5 6];
+
+for metric=1:length(metrics_labels) % for all metrics
+    data={[];[]};
+    for cond=1:n_conditions
+        if any(ismember(mrtrix,cond))
+            data{1}=horzcat(data{1},metrics{cond}(metric,:));
+        else
+            data{2}=horzcat(data{2},metrics{cond}(metric,:));
+        end
+    end
+    data=cell2mat(data);
+    p=signtest(data(1,:),data(2,:));
+    disp(metrics_labels(metric) +" : "+p)
+end
+
+
+clear metrics cond metric mrtrix p data
 %% Do ANOVA
 alg=[1 1 2 2 1 1 2 2];
 cond=[1 2 1 2 3 4 3 4];
