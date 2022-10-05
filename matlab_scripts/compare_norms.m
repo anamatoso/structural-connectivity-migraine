@@ -100,8 +100,8 @@ clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
 %% Get metrics
 
 allmetrics=cell(size(allconnectomes));
-version_metrics=3;%  3=nodal metrics, 2=general metrics
-load('allmetrics3.mat')
+version_metrics=2;%  3=nodal metrics, 2=general metrics
+load("allmetrics"+version_metrics+".mat")
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)
@@ -414,7 +414,8 @@ clear alg metrics Table table table1  metrics_norm cond1 conds data_point g_alg 
 
 metrics=allmetrics{1};
 mrtrix=[1 2 5 6];
-
+names=["nodestrength" "bc" "lC" "ec"];
+pvals=zeros(1,116*4);
 for metric=1:length(metrics_labels) % for all metrics
     data={[];[]};
     for cond=1:n_conditions
@@ -426,11 +427,26 @@ for metric=1:length(metrics_labels) % for all metrics
     end
     data=cell2mat(data);
     p=signtest(data(1,:),data(2,:));
-    disp(metrics_labels(metric) +" : "+p)
+    if p<=0.5/116/4
+        disp(metrics_labels(metric) +" : "+p)
+    end
+    pvals(metric)=p;
+
+end
+
+nodestrength=(349:464); bc=(1:116); lC=(117:232); ec=(233:348);
+m=[nodestrength;bc;lC;ec];
+names=["nodestrength" "bc" "lC" "ec"];
+diff=1*ones(1,116);
+for i=1:4
+    qvalues=pvals(m(i,:)); 
+    nodes_degree_color = nodes_color_size(qvalues,diff,0.05/116/4,node_labels);
+    nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
+    writetable(nodefile, 'nodes/model/'+names(i)+'_significantpval.txt','Delimiter',' ','WriteVariableNames', 0);
 end
 
 
-clear metrics cond metric mrtrix p data
+clear metrics cond metric mrtrix p
 %% Do ANOVA
 alg=[1 1 2 2 1 1 2 2];
 cond=[1 2 1 2 3 4 3 4];

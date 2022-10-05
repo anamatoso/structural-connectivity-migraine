@@ -45,11 +45,11 @@ for c=1:ncomp
             [~,p] = ttest2(data1,data2,'vartype', 'unequal');
             dif=mean(data2)-mean(data1);
         else                                                            % not normal with unequal variances
-            if paired
-                p = signrank(data1,data2);
-            else
+            %if paired
+             %   p = signrank(data1,data2);
+            %else
                 p = ranksum(data1,data2);
-            end
+            %end
             dif=median(data2)-median(data1);
         end
         

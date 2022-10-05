@@ -37,7 +37,7 @@ for i=1:nmetrics
 %             end
 %         end
 %     end
-    if log(max(x))-log(min(x))>2
+    if log10(max(x))-log10(min(x))>2
         set(gca, 'YScale', 'log')
     end
     

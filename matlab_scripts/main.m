@@ -90,6 +90,7 @@ clear x1 x2
 
 %% Scatter plot and correlation coefficients
 nnodes=length(node_labels);
+connectomes=allconnectomes{1};
 scatterv=[[],[]];
 topprogress=(sum(n_people)/2)*((nnodes*nnodes-nnodes)/2);
 progress=0;
@@ -199,8 +200,8 @@ clear i p
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=3;%  1=nodal metrics, 2=general metrics
-%load('allmetrics3_paired.mat')
+version_metrics=2;%  1=nodal metrics, 2=general metrics
+load("allmetrics"+version_metrics+".mat")
 
 allmetrics=cell(size(allconnectomes));
 for i=1:length(allconnectomes)
@@ -210,7 +211,7 @@ end
 
 clear i
 %% Analysis of results
-version_metrics=3;
+version_metrics=2;
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
@@ -227,28 +228,28 @@ end
 clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle i
 
 %% Visualization of results: metrics
-idx_metrics=[1 7];
-idx_groups=[1:8];
+idx_metrics=[1];
+idx_groups=[3 4 7 8];
 metrics=allmetrics{1};
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
 
-plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,condition_names,version_metrics,116)
-
+%plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,condition_names,version_metrics,116)
+plot_boxplots_both(metrics,idx_metrics,version_metrics,116)
 clear idx_metrics idx_groups
 %% For visualization in BrainNet nodes AAL116
 % nodal metrics:
 nodestrength=(349:464); bc=(1:116); lC=(117:232); ec=(233:348);
-m=[nodestrength];
-names=["nodestrength"];
-ttest_results=ttest_results{4};
-for i=1:1
-    qvalues=table2array(ttest_results(m(i,:),8)); 
-    diff=table2array(ttest_results(m(i,:),7));
+m=[nodestrength;bc;lC;ec];
+names=["nodestrength" "bc" "lC" "ec"];
+ttest_results2=ttest_results{1};
+for i=1:4
+    qvalues=table2array(ttest_results2(m(i,:),5)); 
+    diff=table2array(ttest_results2(m(i,:),7));
     nodes_degree_color = nodes_color_size(qvalues,diff,0.05,node_labels);
     nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-    writetable(nodefile, names(i)+'_significantq_fsl_sym.txt','Delimiter',' ','WriteVariableNames', 0);
+    writetable(nodefile, 'nodes/'+names(i)+'_significantpval.txt','Delimiter',' ','WriteVariableNames', 0);
 end
-clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i
+clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i qvalues pvals m diff
 %% Analysis of connectivity
 comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
