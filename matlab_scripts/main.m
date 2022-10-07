@@ -129,9 +129,9 @@ disp("r^2 with log-log scale: " +num2str(mdllog.Rsquared.Ordinary))
 
 figure('color','w');
 subplot(1,2,1);plot(mdl);text(6.5e-3,0.25e-3,"R^2="+num2str(mdl.Rsquared.Ordinary))
-title("Normal Scale");xlabel("Mrtrix");ylabel("FSL");
+title("Linear Scale");xlabel("Mrtrix");ylabel("FSL");
 subplot(1,2,2);plot(mdllog);text(-7.5,-2.5,"R^2="+num2str(mdllog.Rsquared.Ordinary))
-title("Logarithm Scale");xlabel("Mrtrix");ylabel("FSL");
+title("Logarithmic Scale");xlabel("Mrtrix");ylabel("FSL");
 
 disp("Normal Scale")
 R= corr(scatterv,"Type","Pearson");
@@ -228,7 +228,7 @@ end
 clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle i
 
 %% Visualization of results: metrics
-idx_metrics=[1];
+idx_metrics=[4];
 idx_groups=[3 4 7 8];
 metrics=allmetrics{1};
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];

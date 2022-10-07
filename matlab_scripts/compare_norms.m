@@ -47,7 +47,7 @@ for con=1:length(allconnectomes)
     figure('color','w')
     scatterhist(scatterv(:,1),scatterv(:,2), 'NBins',[40,40],'Direction','out',Marker='x');
     xlabel('MRTrix');ylabel('FSL')
-    title("Normal Scale: Normalization "+num2str(con))
+    title("Linear Scale: Normalization "+num2str(con))
 
 
     figure('color','w')

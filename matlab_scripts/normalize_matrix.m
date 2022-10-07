@@ -9,7 +9,7 @@ size_roi=importdata(roi_size);%.*8; %get size of rois in voxels and multiply by 
 mean_volume=mean(size_roi);
 sum_volume=sum(size_roi);
 
-
+disp(5000*sum_volume)
 %Normalize connectome
 n_nodes=length(connectome);
 for n=1:n_nodes
