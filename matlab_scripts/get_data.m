@@ -1,7 +1,7 @@
 function [allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,show)
 
 if atlas=="AAL116" 
-    pattern="_intersect"; 
+    pattern="_prob";%"_intersect"; 
 else
     pattern="*"+atlas; 
 end

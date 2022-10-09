@@ -5,14 +5,14 @@ close all
 format long
 %% Load data from matrices
 
-dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data';
+dir='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/matrix_data_prob';
 dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_sizes';
 atlas="AAL116";
 threshold=0;
 normalizations=[1 2 3 4];
-%[allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,false);
+[allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,false);
 
-load("allconnectomes.mat")
+%load("allconnectomes.mat")
 n_people=[15 14 15 14 15 9 15 9];
 n_conditions=length(n_people);
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
@@ -22,7 +22,7 @@ clear threshold atlas dir dir_roi
 %% Scatter plot and correlation coefficients
 
 nnodes=length(node_labels);
-for con=1:length(allconnectomes)
+for con=1:1 % only norm=1 length(allconnectomes)
     scatterv=zeros((sum(n_people)/2)*((nnodes*nnodes-nnodes)/2),2);
     idx=1;
     connectomes=allconnectomes{con};
@@ -100,8 +100,8 @@ clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
 %% Get metrics
 
 allmetrics=cell(size(allconnectomes));
-version_metrics=2;%  3=nodal metrics, 2=general metrics
-load("allmetrics"+version_metrics+".mat")
+version_metrics=3;%  3=nodal metrics, 2=general metrics
+%load("allmetrics"+version_metrics+".mat")
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)
@@ -438,11 +438,12 @@ nodestrength=(349:464); bc=(1:116); lC=(117:232); ec=(233:348);
 m=[nodestrength;bc;lC;ec];
 names=["nodestrength" "bc" "lC" "ec"];
 diff=1*ones(1,116);
+node_labels=1:116;
 for i=1:4
     qvalues=pvals(m(i,:)); 
-    nodes_degree_color = nodes_color_size(qvalues,diff,0.05/116/4,node_labels);
+    nodes_degree_color = nodes_color_size(qvalues,diff,0.05/116/4);
     nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-    writetable(nodefile, 'nodes/model/'+names(i)+'_significantpval.txt','Delimiter',' ','WriteVariableNames', 0);
+    writetable(nodefile, 'nodes/model/prob/'+names(i)+'_significantpval.txt','Delimiter',' ','WriteVariableNames', 0);
 end
 
 
@@ -575,7 +576,7 @@ for metric=1:7
     end
     grid on
     legend(colorlabels)
-    title(metrics_labels(metric),'interpreter', 'none')
+    title(metrics_labels(metric),'interpreter', 'none', 'FontWeight','normal','FontName','Arial','FontSize',20)
 end
 
 clear notlog positionaldata xlabels colorlabels data colordata groups_color groups_position i c metric norm

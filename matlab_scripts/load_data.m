@@ -21,7 +21,8 @@ for k = 1 : length(theFiles)
     if algorithm=="fsl"
         roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-23),"_roi_size_intersect.txt"); %17, or 23 for omat3
     elseif algorithm=="mrtrix"
-        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-34),"_roi_size_intersect.txt"); %34 aal, 32 desikan
+        roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-29),"_roi_size_intersect.txt"); %34 aal, 32 desikan
+        %disp(roi_file)
     else
         disp ('Error: Algorithm not known. Please choose either fsl or mrtrix.')
         return

@@ -12,7 +12,7 @@ if a==1
     metrics_labels=RC;
     
 elseif a==2
-    metrics_labels=["L" "GE" "C" "Q" "mean_D" "T" "S"];
+    metrics_labels=["Characteristic Path Length" "Global Efficiency" "Clustering Coefficient" "Modularity" "Average Strength" "Transitivity" "Small-worldness"];
     
 elseif a==3
     BC=strings(1,n_nodes);

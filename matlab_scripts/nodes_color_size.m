@@ -1,8 +1,8 @@
-function [table] = nodes_color_size(pvalues,difference,threshold,atlas_labels)
+function [table] = nodes_color_size(pvalues,difference,threshold)
 
 % size: small (1) for insignifican nodes, and big (3) for significant nodes
 % color: 1 for insignificant, 2 for positive, 0 for negative
-n_nodes=length(atlas_labels);
+n_nodes=length(pvalues);
 table=zeros(n_nodes,2); %color | size
 
 for i=1:n_nodes
