@@ -100,8 +100,8 @@ clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
 %% Get metrics
 
 allmetrics=cell(size(allconnectomes));
-version_metrics=3;%  3=nodal metrics, 2=general metrics
-%load("allmetrics"+version_metrics+".mat")
+version_metrics=2;%  3=nodal metrics, 2=general metrics
+load("allmetrics_prob.mat")
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)
@@ -285,9 +285,9 @@ for metric=1:length(metrics_labels) % for all metrics
             for norm1=1:3
                     for norm2=norm1+1:4
                         p=signrank(data_friedman(:,norm1),data_friedman(:,norm2));
-                        if p<0.05/6/length(metrics_labels)
+                        %if p<0.05/6/length(metrics_labels)
                             %disp("posthoc test,"+ "N"+norm1 +"-N"+norm2+": "+p)
-                        end
+                        %end
                     end
             end
             
@@ -299,7 +299,7 @@ for metric=1:length(metrics_labels) % for all metrics
                         y=data_table(idx,norm2);
                         p_signrank=signrank(x,y);
                         if p_signrank<0.05/6/8/length(metrics_labels) % correct for comparisons of norms and conditions
-                            disp("p-value cond:"+cond1+", N"+norm1 +"-N"+norm2+": "+p_signrank)
+                            %disp("p-value cond:"+cond1+", N"+norm1 +"-N"+norm2+": "+p_signrank)
                         end
                         
                     end
@@ -427,9 +427,9 @@ for metric=1:length(metrics_labels) % for all metrics
     end
     data=cell2mat(data);
     p=signtest(data(1,:),data(2,:));
-    if p<=0.5/116/4
+    %if p<=0.5/116/4
         disp(metrics_labels(metric) +" : "+p)
-    end
+    %end
     pvals(metric)=p;
 
 end
