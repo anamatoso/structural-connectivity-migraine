@@ -100,8 +100,8 @@ clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
 %% Get metrics
 
 allmetrics=cell(size(allconnectomes));
-version_metrics=2;%  3=nodal metrics, 2=general metrics
-load("allmetrics_prob.mat")
+version_metrics=3;%  3=nodal metrics, 2=general metrics
+%load("allmetrics_prob.mat")
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
 for i=1:length(allconnectomes)

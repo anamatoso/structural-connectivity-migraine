@@ -272,19 +272,19 @@ writematrix(matrix, 'edges_AAL116_tscore_neg.txt','Delimiter',' ');
 mean_matrices=calculate_mean_matrix(connectomes);
 %node_labels=node_labels(subnetwork);
 n_nodes=length(mean_matrices);
-hubnodes=strings(round(n_nodes*0.2),4); % SO 2 CONDITIONS
-for i=1:2 % SO 2 CONDITIONS
+hubnodes=cell(2,4); % SO 2 CONDITIONS
+for i=1:8 % SO 2 CONDITIONS
     [idx, values]=hub_nodes(mean_matrices(:,:,i)); %indices of nodes
     labels=node_labels(idx); %names of nodes
-    hubnodes(:,2*(i)-1:2*i)=[labels' values'];
+    hubnodes{i}=[labels' values'];
 end
-hubnodestable=array2table(hubnodes,'VariableNames',{'HC_midcycle','HC_midcycle_BC','M_interictal','M_interictal_BC'});%,'HC_premenstrual','M_ictal'});
+%hubnodestable=array2table(hubnodes,'VariableNames',{'HC_midcycle','HC_midcycle_BC','M_interictal','M_interictal_BC'});%,'HC_premenstrual','M_ictal'});
 
-color_size = hubnodes_color_size(hubnodes(:,1),hubnodes(:,2));
+%color_size = hubnodes_color_size(hubnodes(:,1),hubnodes(:,2));
 
-matrix = makenodefile(color_size);
-T=table(matrix);
-writetable(T, 'hubnodes_HC.txt','Delimiter',' ','WriteVariableNames', 0);
+%matrix = makenodefile(color_size);
+%T=table(matrix);
+%writetable(T, 'hubnodes_HC.txt','Delimiter',' ','WriteVariableNames', 0);
 clear i idx labels T matrix n_nodes values
 
 %% Visualization of results - Rich club
