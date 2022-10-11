@@ -200,7 +200,7 @@ clear i p
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=3;%  1=nodal metrics, 2=general metrics
+version_metrics=2;%  1=nodal metrics, 2=general metrics
 %load("allmetrics"+version_metrics+".mat")
 
 allmetrics=cell(size(allconnectomes));
@@ -216,7 +216,7 @@ comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 
-comparisons=comparison_HCvsP;
+comparisons=comparison_cycle;
 
 ttest_results=cell(size(allmetrics));
 for i=1:length(allmetrics)
@@ -227,7 +227,7 @@ end
 clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle i
 
 %% Visualization of results: metrics
-idx_metrics=[];
+idx_metrics=[1];
 idx_groups=[3 4 7 8];
 metrics=allmetrics{1};
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];

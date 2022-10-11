@@ -10,9 +10,9 @@ dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_size
 atlas="AAL116";
 threshold=0;
 normalizations=[1 2 3 4];
-[allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,false);
+%[allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,false);
 
-%load("allconnectomes.mat")
+load("allconnectomes.mat")
 n_people=[15 14 15 14 15 9 15 9];
 n_conditions=length(n_people);
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
@@ -100,7 +100,7 @@ clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
 %% Get metrics
 
 allmetrics=cell(size(allconnectomes));
-version_metrics=3;%  3=nodal metrics, 2=general metrics
+version_metrics=2;%  3=nodal metrics, 2=general metrics
 %load("allmetrics_prob.mat")
 metrics_labels=get_label_metrics(version_metrics,node_labels);
 
@@ -286,7 +286,7 @@ for metric=1:length(metrics_labels) % for all metrics
                     for norm2=norm1+1:4
                         p=signrank(data_friedman(:,norm1),data_friedman(:,norm2));
                         %if p<0.05/6/length(metrics_labels)
-                            %disp("posthoc test,"+ "N"+norm1 +"-N"+norm2+": "+p)
+                            disp("posthoc test,"+ "N"+norm1 +"-N"+norm2+": "+p)
                         %end
                     end
             end
