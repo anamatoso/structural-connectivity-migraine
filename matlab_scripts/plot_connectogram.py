@@ -12,18 +12,21 @@ from mne_connectivity import spectral_connectivity_epochs
 from mne_connectivity.viz import plot_connectivity_circle
 from tkinter.filedialog import askopenfilename
 
+
 filename = askopenfilename() #input("What matrix file do you want to plot? ")
 connectivity = sio.loadmat(filename)
-connectivity=connectivity['con']
+connectivity=connectivity['matrix']
 
 separate_hemispheres = input("Do you yant to separate both hemispheres?[0/1] ")
+number_edges = input("How many edges do you want to draw? ")
+number_edges=int(number_edges)
 
 if separate_hemispheres=="1": 
     separate_hemispheres=True
 else:
     separate_hemispheres=False
 # Get labels of nodes
-label_names = open("AAL116_labels2.txt","r").read().splitlines()
+label_names = open("AAL116_labels.txt","r").read().splitlines()
 
 # Create one group for left hemisphere and another for right hemisphere
 lh_labels = [name for name in label_names if name.endswith('-L')]
@@ -36,18 +39,22 @@ for name in lh_labels:
 
 lh_labels = [label for (yp, label) in (zip(label_ypos, lh_labels))]
 
-#rh_labels = [label[:-2] + '-R' for label in lh_labels]
 rh_labels = [name for name in label_names if name.endswith('-R')]
+
+lh_labels=label_names[::2] 
+rh_labels=label_names[1::2]
 
 # Save the plot order and create a circular layout
 node_order = list()
 node_order.extend(lh_labels[::-1])  # reverse the order
 node_order.extend(rh_labels)
 
+
+
 if separate_hemispheres:
-    group_boundaries_final=[0, len(label_names) / 2]
+    group_boundaries_final=[13,len(label_names) / 2,len(label_names)-13]
     node_order_final=node_order
-    print(separate_hemispheres)
+    #print(separate_hemispheres)
 else:
     group_boundaries_final=None
     node_order_final=label_names
@@ -56,7 +63,7 @@ else:
 node_angles = circular_layout(label_names, node_order_final, start_pos=90, group_boundaries=group_boundaries_final)
 
 fig, ax = plt.subplots(1,1,figsize=(20, 20), facecolor='white',subplot_kw=dict(projection="polar"))
-plot_connectivity_circle(connectivity, label_names, n_lines=100,node_colors=None, node_angles=node_angles,facecolor='white', textcolor='black', node_edgecolor='white',ax=ax, colormap='jet', padding=3)
+plot_connectivity_circle(connectivity, label_names, n_lines=number_edges,node_colors=None, node_angles=node_angles,facecolor='white', textcolor='black', node_edgecolor='white',ax=ax, colormap='Oranges', colorbar_pos=(-0.1, 0.1),padding=3)
 fig.tight_layout()
 if os.path.isfile("connectome.png"):
     os.remove("connectome.png")

@@ -253,8 +253,9 @@ clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i qvalues p
 comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
+connectomes=allconnectomes{1};
 
-comparisons=comparison_cycle;
+comparisons=[7 8];
 ttest_results_conn = ttest_compare_conn(connectomes,node_labels,comparisons);
 
 %writetable(ANOVA_results_conn, 'ttest_results_conn.xlsx');
@@ -263,6 +264,20 @@ clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle
 idx_metrics=[61 63;1 11;1 35;1 52];
 idx_groups=[3 4];
 plot_boxplots_conn(connectomes,idx_metrics,idx_groups,patient_labels,node_labels)
+
+%% Create matrix to plot
+mat=table2array(ttest_results_conn);
+matrix=zeros(116,116);
+idx=1;
+for i=1:115
+    for j=i+1:116
+        matrix(i,j)=1/str2double(mat(idx,7));
+        matrix(j,i)=matrix(i,j);
+        idx=idx+1;
+    end
+end
+
+clear i j idx mat
 
 %% For visualization in BrainNet edges AAL116
 matrix = anova2matrix(ttest_results_conn,"neg");

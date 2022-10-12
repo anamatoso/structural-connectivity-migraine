@@ -10,9 +10,9 @@ dir_roi='/Users/ana/Documents/Ana/universidade/Tese/Code/matlab_scripts/roi_size
 atlas="AAL116";
 threshold=0;
 normalizations=[1 2 3 4];
-%[allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,false);
+[allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,false);
 
-load("allconnectomes.mat")
+%load("allconnectomes.mat")
 n_people=[15 14 15 14 15 9 15 9];
 n_conditions=length(n_people);
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
