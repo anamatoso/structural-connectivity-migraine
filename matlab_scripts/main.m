@@ -216,7 +216,7 @@ comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 
-comparisons=comparison_cycle;
+comparisons=comparison_HCvsP;
 
 ttest_results=cell(size(allmetrics));
 for i=1:length(allmetrics)
