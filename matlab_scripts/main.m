@@ -255,7 +255,7 @@ comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 connectomes=allconnectomes{1};
 
-comparisons=[7 8];
+comparisons=[1 2];
 ttest_results_conn = ttest_compare_conn(connectomes,node_labels,comparisons);
 
 %writetable(ANOVA_results_conn, 'ttest_results_conn.xlsx');
@@ -271,11 +271,50 @@ matrix=zeros(116,116);
 idx=1;
 for i=1:115
     for j=i+1:116
-        matrix(i,j)=1/str2double(mat(idx,7));
-        matrix(j,i)=matrix(i,j);
+        a=(1-str2double(mat(idx,7)))*str2double(mat(idx,9));
+        if abs(a)<0.95
+            a=0;
+        end
+        if a<0
+            a=a+1;
+        end
+        matrix(i,j)=a;
+        matrix(j,i)=a;
         idx=idx+1;
     end
 end
+
+matreshape=reshape(matrix,[1 116*116]);
+matreshape=nonzeros(matreshape);
+matreshape=sort(matreshape);
+matreshape(2:2:end, :) = [];   
+P1 = length(matreshape)-25;
+matreshape(P1)
+%matreshape=flip(matreshape);
+P2 = 25;
+matreshape(P2)
+
+for i=1:115
+    for j=i+1:116
+        if matrix(i,j)<matreshape(length(matreshape)-25) && matrix(i,j)>matreshape(25)
+            matrix(i,j)=0;
+            matrix(j,i)=0;
+        end
+
+    end
+end
+matrix=10*matrix;
+
+for i=1:115
+    for j=i+1:116
+        if matrix(i,j)>9.5
+            matrix(i,j)=matrix(i,j)-9;
+            matrix(j,i)=matrix(i,j);
+        end
+    end
+end
+
+min(min(nonzeros(matrix)))
 
 clear i j idx mat
 
