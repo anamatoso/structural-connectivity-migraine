@@ -19,7 +19,8 @@ connectivity=connectivity['matrix']
 
 number_edges=int(np.count_nonzero(connectivity)/2)
 
-separate_hemispheres = input("Do you yant to separate both hemispheres?[0/1] ")
+#separate_hemispheres = input("Do you yant to separate both hemispheres?[0/1] ")
+separate_hemispheres="1"
 
 if separate_hemispheres=="1": 
     separate_hemispheres=True
@@ -62,8 +63,11 @@ else:
 
 node_angles = circular_layout(label_names, node_order_final, start_pos=90, group_boundaries=group_boundaries_final)
 
+node_colors=[['blueviolet']*2,['magenta']*26,['red']*2,['lightcoral']*6,['red']*6,['darkorange']*4,['yellowgreen']*2,['darkorange']*6,['green']*2,['blueviolet']*2,['cyan']*10,['blueviolet']*2,['maroon']*6,['red']*2,['green']*12,['gray']*26]
+node_colors = [item for sublist in node_colors for item in sublist]
+
 fig, ax = plt.subplots(1,1,figsize=(20, 20), facecolor='white',subplot_kw=dict(projection="polar"))
-plot_connectivity_circle(connectivity, label_names, n_lines=number_edges,node_colors=None, node_angles=node_angles,facecolor='white', textcolor='black', node_edgecolor='white',ax=ax, colormap='bwr', colorbar_pos=(-0.1, 0.1),padding=3)
+plot_connectivity_circle(connectivity, label_names, n_lines=number_edges,node_colors=node_colors, node_angles=node_angles,facecolor='white', textcolor='black', node_edgecolor='white',ax=ax, colormap='bwr', colorbar_pos=(-0.1, 0.1),padding=3)
 fig.tight_layout()
 if os.path.isfile("connectome.png"):
     os.remove("connectome.png")

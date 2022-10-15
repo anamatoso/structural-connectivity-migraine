@@ -162,18 +162,18 @@ node_labels=node_labels(subnetwork);
 clear i subnetwork
 
 %% Remap matrix (Optional)
-
+connectomes=allconnectomes{1};
 % aggregate adjacent zones
 idx_map=[1 2 repmat([3 4],1,7) 5 6 7 8 9 10 repmat([3 4],1,2) 11 12 13 14 repmat([15 16],1,3)...
     17 18 17 18 19 20 21 22 23 24 25 26 repmat([27 28],1,3) 29 30 1 2 repmat([31 32],1,2)...
-    33 34 35 36 37 38 1 2 39 40 41 42 43 44 45 46 47 48 repmat([49 50],1,5) 51*ones(1,4) 52*ones(1,14) 53*ones(1,8)];
+    33 34 35 36 37 38 1 2 39 40 41 42 43 44 45 46 47 48 repmat([49 50],1,5) repmat([51 52],1,2) repmat([53 54],1,7) 55*ones(1,8)];
 node_labels=["precentralL" "precentralR" "FrontalL" "FrontalR" "RolandicL" "RolandicR" "suppmotorL" "suppmotorR"...
     "olfactoryL" "olfactoryR" "rectusL" "rectusR" "insulaL" "insulaR" "CingulumL" "cingulumR"...
     "hippocampusL" "hippocampusR" "amygdalaL" "amygdalaR" "calcarineL" "calcarineR" "cuneusL" "cuneusR"...
-    "LingualL" "LingualR" "occipitalL" "occipitalR" "fusiforeL" "fusiformR" "parietalL" "parietalR"...
+    "LingualL" "LingualR" "occipitalL" "occipitalR" "fusiformL" "fusiformR" "parietalL" "parietalR"...
     "suppramarginalL" "suppramarginalR" "angularL" "angularR" "precuneusL" "precuneusR" "caudateL" "caudateR"...
     "putamenL" "putamenR" "pallidiumL" "pallidiumR" "thalamusL" "thalamusR" ...
-    "heschlL" "heschlR" "temporalL" "temporalR" "Cerebelum_crus" "Cerebelum_crus" "vermis"];
+    "heschlL" "heschlR" "temporalL" "temporalR" "CerebelumcrusR" "CerebelumcrusL" "CerebelumL" "CerebelumR" "vermis"];
 newconnectome=cell(size(connectomes));
 for i=1:n_conditions
     for p=1:n_people(i)
@@ -255,7 +255,7 @@ comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 connectomes=allconnectomes{1};
 
-comparisons=[1 2];
+comparisons=comparison_HCvsP;
 ttest_results_conn = ttest_compare_conn(connectomes,node_labels,comparisons);
 
 %writetable(ANOVA_results_conn, 'ttest_results_conn.xlsx');
@@ -267,10 +267,11 @@ plot_boxplots_conn(connectomes,idx_metrics,idx_groups,patient_labels,node_labels
 
 %% Create matrix to plot
 mat=table2array(ttest_results_conn);
-matrix=zeros(116,116);
+nnodes=length(node_labels);
+matrix=zeros(nnodes,nnodes);
 idx=1;
-for i=1:115
-    for j=i+1:116
+for i=1:nnodes-1
+    for j=i+1:nnodes
         a=(1-str2double(mat(idx,7)))*str2double(mat(idx,9));
         if abs(a)<0.95
             a=0;
@@ -284,18 +285,18 @@ for i=1:115
     end
 end
 
-matreshape=reshape(matrix,[1 116*116]);
+matreshape=reshape(matrix,1,[]);
 matreshape=nonzeros(matreshape);
 matreshape=sort(matreshape);
 matreshape(2:2:end, :) = [];   
-P1 = length(matreshape)-25;
+P1 = length(matreshape)-5;
 matreshape(P1)
 %matreshape=flip(matreshape);
-P2 = 25;
+P2 = 5;
 matreshape(P2)
 
-for i=1:115
-    for j=i+1:116
+for i=1:nnodes-1
+    for j=i+1:nnodes
         if matrix(i,j)<matreshape(length(matreshape)-25) && matrix(i,j)>matreshape(25)
             matrix(i,j)=0;
             matrix(j,i)=0;
@@ -305,8 +306,8 @@ for i=1:115
 end
 matrix=10*matrix;
 
-for i=1:115
-    for j=i+1:116
+for i=1:nnodes-1
+    for j=i+1:nnodes
         if matrix(i,j)>9.5
             matrix(i,j)=matrix(i,j)-9;
             matrix(j,i)=matrix(i,j);
@@ -316,7 +317,7 @@ end
 
 min(min(nonzeros(matrix)))
 
-clear i j idx mat
+clear i j idx mat P1 P2
 
 %% For visualization in BrainNet edges AAL116
 matrix = anova2matrix(ttest_results_conn,"neg");
