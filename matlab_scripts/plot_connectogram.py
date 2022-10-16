@@ -13,7 +13,7 @@ from mne_connectivity.viz import plot_connectivity_circle
 from tkinter.filedialog import askopenfilename
 
 
-filename = askopenfilename() #input("What matrix file do you want to plot? ")
+filename = sys.argv[1] #askopenfilename() #input("What matrix file do you want to plot? ")
 connectivity = sio.loadmat(filename)
 connectivity=connectivity['matrix']
 
@@ -63,7 +63,7 @@ else:
 
 node_angles = circular_layout(label_names, node_order_final, start_pos=90, group_boundaries=group_boundaries_final)
 
-node_colors=[['blueviolet']*2,['magenta']*26,['red']*2,['lightcoral']*6,['red']*6,['darkorange']*4,['yellowgreen']*2,['darkorange']*6,['green']*2,['blueviolet']*2,['cyan']*10,['blueviolet']*2,['maroon']*6,['red']*2,['green']*12,['gray']*26]
+node_colors=[['mediumpurple']*2,['steelblue']*26,['orangered']*2,['salmon']*6,['orangered']*6,['darkorange']*4,['darkorange']*2,['darkorange']*6,['yellowgreen']*2,['mediumpurple']*2,['orchid']*10,['mediumpurple']*2,['brown']*6,['orangered']*2,['yellowgreen']*12,['gray']*26]
 node_colors = [item for sublist in node_colors for item in sublist]
 
 fig, ax = plt.subplots(1,1,figsize=(20, 20), facecolor='white',subplot_kw=dict(projection="polar"))

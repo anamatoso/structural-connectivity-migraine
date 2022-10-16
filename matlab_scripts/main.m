@@ -255,7 +255,7 @@ comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 connectomes=allconnectomes{1};
 
-comparisons=comparison_HCvsP;
+comparisons=[4 8];
 ttest_results_conn = ttest_compare_conn(connectomes,node_labels,comparisons);
 
 %writetable(ANOVA_results_conn, 'ttest_results_conn.xlsx');
@@ -266,6 +266,8 @@ idx_groups=[3 4];
 plot_boxplots_conn(connectomes,idx_metrics,idx_groups,patient_labels,node_labels)
 
 %% Create matrix to plot
+n_edges=25;
+
 mat=table2array(ttest_results_conn);
 nnodes=length(node_labels);
 matrix=zeros(nnodes,nnodes);
@@ -289,15 +291,15 @@ matreshape=reshape(matrix,1,[]);
 matreshape=nonzeros(matreshape);
 matreshape=sort(matreshape);
 matreshape(2:2:end, :) = [];   
-P1 = length(matreshape)-5;
+P1 = length(matreshape)-n_edges;
 matreshape(P1)
 %matreshape=flip(matreshape);
-P2 = 5;
+P2 = n_edges;
 matreshape(P2)
 
 for i=1:nnodes-1
     for j=i+1:nnodes
-        if matrix(i,j)<matreshape(length(matreshape)-25) && matrix(i,j)>matreshape(25)
+        if matrix(i,j)<matreshape(length(matreshape)-n_edges) && matrix(i,j)>matreshape(n_edges)
             matrix(i,j)=0;
             matrix(j,i)=0;
         end
