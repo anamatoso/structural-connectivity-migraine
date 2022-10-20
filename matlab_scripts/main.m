@@ -227,7 +227,7 @@ end
 clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle i
 
 %% Visualization of results: metrics
-idx_metrics=[1];
+idx_metrics=[7];
 idx_groups=[3 4 7 8];
 metrics=allmetrics{1};
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
