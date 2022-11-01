@@ -88,11 +88,11 @@ for k = 1 : length(theFiles)
     roisizes{idx}=vertcat(roisizes{idx},roi_size);
 end
 
-condition={'Midcycle', 'Interictal', 'Prementrual', 'Ictal'};
+condition={'Controls in the Midcycle Phase', 'Migraineurs in the Interictal Phase', 'Controls in the Prementrual Phase', 'Migraineurs in the Ictal Phase'};
 for k=1:4
     figure('color','w')
-    histogram(roisizes{k},'Normalization', 'cdf')
-    title("ROI sizes in "+ condition(k))
+    histogram(roisizes{k},'Normalization','probability')
+    title("ROI sizes of "+ condition(k))
 end
 
 clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
