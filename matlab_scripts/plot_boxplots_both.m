@@ -1,4 +1,4 @@
-function [] = plot_boxplots_both(metrics,idx_metrics,version_metrics)
+function [] = plot_boxplots_both(metrics,idx_metrics,ybound,yscale)
 idx_groups1=[1 2 5 6];
 idx_groups2=[3 4 7 8];
 
@@ -8,7 +8,8 @@ patient_labels=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "MRtrix-HC-premenstru
 
 nmetrics=length(idx_metrics);
 for i=1:nmetrics
-    figure('color','w','Position',[360 277 619 420]);
+    figure('color','w','Position',[200 100 1500 500]); %360 277 619 420
+    set(gca,'FontSize',15)
     metric=idx_metrics(i);
     x1=[];
     group1=[];
@@ -26,20 +27,22 @@ for i=1:nmetrics
     
     yyaxis left
     boxplot([x1 nan(1,100)],[group1 4*ones(1,25) 5*ones(1,25) 6*ones(1,25) 7*ones(1,25)],"Colors","b")%,'Labels',labels1)
-%     if log10(max(x1))-log10(min(x1))>2
-%         set(gca, 'YScale', 'log')
-%     end
-    %set(gca, 'YScale', 'log')
-    %ylim([0.6 1.6])
-    
+    if yscale
+        set(gca, 'YScale', 'log')
+    end
+    if ~isempty(ybound)
+        ylim(ybound)
+    end
+    ylim([7500 11500])
     yyaxis right
     boxplot([nan(1,100) x2],[0*ones(1,25) 1*ones(1,25) 2*ones(1,25) 3*ones(1,25) group2],"Colors","r",'Labels',patient_labels)
-%     if log10(max(x2))-log10(min(x2))>2
+    if yscale
         set(gca, 'YScale', 'log')
-%     end
-    set(gca, 'YScale', 'log')
-    %ylim([0.6 1.6])
-    title(metrics_labels(metric),'interpreter', 'none','FontSize',15,'FontWeight','normal','FontName','Arial')
+    end
+    if ~isempty(ybound)
+        ylim(ybound)
+    end
+    title(metrics_labels(metric),'interpreter', 'none','FontSize',20,'FontWeight','normal','FontName','Arial')
 
 
     %Image = getframe(gcf);

@@ -120,6 +120,7 @@ for i=1:length(todelete)
 end
 
 figure('color','w')
+set(gca,'FontSize',20)
 scatterhist(scattervlog(:,1),scattervlog(:,2), 'NBins',[40,40],'Direction','out',Marker='x'); xlabel('MRTrix');ylabel('FSL')
 %%
 mdl = fitlm(scatterv(:,1),scatterv(:,2));
@@ -227,13 +228,13 @@ end
 clear comparisons comparison_HCvsP comparison_MRtrixvsFSL comparison_cycle i
 
 %% Visualization of results: metrics
-idx_metrics=[7];
+idx_metrics=[1];
 idx_groups=[3 4 7 8];
 metrics=allmetrics{1};
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
 
 %plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,condition_names,version_metrics,116)
-plot_boxplots_both(metrics,idx_metrics,version_metrics)
+plot_boxplots_both(metrics,idx_metrics,[],1)
 clear idx_metrics idx_groups
 %% For visualization in BrainNet nodes AAL116
 % nodal metrics:

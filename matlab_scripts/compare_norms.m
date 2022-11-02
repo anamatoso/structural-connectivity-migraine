@@ -90,9 +90,13 @@ end
 
 condition={'Controls in the Midcycle Phase', 'Migraineurs in the Interictal Phase', 'Controls in the Prementrual Phase', 'Migraineurs in the Ictal Phase'};
 for k=1:4
-    figure('color','w')
+    figure('color','w','Position',[268 165 652 532])
+    
     histogram(roisizes{k},'Normalization','probability')
-    title("ROI sizes of "+ condition(k))
+    ylabel('Probability')
+    title("ROI sizes of "+ condition(k),'interpreter', 'none','FontSize',15,'FontWeight','normal','FontName','Arial')
+    set(gca,'FontSize',15)
+
 end
 
 clear roi_size idx fullFileName baseFileName k theFiles filePattern F dir_roi
