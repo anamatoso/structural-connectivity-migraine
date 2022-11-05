@@ -234,7 +234,7 @@ metrics=allmetrics{1};
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
 
 %plot_boxplots(metrics,idx_metrics,idx_groups,metrics_labels,condition_names,version_metrics,116)
-plot_boxplots_both(metrics,idx_metrics,[],1)
+plot_boxplots_both(metrics,idx_metrics,[],0)
 clear idx_metrics idx_groups
 %% For visualization in BrainNet nodes AAL116
 % nodal metrics:
