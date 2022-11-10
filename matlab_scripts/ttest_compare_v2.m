@@ -3,11 +3,11 @@ function [ttest_results] = ttest_compare_v2(metrics,metrics_labels,version_metri
 % which metrics are significantly different.
 cycle=[1 5;3 7;2 6;4 8];
 
-if all(comparisons==cycle)
-    paired=true;
-else 
+%if all(comparisons==cycle)
+ %   paired=true;
+%else 
     paired=false;
-end
+%end
 
 n_metrics=length(metrics_labels);
 compare_ttest=zeros(1,6);
