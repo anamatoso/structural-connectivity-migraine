@@ -201,7 +201,7 @@ clear i p
 %connectomes=rescale_connectomes(connectomes,n_people);
 % connectomes =connectome2aal90(connectomes);
 
-version_metrics=2;%  1=nodal metrics, 2=general metrics
+version_metrics=3;%  1=nodal metrics, 2=general metrics
 %load("allmetrics"+version_metrics+".mat")
 
 allmetrics=cell(size(allconnectomes));
@@ -217,7 +217,7 @@ comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 
-comparisons=comparison_HCvsP;
+comparisons=[1 2];
 
 ttest_results=cell(size(allmetrics));
 for i=1:length(allmetrics)
@@ -238,18 +238,20 @@ plot_boxplots_both(metrics,idx_metrics,[],0)
 clear idx_metrics idx_groups
 %% For visualization in BrainNet nodes AAL116
 % nodal metrics:
+norm=1;
+
 nodestrength=(349:464); bc=(1:116); lC=(117:232); ec=(233:348);
 m=[nodestrength;bc;lC;ec];
 names=["D" "BC" "Ci" "EC"];
-ttest_results2=ttest_results{1};
+ttest_results2=ttest_results{norm};
 for i=1:4
     qvalues=table2array(ttest_results2(m(i,:),5)); 
     diff=table2array(ttest_results2(m(i,:),7));
     nodes_degree_color = nodes_color_size(qvalues,diff,0.05);
     nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-    writetable(nodefile, 'nodes/cycle/prob/'+names(i)+'_FSL_intervsict.txt','Delimiter',' ','WriteVariableNames', 0);
+    writetable(nodefile, 'nodes/ismrm23/'+names(i)+'_preinct_n'+string(norm)+'.txt','Delimiter',' ','WriteVariableNames', 0);
 end
-clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i qvalues pvals m diff
+clear pvalues diff nodes_degree_color nodefile nodestrength bc lC ec i qvalues pvals m diff norm
 %% Analysis of connectivity
 comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
