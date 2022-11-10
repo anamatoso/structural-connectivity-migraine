@@ -39,7 +39,7 @@ for i=1:n_conditions
     n_people(i)=s(end);
 end
 node_labels=get_label_nodes(atlas+"_labels.txt");
-condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
+condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-HC-premenstrual" "MRtrix-M-ictal" "FSL-HC-premenstrual" "FSL-M-ictal"];
 
 if show
     figure("color","w");imagesc(connectomes{3}(:,:,4));colorbar;colormap jet

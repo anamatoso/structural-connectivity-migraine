@@ -15,7 +15,7 @@ normalizations=[1 2 3 4];
 %load("allconnectomes.mat")
 n_people=[15 14 15 14 15 9 15 9];
 n_conditions=length(n_people);
-condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-M-premenstrual" "MRtrix-M-ictal" "FSL-M-premenstrual" "FSL-M-ictal"];
+condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-HC-premenstrual" "MRtrix-M-ictal" "FSL-HC-premenstrual" "FSL-M-ictal"];
 node_labels=get_label_nodes(atlas+"_labels.txt");
 
 clear threshold atlas dir dir_roi
