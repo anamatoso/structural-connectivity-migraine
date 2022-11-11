@@ -21,7 +21,7 @@ rm -f "${MAINDIR}/${DIR}/list_rois.txt"
 
 for ((i = 1 ; i <= 116 ; i++)); do
 	#divide atlas into regions of interest
-    mrcalc ${ATLAS} $i -eq "${ATLASDIR}/atlas_roi${i}.mif" -force # 1 if =i, 0 otherwise
+    	mrcalc ${ATLAS} $i -eq "${ATLASDIR}/atlas_roi${i}.mif" -force # 1 if =i, 0 otherwise
 	mrconvert "${ATLASDIR}/atlas_roi${i}.mif" "${ATLASDIR}/atlas_roi${i}.nii.gz" -force
 	rm "${ATLASDIR}/atlas_roi${i}.mif"
 

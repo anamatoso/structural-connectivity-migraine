@@ -510,16 +510,6 @@ for metric=1:7
 
     end
 
-    %     disp(metrics_labels(metric))
-    %     for i=1:length(data)-1
-    %         for j=i+1:length(data)
-    %             p=stattest(data{i},data{j});
-    %             if p<0.05/(16*15)
-    %                 disp(num2str(i)+"-"+num2str(j)+": p="+num2str(p))
-    %             end
-    %         end
-    %     end
-
     data=cell2mat(data);
     colorlabels={'MRTrix' 'FSL'};
     xlabels={'HCmid-N1' 'Mint-N1' 'HCpre-N1' 'Mict-N1' ...
