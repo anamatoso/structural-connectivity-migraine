@@ -129,7 +129,7 @@ tcksift2 -act 5tt_coreg.mif -out_mu sift_mu.txt -out_coeffs sift_coeffs.txt trac
 #Creating the connectome 
 tck2connectome -symmetric -zero_diagonal -scale_invnodevol -tck_weights_in sift.txt tracks.tck atlas.mif "${MAINDIR}/matrix_data/${DIR}_mrtrix_matrix_bval2_intersect.csv" -force
 
-rm -f 5tt_nocoreg.nii.gz 5tt_nocoreg.mif mean_b0_processed.mif mean_b0_processed.nii.gz 5tt_vol0.nii.gz anat.mif atlas_2struct_desikan.nii.gz atlas_2struct_desikan.mif atlas_coreg_desikan.mif atlas_desikan.nii.gz atlas_coreg.mif gmfod.mif gmfod_norm.mif csffod.mif csffod_norm.mif mask.mif wmfod.mif dwi.mif wm.txt gm.txt csf.txt
+rm -f tracks.tck 5tt_nocoreg.nii.gz 5tt_nocoreg.mif mean_b0_processed.mif mean_b0_processed.nii.gz 5tt_vol0.nii.gz anat.mif atlas_2struct_desikan.nii.gz atlas_2struct_desikan.mif atlas_coreg_desikan.mif atlas_desikan.nii.gz atlas_coreg.mif gmfod.mif gmfod_norm.mif csffod.mif csffod_norm.mif mask.mif wmfod.mif dwi.mif wm.txt gm.txt csf.txt
 
 
 cd $MAINDIR
