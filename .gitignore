@@ -4,10 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 matlab_scripts/BCT/*
-matrices data/*
 *.txt
 *.mat
-matlab_scripts/NBS/*
 
 # User-specific files
 *.rsuser
