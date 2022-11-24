@@ -3,10 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-matlab_scripts/BCT/*
-*.txt
-*.mat
-
 # User-specific files
 *.rsuser
 *.suo
@@ -352,6 +348,10 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+matlab_scripts/*/*
+*.txt
+*.mat
 .DS_Store
 *.csv
 *.xlsx
