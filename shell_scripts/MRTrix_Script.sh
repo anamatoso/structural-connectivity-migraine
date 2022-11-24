@@ -1,38 +1,43 @@
 #!/bin/bash
-set -e
-# Have to be in data directory
-MAINDIR=$(pwd)
+
+set -e # Stop on errors
+
 display_usage() {
-	echo "$(basename $0) [Subject and type of session]"
-	# echo "This script uses MRTrix to analyze diffusion data. It requires X arguments: 
-	# 	1) Subject DWI Directory. Example: sub-control019
-	#	2) Type of session. Example: ses-midcycle
+	echo "This script uses MRTrix to analyze diffusion data and create a connectivity matrix."
+	echo "Usage: $(basename $0) [Directory]"
+	echo "It requires 1 argument: Subject DWI Directory. Example: sub-control019_ses-midcycle"
 	}
 
-	if [ $# -le 0 ] # if there are 1 argument or less
+	if [ $# -le 0 ] # if there are 0
 	then
+		# can't run function
 		display_usage
 		exit 1
 	fi
 
+MAINDIR=$(pwd)
+
 DIR=$1 #example name: sub-control019_ses-midcycle
-SUB=${DIR:0:14} # example name: sub-control019
+SUB=${DIR:0:14} # crop name. result=sub-control019
 
 ########################### STEP 1 ###################################
 #             		  Prepare data and directories					 #
 ######################################################################
-ATLAS=/home/amatoso/tese/data/AAL116_intersect.nii.gz
+
+# Get directories
 SUBDIR="${MAINDIR}/${DIR}" 
-ANATDIR="${MAINDIR}/${SUB}" #example name: sub-control019
+ANATDIR="${MAINDIR}/${SUB}"
 ANAT="${ANATDIR}/${SUB}_restored-MPRAGE_brain.nii.gz"
 cd $SUBDIR
 
-# WHEN DOING FOR REAL, CHECK IF THERE IS MORE DATA WITH MORE BVALUES
+# Get data
+ATLAS="AAL116_intersect.nii.gz"
 DWI="${SUBDIR}/*clean.nii.gz"
 DWIMASK="${SUBDIR}/*clean_mask.nii.gz"
 BVEC="${SUBDIR}/*rotated_bvecs.bvec"
-BVAL="/home/amatoso/tese/data/bvals_132dir.bval"
+BVAL="bvals_132dir.bval"
 
+# Make output folder and change to that
 mkdir -p mrtrix_outputs_bvals2
 cd mrtrix_outputs_bvals2
 
@@ -61,7 +66,7 @@ dwi2fod msmt_csd dwi.mif -mask mask.mif wm.txt wmfod.mif gm.txt gmfod.mif csf.tx
 # You should see FOD's mostly within the white matter. These can be viewed later with the command "mrview vf.mif -odf.load_sh wmfod.mif"
 #mrconvert -coord 3 0 wmfod.mif - | mrcat csffod.mif gmfod.mif - vf.mif
 
-# Now normalize the FODs to enable comparison between subjects
+# Normalize the FODs to enable comparison between subjects
 mtnormalise wmfod.mif wmfod_norm.mif gmfod.mif gmfod_norm.mif csffod.mif csffod_norm.mif -mask mask.mif -force
 
 ########################### STEP 4 ###################################
@@ -69,7 +74,7 @@ mtnormalise wmfod.mif wmfod_norm.mif gmfod.mif gmfod_norm.mif csffod.mif csffod_
 ######################################################################
 
 # Extract all five tissue catagories (1=GM; 2=Subcortical GM; 3=WM; 4=CSF; 5=Pathological tissue)
-5ttgen fsl anat.mif 5tt_nocoreg.mif -premasked -nocrop -force
+5ttgen fsl anat.mif 5tt_nocoreg.mif -premasked -nocrop -force #premasked because the data is already just the brain and no crop to maintain the size of the image
 
 # The following series of commands will take the average of the b0 images (which have the best contrast), convert them and the 5tt image to NIFTI format, and use it for coregistration.
 dwiextract dwi.mif - -bzero | mrmath - mean mean_b0_processed.mif -axis 3 -force
@@ -94,7 +99,7 @@ mrtransform 5tt_nocoreg.mif -linear diff2struct_mrtrix.txt -inverse 5tt_coreg.mi
 applywarp -i $ATLAS -r $ANAT --out=atlas_2struct --warp="${ANATDIR}/reg_nonlinear_invwarp_T1tostandard_2mm.nii.gz"
 mrconvert atlas_2struct.nii.gz atlas_2struct.mif -force
 
-#Coregister atlas to diff space
+#Coregister atlas to diffusion space
 mrtransform atlas_2struct.mif -linear diff2struct_mrtrix.txt -inverse atlas_coreg.mif -force
 
 # Make sure the values of the atlas are integer
@@ -103,23 +108,24 @@ mrcalc atlas_coreg.mif -round -datatype uint32 atlas.mif -force
 # Restric the GM/WM boundary to the atlas
 mrcalc atlas.mif gmwmSeed_coreg.mif -mult gmwmseed_atlas.mif -force
 
-# for probtrackx
+# for probtrackx (in FSL pipeline)
 mrconvert gmwmseed_atlas.mif gmwmseed_atlas.nii.gz
+./divide_atlas.sh "${SUBDIR}/mrtrix_outputs_bvals2/atlas.mif" $SUBDIR
 
-# Create file with sizes of ROIs (in voxels) - for use in matlab
+# Create file with sizes of ROIs (in voxels) - to use in matlab to normalize matrices for ROI size
 mrconvert atlas.mif atlas.nii.gz -force
 fslstats atlas.nii.gz -h 117 >> roi_size_w0.txt
 tail -n +2 roi_size_w0.txt >> roi_size.txt
 rm roi_size_w0.txt
 
 ########################### STEP 6 ###################################
-#                 Run the streamline analysis                        #
+#                 Run the streamline generation                      #
 ######################################################################
 
 # Create streamlines: maxlength=250mm, 10M seeds
-tckgen -act 5tt_coreg.mif -algorithm SD_STREAM -seed_gmwmi gmwmseed_atlas.mif -maxlength 250 -select 10000000 wmfod_norm.mif tracks.tck -force
+tckgen -act 5tt_coreg.mif -seed_gmwmi gmwmseed_atlas.mif -maxlength 250 -select 10000000 wmfod_norm.mif tracks.tck -force
 
-# Reduce the number of streamlines with tcksift
+# Filter streamlines with tcksift
 tcksift2 -act 5tt_coreg.mif -out_mu sift_mu.txt -out_coeffs sift_coeffs.txt tracks.tck wmfod_norm.mif sift.txt -force
 
 ########################### STEP 7 ###################################
@@ -129,7 +135,8 @@ tcksift2 -act 5tt_coreg.mif -out_mu sift_mu.txt -out_coeffs sift_coeffs.txt trac
 #Creating the connectome 
 tck2connectome -symmetric -zero_diagonal -scale_invnodevol -tck_weights_in sift.txt tracks.tck atlas.mif "${MAINDIR}/matrix_data/${DIR}_mrtrix_matrix_bval2_intersect.csv" -force
 
+# Remove big files and only keep the ones useful for the critical steps
 rm -f tracks.tck 5tt_nocoreg.nii.gz 5tt_nocoreg.mif mean_b0_processed.mif mean_b0_processed.nii.gz 5tt_vol0.nii.gz anat.mif atlas_2struct_desikan.nii.gz atlas_2struct_desikan.mif atlas_coreg_desikan.mif atlas_desikan.nii.gz atlas_coreg.mif gmfod.mif gmfod_norm.mif csffod.mif csffod_norm.mif mask.mif wmfod.mif dwi.mif wm.txt gm.txt csf.txt
 
-
+# Go back to main directory
 cd $MAINDIR

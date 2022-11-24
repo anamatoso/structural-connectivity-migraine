@@ -1,6 +1,7 @@
 set -e
 
 all_SUBSdwi="sub-control051_ses-premenstrual"
+
 #link dwi images
 for i in $all_SUBSdwi; do
  sub="/strombolihome/mig_n2treatdata/derivatives/dwi-preproc/${i}"
