@@ -363,3 +363,10 @@ MigrationBackup/
 scripts antigos/*
 matlab_scripts/old functions and data/*
 matlab_scripts/mat*
+shell_scripts/create_links.sh
+shell_scripts/divide_atlas_seedgmwm.sh
+shell_scripts/FSL_02_tractography_mat3_seedgmwminterface.sh
+shell_scripts/loop*
+shell_scripts/make_atlasintersect.sh
+shell_scripts/redo_atlascropped.sh
+shell_scripts/MRTrix_Script_bvals2_newatlas.sh
