@@ -1,8 +1,8 @@
-function [metrics_labels] = get_label_metrics(a,node_labels)
-% This funtion prints the labels of each metric given a choice of metrics and the label of each node
+function [metrics_labels] = get_label_metrics(version,node_labels)
+% This funtion gets the labels of each metric given the choice of metrics and the label of each node
 
 n_nodes=length(node_labels);
-if a==1
+if version==1
     RC=strings(1,n_nodes-1);
     
     for i=1:n_nodes-1     
@@ -11,10 +11,10 @@ if a==1
     
     metrics_labels=RC;
     
-elseif a==2
+elseif version==2
     metrics_labels=["Characteristic Path Length" "Global Efficiency" "Clustering Coefficient" "Modularity" "Average Strength" "Transitivity" "Small-worldness"];
     
-elseif a==3
+elseif version==3
     BC=strings(1,n_nodes);
     Ci=strings(1,n_nodes);
     EC=strings(1,n_nodes);

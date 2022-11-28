@@ -1,10 +1,14 @@
-function [allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations,show)
+function [allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations)
+% This function gets the data of all connectivity matrices and saves them in allconnectomes variable. It also gets the number of people and the number of groups. Additionally it also creates the node labels and the labels of the groups.
 
+% Decide what is the pattern to look for in the files
 if atlas=="AAL116" 
     pattern="_prob";%"_intersect"; 
 else
     pattern="*"+atlas; 
 end
+
+% Create the allconnectomes variable
 i=1;
 for norm=normalizations
     % Controls midcyle
@@ -27,22 +31,21 @@ for norm=normalizations
     M_interictal_mrtrix M_interictal_fsl M_ictal_mrtrix M_ictal_fsl};
     i=i+1;
 end
-%connectomes={HC_midcycle_mrtrix M_interictal_mrtrix};
+
+% Get number of groups
 connectomes=allconnectomes{1};
 n_conditions=numel(connectomes);
 
-% Calculate people per situation
+% Calculate people per group
 n_people=zeros(1,n_conditions);
 for i=1:n_conditions
     conmat=connectomes{i};
     s=size(conmat);
     n_people(i)=s(end);
 end
+
+% Create node labels and the labels of the groups.
 node_labels=get_label_nodes(atlas+"_labels.txt");
 condition_names=["MRtrix-HC-midcycle" "MRtrix-M-interictal" "FSL-HC-midcycle" "FSL-M-interictal" "MRtrix-HC-premenstrual" "MRtrix-M-ictal" "FSL-HC-premenstrual" "FSL-M-ictal"];
-
-if show
-    figure("color","w");imagesc(connectomes{3}(:,:,4));colorbar;colormap jet
-end
 
 end

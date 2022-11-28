@@ -2,17 +2,21 @@ function [connectomes] = load_data(folder_matrix,pattern,folder_roi_sizes,algori
 % This function loads the data from a given folder which have a given
 % pattern
 
+% Get folder and files
 F = folder_matrix;
 filePattern = fullfile(F, pattern);
 theFiles = dir(filePattern);
+
+% Check if folder is empty
 if isempty(theFiles)
-    disp ('Error: File of matrices is empty')
-    return 
+    error('Error: File of matrices is empty') 
 end
+
+% Import data
 baseFileName = theFiles(1).name;
 fullFileName = fullfile(theFiles(1).folder, baseFileName);
 c=importdata(fullFileName);
-connectomes=zeros(length(c),length(c),length(theFiles));
+connectomes=zeros(length(c),length(c),length(theFiles)); % create matrix of size [n_nodes,n_nodes,n_people_of_group]
 
 for k = 1 : length(theFiles)
     baseFileName = theFiles(k).name;
@@ -24,10 +28,10 @@ for k = 1 : length(theFiles)
         roi_file=strcat(folder_roi_sizes,"/",baseFileName(1:length(baseFileName)-29),"_roi_size_intersect.txt"); %34 aal, 32 desikan
         %disp(roi_file)
     else
-        disp ('Error: Algorithm not known. Please choose either fsl or mrtrix.')
+        error('Error: Algorithm not known. Please choose either fsl or mrtrix.')
         return
     end
-    c=normalize_matrix(fullFileName,roi_file,threshold,algorithm,normalization);
+    c=normalize_matrix(fullFileName,roi_file,threshold,algorithm,normalization); %normalize matrix according to certain normalization
     connectomes(:,:,k)=c;
 end
 end
