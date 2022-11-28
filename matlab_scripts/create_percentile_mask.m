@@ -1,6 +1,5 @@
 function [significance_mask] = create_percentile_mask(group_matrix,threshold)
-% a is matrix of size 116x116xn_people. Comes from load data.
-% significance_mask is 1 is connection is significant and 0 otherwise
+% This function creates a percentile mask where 1 means that the connection is above the threshold and 0 otherwise.
 
 [n_nodes,~,n_people]=size(group_matrix);
 significance_mask=zeros(size(group_matrix));
