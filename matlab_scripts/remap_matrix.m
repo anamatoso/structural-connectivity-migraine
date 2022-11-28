@@ -1,6 +1,12 @@
 function [new_matrix] = remap_matrix(matrix,idx_map)
+% This function remaps the matrix given the new indices in idx_map
 
 [n_nodes,~]=size(matrix);
+
+if n_nodes~=length(idx_map)
+    error("The length of the mapping vector must be equal to the number of nodes of the original matrix.")
+end
+
 n_newnodes=length(unique(idx_map));
 new_matrix=zeros(n_newnodes,n_newnodes);
 
