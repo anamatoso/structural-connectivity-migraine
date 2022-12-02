@@ -1,6 +1,7 @@
 function [ttest_results] = ttest_compare_v2(metrics,metrics_labels,n_nodes,comparisons)
-% Given the metrics and the respective labels, this function calculates
-% which metrics are significantly different.
+% Given the metrics and the respective labels, this function calculates the
+% pvalues of the comparison of all metrics between each pair of groups in
+% comparisons.
 
 n_metrics=numel(metrics_labels);
 [n_comp,~]=size(comparisons);
