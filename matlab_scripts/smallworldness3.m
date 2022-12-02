@@ -19,7 +19,7 @@ Crand=mean(clustering_coef_wu(weight_conversion(randmat, 'normalize'))); % clust
 [Lrand,~]=charpath(d_mat_rand,0,0);
 
 %Calculate S
-S=(C/Crand)/(=L/Lrand);
+S=(C/Crand)/(L/Lrand);
 
 end
 
