@@ -1,7 +1,6 @@
 function [S] = smallworldness3(mat)
 % This function calculates the small-worldness of a given connectivity
 % matrix.
-nnodes=length(mat);
 
 % Calculate C and L of original matrix
 len_mat=1./mat;                 % conection-length matrix
