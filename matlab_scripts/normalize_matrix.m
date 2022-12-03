@@ -3,9 +3,9 @@ function [connectome] = normalize_matrix(filename,roi_size,threshold,algorithm,n
 % all ROIs. As input, besides the connectivity matrix the list (txt) of ROI sizes
 % in voxel count is given.
 
-connectome=importdata(filename);
+connectome=load(filename);
 
-size_roi=importdata(roi_size); %get size of rois in voxels 
+size_roi=load(roi_size); %get size of rois in voxels 
 mean_volume=mean(size_roi);
 sum_volume=sum(size_roi);
 

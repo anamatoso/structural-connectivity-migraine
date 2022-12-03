@@ -15,7 +15,7 @@ end
 % Import data
 baseFileName = theFiles(1).name;
 fullFileName = fullfile(theFiles(1).folder, baseFileName);
-c=importdata(fullFileName);
+c=load(fullFileName);
 connectomes=zeros(length(c),length(c),length(theFiles)); % create matrix of size [n_nodes,n_nodes,n_people_of_group]
 
 for k = 1 : length(theFiles)
