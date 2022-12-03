@@ -10,6 +10,7 @@ end
 
 % Create the allconnectomes variable
 i=1;
+allconnectomes=cells(length(normalizations),1);
 for norm=normalizations
     % Controls midcyle
     HC_midcycle_mrtrix=load_data(dir,"*midcycle*mrtrix*bval2"+pattern+".csv",dir_roi, "mrtrix",threshold,norm); 
