@@ -1,7 +1,10 @@
 function [ttest_results] = ttest_compare_v2(metrics,metrics_labels,n_nodes,comparisons)
 % Given the metrics and the respective labels, this function calculates the
 % pvalues of the comparison of all metrics between each pair of groups in
-% comparisons.
+% comparisons. It outputs a table with the following headers: Metric Name,
+% Group 1, Group 2, P-value, P-value (corrected) and Difference. If the
+% metrics are nodal then it also has another column with the FDR corrected
+% values.
 
 n_metrics=numel(metrics_labels);
 [n_comp,~]=size(comparisons);
