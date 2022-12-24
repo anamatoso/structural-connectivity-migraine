@@ -27,17 +27,18 @@ then
 	#             		   Prepare Directories                           #
 	######################################################################
 
-	# create bedpost directory inside subject and copy files there
+	# create bedpost directory inside subject and copy files there (with the names required by bedpostx)
+	# this directory should have the data (dwi), the brain mask, the bvals and bvecs
 	mkdir -p bedpostdata
 	cp *_${SUBDIR}_clean.nii.gz ./bedpostdata/data.nii.gz
 	cp *_${SUBDIR}_clean_mask.nii.gz ./bedpostdata/nodif_brain_mask.nii.gz
-	cp "/home/amatoso/tese/data/bvals_132dir.bval" ./bedpostdata/bvals
+	cp "${MAINDIR}/bvals_132dir.bval" ./bedpostdata/bvals
 	cp *_${SUBDIR}_eddy.eddy_rotated_bvecs.bvec ./bedpostdata/bvecs
 
 	# check if its all good. It should be.
 	# bedpostx_datacheck bedpostdata
 
-	########################### STEP 1 ###################################
+	########################### STEP 2 ###################################
 	#             		Fiber orientation estimation                     #
 	######################################################################
 
@@ -45,7 +46,7 @@ then
 	bedpostx ./bedpostdata -model 2 -n 4
 	
 else 
-	echo "The subject ${SUBDIR} has already the bedpost directory."
+	echo "The subject ${SUBDIR} has already gone through bedpostx."
 fi
 
 cd $MAINDIR
