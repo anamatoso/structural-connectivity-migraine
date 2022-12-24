@@ -3,7 +3,8 @@
 set -e #Stop on errors
 
 display_usage() {
-	echo "This script uses FSL's probtrackx2 to create a connectivity matrix."
+	echo "This script uses FSL's probtrackx2 to create a connectivity matrix. Note that either the MRtrix pipeline needs to be done first or the command for the division of the atlas should be uncommented."
+	echo "It uses the option omatrix1 in FSL"
 	echo "Usage: $(basename $0) [Subject and type of session]"
 	echo "t requires 1 argument: the subject directory. Example: sub-control019_ses-midcycle"
 	}
@@ -27,7 +28,7 @@ SUBDIR="${MAINDIR}/${DIR}"
 cd $SUBDIR
 
 # divide the atlas into several files each one with one ROI
-#/home/amatoso/tese/divide_atlas.sh "${SUBDIR}/mrtrix_outputs_bvals2/atlas.mif" $SUBDIR -> done in MRtrix pipeline
+# ${MAINDIR}/divide_atlas.sh "${SUBDIR}/mrtrix_outputs_bvals2/atlas.mif" $SUBDIR -> done in MRtrix pipeline
 
 ROIS="${MAINDIR}/${DIR}/list_rois.txt"
 
