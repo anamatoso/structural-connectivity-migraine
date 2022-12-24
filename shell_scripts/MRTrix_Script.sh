@@ -110,7 +110,7 @@ mrcalc atlas.mif gmwmSeed_coreg.mif -mult gmwmseed_atlas.mif -force
 
 # for probtrackx (in FSL pipeline)
 mrconvert gmwmseed_atlas.mif gmwmseed_atlas.nii.gz
-./divide_atlas.sh "${SUBDIR}/mrtrix_outputs_bvals2/atlas.mif" $SUBDIR
+${MAINDIR}/divide_atlas.sh "${SUBDIR}/mrtrix_outputs_bvals2/atlas.mif" $SUBDIR
 
 # Create file with sizes of ROIs (in voxels) - to use in matlab to normalize matrices for ROI size
 mrconvert atlas.mif atlas.nii.gz -force
