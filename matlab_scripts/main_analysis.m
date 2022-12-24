@@ -3,7 +3,7 @@ clear variables
 close all
 format long
 
-% directories
+%% Load data from matrices
 dir=strcat(pwd,'/matrix_data_prob');
 dir_roi=strcat(pwd,'/roi_sizes');
 
