@@ -173,6 +173,8 @@ clear i p
 % connectomes=rescale_connectomes(connectomes);
 
 version_metrics=2;%  1=rich club coefficient, 2=global metrics, 3=nodal metrics
+metrics_labels=get_label_metrics(version_metrics,node_labels);
+load("allmetrics_2.mat")
 
 % Calculate metrics
 allmetrics=cell(size(allconnectomes));
@@ -180,16 +182,16 @@ for i=1:length(allconnectomes)
     connectomes=allconnectomes{i};
     allmetrics{i}=get_metrics(connectomes,version_metrics);
 end
-metrics_labels=get_label_metrics(version_metrics,node_labels);
 
-clear i connectomes
+
+clear i connectomes version_metrics
 %% Statistical Analysis of Results
 
 comparison_HCvsP=[1 2;3 4;5 6;7 8];
-%comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
-%comparison_cycle=[1 5;3 7;2 6;4 8];
+comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
+comparison_cycle=[1 5;3 7;2 6;4 8];
 
-comparisons=comparison_HCvsP;
+comparisons=comparison_cycle;
 
 ttest_results=cell(size(allmetrics));
 for i=1:length(allmetrics)
