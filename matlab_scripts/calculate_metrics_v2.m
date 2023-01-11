@@ -24,17 +24,17 @@ if v==2
     mean_strengthrand=mean(strengthrand);
     
     T=transitivity_wu(weight_conversion(mat, 'normalize'));         % transitivity 6
-    S=smallworldness3(mat);                                   % smallworldness 7
+    S=smallworldness3(mat);                                         % smallworldness 7
     
     
     % insert metrics in matrix
     metrics=[L/Lrand GE/GErand C Q mean_strength/mean_strengthrand T S]';
 else
     % metrics
-    BC=betweenness_wei(len_mat)'/((n_nodes-1)*(n_nodes-2));     % betweenness centrality 1-116
-    Ci=clustering_coef_wu(weight_conversion(mat, 'normalize'))';% local clustering coefficient 117-232
-    EC=eigenvector_centrality_und(mat)';                        % eigenvector centrality 233-348
-    strength=strengths_und(mat);                                % node strength 464-579
+    BC=betweenness_wei(len_mat)'/((n_nodes-1)*(n_nodes-2));         % betweenness centrality 1-116
+    Ci=clustering_coef_wu(weight_conversion(mat, 'normalize'))';    % local clustering coefficient 117-232
+    EC=eigenvector_centrality_und(mat)';                            % eigenvector centrality 233-348
+    strength=strengths_und(mat);                                    % node strength 464-579
     strengthrand=strengths_und(randmat);
 
     % insert metrics in matrix
