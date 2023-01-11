@@ -373,4 +373,7 @@ shell_scripts/make_atlasintersect.sh
 shell_scripts/redo_atlascropped.sh
 shell_scripts/MRTrix_Script_bvals2_newatlas.sh
 *.asv
-matlab_scripts/extra_or_future_work.m
+matlab_scripts/matrix_data_v2/*
+matlab_scripts/matrix_data - OG/*
+matlab_scripts/matrix_data_prob/*
+
