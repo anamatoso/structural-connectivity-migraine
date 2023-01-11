@@ -379,3 +379,4 @@ matlab_scripts/matrix_data_prob/*
 matlab_scripts/spm12/*
 shell_scripts/loop_probtrackx.sh
 shell_scripts/redo_atlascropped.sh
+matlab_scripts/extra_or_future_work.m
