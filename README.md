@@ -6,11 +6,10 @@ It is divided into 3 main files: `main_analysis.m`, `main_comparisons.m` and `IS
 
 The first file ([link](https://github.com/anamatoso/structural-connectivity-migraine/blob/main/matlab_scripts/main_analysis.m)) is responsible for the analysis between groups. It is dependent on several functions that were developed by me. They can be divided in 6 groups/objectives according to the following images:
 
+![2](https://user-images.githubusercontent.com/78906907/214705744-1ec1df5a-55ac-475a-892b-742f8e491cd2.png)
+![3](https://user-images.githubusercontent.com/78906907/214705752-ae7d3cfd-b9cc-4300-9ed9-6da6e1450b59.png)
 
 
-
-![2-removebg-preview](https://user-images.githubusercontent.com/78906907/214705589-a458d873-ece2-4994-b97f-9f94110f06e4.png)
-![3-removebg-preview](https://user-images.githubusercontent.com/78906907/214705615-52cad6d6-4ab1-4e62-869f-6cee6044ef3f.png)
 
 
 [main_analysis.m](https://github.com/anamatoso/structural-connectivity-migraine/blob/main/matlab_scripts/main_analysis.m) 
