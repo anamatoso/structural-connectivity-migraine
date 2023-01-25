@@ -19,10 +19,10 @@ It is dependent on many functions that can be divided into 6 groups/objectives a
 
 Additionally, the [main_comparisons.m](https://github.com/anamatoso/structural-connectivity-migraine/blob/main/matlab_scripts/main_comparisons.m) was used to compare values between normalizations. Besides the functions mentioned before, the following were also used:
 
-<img width="500" src="https://user-images.githubusercontent.com/78906907/214710508-390ca3e2-f284-4928-8592-e1ce46e87773.png">
+<img width="400" src="https://user-images.githubusercontent.com/78906907/214710508-390ca3e2-f284-4928-8592-e1ce46e87773.png">
 
 Finally, the [ISMRM23.m](https://github.com/anamatoso/structural-connectivity-migraine/blob/main/matlab_scripts/ISMRM23.m) file is very similar to the main analysis however, the metrics used were calculated using a null model as a normalization. Thus, the following functions were used:
 
-<img width="500" alt="Captura de ecrã 2023-01-25, às 22 58 47" src="https://user-images.githubusercontent.com/78906907/214711048-d18c6ddc-557b-40c8-be56-0666bb240cf9.png">
+<img width="400" alt="Captura de ecrã 2023-01-25, às 22 58 47" src="https://user-images.githubusercontent.com/78906907/214711048-d18c6ddc-557b-40c8-be56-0666bb240cf9.png">
 
 Furthermore, if you need any further explanation, do not hesitate to contact me!
