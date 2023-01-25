@@ -29,7 +29,7 @@ elseif version==2
     mean_strength=mean(strength);                                   % mean strength
     T=transitivity_wu(weight_conversion(mat, 'normalize'));         % transitivity
     %S=smallworldness2(mat,20000);                                  % smallworldness
-    S=smallworldness3(mat);                                         % smallworldness
+    S=smallworldness(mat);                                          % smallworldness
     %A=assortativity_wei(mat,0);                                    % assortivity
     
     % insert metrics in matrix
