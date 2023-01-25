@@ -1,4 +1,5 @@
 # Structural Connectivity Changes in Episodic Migraine
+<img width="1271" alt="banner" src="https://user-images.githubusercontent.com/78906907/214711685-eff796e6-f530-40c3-b40d-eb39f177d952.png">
 
 This repository consists of the code used in order to detect structural alterations in episodic migraine using graph theory metrics. It was done in the scope of my Master Thesis in Biomedical Engineering.
 
