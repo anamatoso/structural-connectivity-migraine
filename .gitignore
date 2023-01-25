@@ -364,8 +364,6 @@ matlab_scripts/*/*
 scripts antigos/*
 matlab_scripts/old functions and data/*
 matlab_scripts/mat*
-matlab_scripts/smallworldness.m
-matlab_scripts/smallworldness2.m
 shell_scripts/create_links.sh
 shell_scripts/divide_atlas_seedgmwm.sh
 shell_scripts/FSL_02_tractography_mat3_seedgmwminterface.sh
