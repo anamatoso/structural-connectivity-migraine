@@ -1,12 +1,12 @@
 # Structural Connectivity Changes in Episodic Migraine
 <img width="1271" alt="banner" src="https://user-images.githubusercontent.com/78906907/214711685-eff796e6-f530-40c3-b40d-eb39f177d952.png">
 
-This repository consists of the original code created in order to detect structural alterations in episodic migraine using graph theory metrics. It was done in the scope of my Master's Thesis in Biomedical Engineering at Instituto Superior Técnico. In this work, a comparison was made not only between controls and patients but also longitudinally between different stages of the menstrual cycle. In addition, it was also studied the impact of different software packages on the calculation of the connectivity matrix and of different normalizations of the connectivity matrix.
+This repository consists of the original code created in order to detect structural alterations in episodic migraine using graph theory metrics. It was done in the scope of my Master's Thesis in Biomedical Engineering at Instituto Superior Técnico. In this work, a comparison was made not only between controls and patients but also longitudinally between different stages of the menstrual cycle. In addition, it was also studied the impact of different software packages on the calculation of the connectivity matrix and of different normalizations of the connectivity matrix. 
 
 
 Firstly, from the DWI images, connectivity matrices had to be created. To do that, the bash files in shell_scripts were used. Two software packages were used and compared: MRtrix and FSL. To create a connectivity matrix using MRtrix one only needs to run the `MRTrix_Script.sh`. On the other hand, if you want to use FSL, you only need to run `FSL_01_bedpostx.sh` followed by either `FSL_02_tractography.sh` or `FSL_02_tractography_mat3.sh`. Note that to run the tractography in FSL, you first need to run `divide_atlas.sh`.
 
-Then, with the connectivity matrices of all subjects, an analysis in MATLAB can be done using the files in matlab_scripts.
+Then, with the connectivity matrices of all subjects, an analysis in MATLAB can be done using the files in matlab_scripts (and some functions of the ![BCT toolbox](https://sites.google.com/site/bctnet/) which are not included in this repository).
 This folder has 3 main files: `main_analysis.m`, `main_comparisons.m` and `ISMRM23.m`. These files are dependent on several functions that had to be created by me whose dependencies are explained below. 
 
 The [main_analysis.m](https://github.com/anamatoso/structural-connectivity-migraine/blob/main/matlab_scripts/main_analysis.m) file is responsible for the analysis between groups.
