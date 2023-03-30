@@ -372,3 +372,4 @@ shell_scripts/make_atlasintersect.sh
 shell_scripts/redo_atlascropped.sh
 shell_scripts/MRTrix_Script_bvals2_newatlas.sh
 matlab_scripts/extra_or_future_work.m
+.idea/*
