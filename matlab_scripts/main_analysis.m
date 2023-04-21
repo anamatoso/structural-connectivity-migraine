@@ -2,6 +2,7 @@
 clear variables
 close all
 format long
+clc
 
 %% Load data from matrices
 dir=strcat(pwd,'/matrix_data_prob');
@@ -180,23 +181,23 @@ load("allmetrics_2.mat")
 allmetrics=cell(size(allconnectomes));
 for i=1:length(allconnectomes)
     connectomes=allconnectomes{i};
-    allmetrics{i}=get_metrics(connectomes,version_metrics);
+    allmetrics{i}=get_metrics_v2(connectomes,version_metrics);
 end
 
 
-clear i connectomes version_metrics
+clear i connectomes
 %% Statistical Analysis of Results
 
 comparison_HCvsP=[1 2;3 4;5 6;7 8];
 comparison_MRtrixvsFSL=[1 3;2 4;5 7;6 8];
 comparison_cycle=[1 5;3 7;2 6;4 8];
 
-comparisons=comparison_cycle;
+comparisons=[1 2;3 4;5 6;7 8;1 5;3 7;2 6;4 8];
 
 ttest_results=cell(size(allmetrics));
 for i=1:length(allmetrics)
     metrics=allmetrics{i};
-    ttest_results{i} = ttest_compare_v2(metrics,metrics_labels,numel(node_labels),comparisons);
+    ttest_results{i} = ttest_compare_v2(metrics,metrics_labels,version_metrics,numel(node_labels),comparisons);
 end
 %writetable(ttest_results, 'ttest_results.xlsx');
 
