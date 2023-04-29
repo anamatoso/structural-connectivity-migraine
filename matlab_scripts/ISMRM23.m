@@ -29,7 +29,7 @@ clear allconnectomes g connectomes
 
 %% Calculate metrics
 
-version=2; % Choose type of metrics to calculate
+version=3; % Choose type of metrics to calculate
 
 allmetrics_norms=cell(1,2);
 allmetrics_groups=cell(1,2);
@@ -44,10 +44,17 @@ clear norm version
 
 %% See results comparing both normalizations and plot
 
-show=1; % Plot boxplots
+show=0; % Plot boxplots
 
 %Create array for p values
 table=zeros(length(metrics_labels),2);
+
+% Deal with weird data
+allmetrics_norms{1}(isnan(allmetrics_norms{1}))=1;
+allmetrics_norms{2}(isnan(allmetrics_norms{2}))=1;
+allmetrics_norms{1}(isinf(allmetrics_norms{1}))=1e15;
+allmetrics_norms{2}(isinf(allmetrics_norms{2}))=1e15;
+
 
 % Iterate through metrics
 for metric=1:length(metrics_labels)
@@ -60,8 +67,8 @@ for metric=1:length(metrics_labels)
     
     if show
         % Plot figure
-        figure('color','w')
-        boxplot([N2' N4'],'Labels',["N1","N2"])
+        figure('color','w', 'Position',[360 97 701 501])
+        boxplot([N2' N4'],'Labels',["With ROI Normalization","Without ROI Normalization"])
         title(metrics_labels(metric),'interpreter', 'none','FontSize',20,'FontWeight','normal','FontName','Arial')
         text(2.1,1*max(max(N2),max(N4)), "p="+num2str(p),'FontSize',12,'Color','black');
         set(gca,'FontSize',20)
@@ -72,7 +79,7 @@ end
 T1=array2table(metrics_labels','VariableNames',"Metric Name");
 T2=array2table(table,'VariableNames',["Metric Index","P-value"]);
 T_norms=[T1 T2];
-disp(T_norms(T_norms.("P-value")<0.05,:))
+disp(T_norms(T_norms.("P-value")<0.05/116/3,:))
 
 clear N2 N4 metric p T1 T2 table show
 
@@ -87,9 +94,9 @@ names=["BC" "Ci" "EC" "D"];
 for metric=1:4
     pvalues=table2array(T_norms(m(metric,:),3)); 
     diff=ones(116,1); % all changed (no matter positively or negatively)
-    nodes_degree_color = nodes_color_size(pvalues,diff,0.05/116/2);
+    nodes_degree_color = nodes_color_size(pvalues,diff,0.05/116/3);
     nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-    writetable(nodefile, 'nodes/ismrm23/'+names(metric)+'_diffnorms.txt','Delimiter',' ','WriteVariableNames', 0);
+    writetable(nodefile, 'nodes/ismrm23_final/'+names(metric)+'_diffnorms.txt','Delimiter',' ','WriteVariableNames', 0);
 end
 
 clear bc lC ec nodestrength m names metric pvalues diff nodes_degree_color nodefile
@@ -151,7 +158,7 @@ for metric=1:length(metrics_labels)
     grid on
     title(metrics_labels(metric),'interpreter', 'none','FontSize',20,'FontWeight','normal','FontName','Arial')
     xline(1.5)
-    legend(["N1", "N2"])
+    legend(["With ROI Normalization", "Without ROI Normalization"], "FontSize",14)
     set(gca,'FontSize',20)
 
 end
@@ -171,7 +178,7 @@ clear g metrics
 %% For visualization in BrainNet nodes AAL116 - Groups
 
 % Define metrics and chose normalisation
-norm=2;
+norm=1;
 bc=(1:116); lC=(117:232); ec=(233:348); nodestrength=(349:464);
 m=[bc;lC;ec;nodestrength];
 names=["BC" "Ci" "EC" "D"];
@@ -183,7 +190,7 @@ for metric=1:4
     diff=table2array(ttest_results2(m(metric,:),7));
     nodes_degree_color = nodes_color_size(pvalues,diff,0.05);
     nodefile = table(makenodefile("aal116_MNIcoord.txt",node_labels,nodes_degree_color));
-    writetable(nodefile, 'nodes/ismrm23/'+names(metric)+'_midinter_n'+string(norm)+'.txt','Delimiter',' ','WriteVariableNames', 0);
+    writetable(nodefile, 'nodes/ismrm23_final/'+names(metric)+'_midinter_n'+string(norm)+'.txt','Delimiter',' ','WriteVariableNames', 0);
 end
 
 clear norm bc lC ec nodestrength m names metric pvalues diff nodes_degree_color nodefile
