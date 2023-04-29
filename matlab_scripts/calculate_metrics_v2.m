@@ -45,7 +45,7 @@ else
     strengthrand=strengths_und(randmat);
 
     % insert metrics in matrix
-    metrics=[BC/BCrand Ci/Cirand EC/ECrand strength./strengthrand]';
+    metrics=[BC./BCrand Ci./Cirand EC./ECrand strength./strengthrand]';
 
 end
 
