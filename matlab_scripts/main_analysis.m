@@ -5,7 +5,7 @@ format long
 clc
 
 %% Load data from matrices
-dir=strcat(pwd,'/matrix_data_prob');
+dir=strcat(pwd,'/matrix_data_gooddata');
 dir_roi=strcat(pwd,'/roi_sizes');
 
 atlas="AAL116"; 
@@ -175,7 +175,7 @@ clear i p
 
 version_metrics=2;%  1=rich club coefficient, 2=global metrics, 3=nodal metrics
 metrics_labels=get_label_metrics(version_metrics,node_labels);
-load("allmetrics_2.mat")
+%load("allmetrics_2.mat")
 
 % Calculate metrics
 allmetrics=cell(size(allconnectomes));

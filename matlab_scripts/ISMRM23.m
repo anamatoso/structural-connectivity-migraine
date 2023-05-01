@@ -4,7 +4,7 @@ clear variables
 close all
 format long
 %% Load data from matrices
-dir=strcat(pwd,'/matrix_data_prob');
+dir=strcat(pwd,'/matrix_data_gooddata');
 dir_roi=strcat(pwd,'/roi_sizes');
 atlas="AAL116";
 threshold=0;
@@ -29,7 +29,7 @@ clear allconnectomes g connectomes
 
 %% Calculate metrics
 
-version=3; % Choose type of metrics to calculate
+version=2; % Choose type of metrics to calculate
 
 allmetrics_norms=cell(1,2);
 allmetrics_groups=cell(1,2);
@@ -44,7 +44,7 @@ clear norm version
 
 %% See results comparing both normalizations and plot
 
-show=0; % Plot boxplots
+show=1; % Plot boxplots
 
 %Create array for p values
 table=zeros(length(metrics_labels),2);
