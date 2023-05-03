@@ -33,6 +33,7 @@ if v==2
     
     % insert metrics in matrix
     metrics=[L/Lrand GE/GErand C/Crand Q/Qrand mean_strength/mean_strengthrand T/Trand S]';
+
 else
     % metrics
     BC=betweenness_wei(len_mat)'/((n_nodes-1)*(n_nodes-2));         % betweenness centrality 1-116
@@ -49,7 +50,8 @@ else
 
 end
 
-
+% Deal with NaN data
+metrics(isnan(metrics))=1;
 
 end
 

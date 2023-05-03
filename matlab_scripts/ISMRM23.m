@@ -29,7 +29,7 @@ clear allconnectomes g connectomes
 
 %% Calculate metrics
 
-version=2; % Choose type of metrics to calculate
+version=3; % Choose type of metrics to calculate
 
 allmetrics_norms=cell(1,2);
 allmetrics_groups=cell(1,2);
@@ -48,13 +48,6 @@ show=1; % Plot boxplots
 
 %Create array for p values
 table=zeros(length(metrics_labels),2);
-
-% Deal with weird data
-allmetrics_norms{1}(isnan(allmetrics_norms{1}))=1;
-allmetrics_norms{2}(isnan(allmetrics_norms{2}))=1;
-allmetrics_norms{1}(isinf(allmetrics_norms{1}))=1e15;
-allmetrics_norms{2}(isinf(allmetrics_norms{2}))=1e15;
-
 
 % Iterate through metrics
 for metric=1:length(metrics_labels)
