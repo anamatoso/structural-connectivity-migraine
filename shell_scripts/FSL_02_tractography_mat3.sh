@@ -9,7 +9,7 @@ display_usage() {
 	echo "t requires 1 argument: the subject directory. Example: sub-control019_ses-midcycle"
 	}
 
-	if [ $# -le 0 ] # if there are 1 argument or less
+	if [ $# -le 0 ] # if there are no arguments
 	then
 		display_usage
 		exit 1
@@ -24,17 +24,17 @@ DIR=$1 #example name: sub-control019_ses-midcycle
 #             Prepare for atlas for probtrackx                       #
 ######################################################################
 
-SUBDIR="${MAINDIR}/${DIR}"
+SUBDIR="${MAINDIR}/data/${DIR}"
 cd $SUBDIR
 
 # divide the atlas into several files each one with one ROI -> done in MRtrix pipeline
 # ${MAINDIR}/divide_atlas.sh "${SUBDIR}/mrtrix_outputs_bvals2/atlas.mif" $SUBDIR 
 
-ROIS="${MAINDIR}/${DIR}/list_rois.txt"
+ROIS="${MAINDIR}/data/${DIR}/list_rois.txt"
 
 # Convert GM/WM boundary to nii.gz if it isn't already
-if [ ! -f "${MAINDIR}/${DIR}/mrtrix_outputs_bvals2/gmwmseed_atlas.nii.gz" ]; then
-	mrconvert "${MAINDIR}/${DIR}/mrtrix_outputs_bvals2/gmwmseed_atlas.mif" "${MAINDIR}/${DIR}/mrtrix_outputs_bvals2/gmwmseed_atlas.nii.gz"
+if [ ! -f "${MAINDIR}/data/${DIR}/mrtrix_outputs_bvals2/gmwmseed_atlas.nii.gz" ]; then
+	mrconvert "${MAINDIR}/data/${DIR}/mrtrix_outputs_bvals2/gmwmseed_atlas.mif" "${MAINDIR}/data/${DIR}/mrtrix_outputs_bvals2/gmwmseed_atlas.nii.gz"
 fi
 
 ########################### STEP 2 ###################################

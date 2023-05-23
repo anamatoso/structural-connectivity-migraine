@@ -3,12 +3,22 @@
 set -e # Stop on errors
 
 display_usage() {
+	echo ""
+	tput bold 
+	echo "Description"
+	tput sgr0
+	echo ""
 	echo "This script uses MRTrix to analyze diffusion data and create a connectivity matrix."
-	echo "Usage: $(basename $0) [Directory]"
+	echo ""
+	tput bold 
+	echo "Usage"
+	tput sgr0
+	echo ""
+	echo "./$(basename $0) [Directory]"
 	echo "It requires 1 argument: Subject DWI Directory. Example: sub-control019_ses-midcycle"
 	}
 
-	if [ $# -le 0 ] # if there are 0
+	if [ $# -le 0 ] # if there are no arguments
 	then
 		# can't run function
 		display_usage
@@ -17,16 +27,16 @@ display_usage() {
 
 MAINDIR=$(pwd)
 
-DIR=$1 #example name: sub-control019_ses-midcycle
-SUB=${DIR:0:14} # crop name. result=sub-control019
+DIR=$1 
+SUB=${DIR:0:14} # crop name. ex result=sub-control019
 
 ########################### STEP 1 ###################################
 #             		  Prepare data and directories					 #
 ######################################################################
 
 # Get directories
-SUBDIR="${MAINDIR}/${DIR}" 
-ANATDIR="${MAINDIR}/${SUB}"
+SUBDIR="${MAINDIR}/data/${DIR}" 
+ANATDIR="${MAINDIR}/data/${SUB}"
 ANAT="${ANATDIR}/${SUB}_restored-MPRAGE_brain.nii.gz"
 cd $SUBDIR
 
@@ -37,7 +47,7 @@ DWIMASK="${SUBDIR}/*clean_mask.nii.gz"
 BVEC="${SUBDIR}/*rotated_bvecs.bvec"
 BVAL="bvals_132dir.bval"
 
-# Make output folder and change to that
+# Create output folder and cd to it
 mkdir -p mrtrix_outputs_bvals2
 cd mrtrix_outputs_bvals2
 
@@ -64,7 +74,7 @@ dwi2fod msmt_csd dwi.mif -mask mask.mif wm.txt wmfod.mif gm.txt gmfod.mif csf.tx
 
 # Creates an image of the fiber orientation densities overlaid onto the estimated tissues (Blue=WM; Green=GM; Red=CSF)
 # You should see FOD's mostly within the white matter. These can be viewed later with the command "mrview vf.mif -odf.load_sh wmfod.mif"
-#mrconvert -coord 3 0 wmfod.mif - | mrcat csffod.mif gmfod.mif - vf.mif
+# mrconvert -coord 3 0 wmfod.mif - | mrcat csffod.mif gmfod.mif - vf.mif
 
 # Normalize the FODs to enable comparison between subjects
 mtnormalise wmfod.mif wmfod_norm.mif gmfod.mif gmfod_norm.mif csffod.mif csffod_norm.mif -mask mask.mif -force
@@ -82,24 +92,24 @@ mrconvert mean_b0_processed.mif mean_b0_processed.nii.gz -force
 mrconvert 5tt_nocoreg.mif 5tt_nocoreg.nii.gz -force
 
 # Uses FSL commands fslroi and flirt to create a transformation matrix for regisitration between the tissue map and the b0 images
-fslroi 5tt_nocoreg.nii.gz 5tt_vol0.nii.gz 0 1 #Extract the first volume of the 5tt dataset (since flirt can only use 3D images, not 4D images)
+fslroi 5tt_nocoreg.nii.gz 5tt_vol0.nii.gz 0 1 # Extract the first volume of the 5tt dataset (since flirt can only use 3D images, not 4D images)
 
 flirt -in mean_b0_processed.nii.gz -ref 5tt_vol0.nii.gz -interp nearestneighbour -dof 6 -omat diff2struct_fsl.mat
 transformconvert diff2struct_fsl.mat mean_b0_processed.nii.gz 5tt_nocoreg.nii.gz flirt_import diff2struct_mrtrix.txt -force
 mrtransform 5tt_nocoreg.mif -linear diff2struct_mrtrix.txt -inverse 5tt_coreg.mif -force
 
-#Create a seed region along the GM/WM boundary
+# Create a seed region along the GM/WM boundary
 5tt2gmwmi 5tt_coreg.mif gmwmSeed_coreg.mif -force
 
 ########################### STEP 5 ###################################
 #             		  Coregister atlas to the data                   #
 ######################################################################
 
-#Coregister atlas to struct space and convert to mrtrix format
+# Coregister atlas to struct space and convert to mrtrix format
 applywarp -i $ATLAS -r $ANAT --out=atlas_2struct --warp="${ANATDIR}/reg_nonlinear_invwarp_T1tostandard_2mm.nii.gz"
 mrconvert atlas_2struct.nii.gz atlas_2struct.mif -force
 
-#Coregister atlas to diffusion space
+# Coregister atlas to diffusion space
 mrtransform atlas_2struct.mif -linear diff2struct_mrtrix.txt -inverse atlas_coreg.mif -force
 
 # Make sure the values of the atlas are integer
@@ -108,7 +118,7 @@ mrcalc atlas_coreg.mif -round -datatype uint32 atlas.mif -force
 # Restric the GM/WM boundary to the atlas
 mrcalc atlas.mif gmwmSeed_coreg.mif -mult gmwmseed_atlas.mif -force
 
-# for probtrackx (in FSL pipeline)
+# For probtrackx (in FSL pipeline)
 mrconvert gmwmseed_atlas.mif gmwmseed_atlas.nii.gz
 ${MAINDIR}/divide_atlas.sh "${SUBDIR}/mrtrix_outputs_bvals2/atlas.mif" $SUBDIR
 
@@ -132,7 +142,7 @@ tcksift2 -act 5tt_coreg.mif -out_mu sift_mu.txt -out_coeffs sift_coeffs.txt trac
 #             		  Creating the connectome	                     #
 ######################################################################
 
-#Creating the connectome 
+# Creating the connectome 
 tck2connectome -symmetric -zero_diagonal -scale_invnodevol -tck_weights_in sift.txt tracks.tck atlas.mif "${MAINDIR}/matrix_data/${DIR}_mrtrix_matrix_bval2_intersect.csv" -force
 
 # Remove big files and only keep the ones useful for the critical steps
