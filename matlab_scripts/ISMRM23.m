@@ -29,7 +29,7 @@ clear allconnectomes g connectomes
 
 %% Calculate metrics
 
-version=3; % Choose type of metrics to calculate
+version=2; % Choose type of metrics to calculate
 
 allmetrics_norms=cell(1,2);
 allmetrics_groups=cell(1,2);
@@ -119,7 +119,7 @@ disp(T_groups(T_groups.("P-value")<0.05,:))
 
 clear table metric p_1 p_2 T1 T2 
 
-%% Plot boxchart for each metric
+%% Plot boxchart for each metric (color=norm, pos=group)
 
 [~,n_people]= size(allmetrics_norms{1});
 for metric=1:length(metrics_labels)
@@ -153,6 +153,46 @@ for metric=1:length(metrics_labels)
     xline(1.5)
     legend(["With ROI Normalization", "Without ROI Normalization"], "FontSize",14)
     set(gca,'FontSize',20)
+
+end
+
+clear n_people metric x xgroup colourdata datapoint group norm metric_data i xlabels positionaldata  
+
+%% Plot boxchart for each metric (color=group, pos=norm)
+
+[~,n_people]= size(allmetrics_norms{1});
+for metric=1:length(metrics_labels)
+    
+    % Prepare data
+    x=zeros(1,2*n_people);
+    xgroup=zeros(1,2*n_people);
+    colourdata=zeros(1,2*n_people);
+    datapoint=1;
+    for group=1:2
+        for norm=1:2
+            metric_data=allmetrics_groups{norm}{group}(metric,:);
+            for i=1:length(metric_data)
+                x(datapoint)=metric_data(i);
+                xgroup(datapoint)=norm;
+                colourdata(datapoint)=group;
+                datapoint=datapoint+1;
+            end
+        end
+    end
+
+    % Turn xgroup into labels aka categorical variable
+    xlabels={'With ROI Normalisation' 'Without ROI Normalisation'};
+    positionaldata=discretize(xgroup,1:3,'categorical',xlabels);
+    
+    % Plot figure
+    figure('color','w','Position',[200 100 895 500])
+    boxchart(positionaldata, x,"GroupByColor",colourdata)
+    grid on
+    title(metrics_labels(metric),'interpreter', 'none','FontSize',20,'FontWeight','normal','FontName','Arial')
+    xline(1.5)
+    ylim([0.95*min(x),1.1*max(x)])
+    legend(["Controls", "Migraineurs"], "FontSize",14)
+    set(gca,'FontSize',16)
 
 end
 
