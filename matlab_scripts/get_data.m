@@ -1,5 +1,8 @@
 function [allconnectomes,n_conditions,n_people,node_labels,condition_names] = get_data(dir,dir_roi,atlas,threshold,normalizations)
-% This function gets the data of all connectivity matrices and saves them in allconnectomes variable. It also gets the number of people and the number of groups. Additionally it also creates the node labels and the labels of the groups.
+% This function gets the data of all connectivity matrices and saves them
+% in allconnectomes variable. It also gets the number of people and the
+% number of groups. Additionally it also creates the node labels and the
+% labels of the groups.
 
 % Decide what is the pattern to look for in the files
 if atlas=="AAL116" 
