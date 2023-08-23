@@ -2,7 +2,6 @@
 
 set -e # Stop on errors
 
-
 display_usage() {
 	echo ""
 	tput bold 
